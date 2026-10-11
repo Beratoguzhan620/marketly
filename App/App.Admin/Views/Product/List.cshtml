@@ -1,0 +1,55 @@
+@model List<AdminProductListItemViewModel>
+@{
+    ViewData["Title"] = "Ürünler";
+
+    // data URI base64 ile kodlanır; aksi halde SVG içindeki tek tırnaklar onerror'daki
+    // JS string'in tek tırnağıyla çakışıp handler'ın bozuk şekilde çalışmasına yol açar.
+    const string noImageSvg = "<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60'><rect width='60' height='60' fill='#e9ecef'/></svg>";
+    var noImagePlaceholder = "data:image/svg+xml;base64," + Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(noImageSvg));
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex">
+                <h4 class="card-title mr-auto mb-0">Ürünler</h4>
+            </div>
+            <div class="card-body">
+                <partial name="Partials/_ViewMessages" />
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Görsel</th>
+                                <th>Adı</th>
+                                <th>Satıcı</th>
+                                <th>Fiyat</th>
+                                <th>Durum</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var product in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <img src="@(product.ImageUrl ?? noImagePlaceholder)" alt=""
+                                             style="width:60px;height:60px;object-fit:cover;"
+                                             onerror="this.onerror=null;this.src='@noImagePlaceholder';" />
+                                    </td>
+                                    <td>@product.Name</td>
+                                    <td>@product.SellerName</td>
+                                    <td>@product.Price.ToString("C")</td>
+                                    <td>@(product.Enabled ? "Aktif" : "Pasif")</td>
+                                    <td>
+                                        <a asp-action="Images" asp-route-productId="@product.Id" class="btn btn-primary">Görselleri Yönet</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

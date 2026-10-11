@@ -1,0 +1,141 @@
+﻿using App.Application.Models.Dtos;
+using App.Application.Results;
+using App.Application.Services.Interfaces;
+using App.Eticaret.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace App.Eticaret.Controllers
+{
+    [Authorize(Roles = "buyer, seller")]
+    public class CartController(ICartService cartService) : BaseController
+    {
+        [HttpGet("/add-to-cart/{productId:int}")]
+        public async Task<IActionResult> AddProduct([FromRoute] int productId)
+        {
+            var userId = GetUserId();
+
+            if (userId is null)
+            {
+                return RedirectToAction(nameof(AuthController.Login), "Auth");
+            }
+
+            var result = await cartService.AddProductAsync(userId.Value, productId);
+
+            if (!result.Success)
+            {
+                if (result.Type == ServiceResultType.NotFound)
+                {
+                    return NotFound();
+                }
+
+                TempData["ErrorMessage"] = result.Message;
+            }
+
+            var prevUrl = Request.Headers.Referer.FirstOrDefault();
+
+            if (prevUrl is null)
+            {
+                return RedirectToAction(nameof(Edit));
+            }
+
+            return Redirect(prevUrl);
+        }
+
+        [HttpGet("/cart")]
+        public async Task<IActionResult> Edit()
+        {
+            var userId = GetUserId();
+
+            if (userId is null)
+            {
+                return RedirectToAction(nameof(AuthController.Login), "Auth");
+            }
+
+            ApplyPreviousErrorMessage();
+
+            var cart = await cartService.GetCartAsync(userId.Value);
+
+            return View(MapToViewModels(cart));
+        }
+
+        [HttpGet("/cart/{cartItemId:int}/remove")]
+        public async Task<IActionResult> Remove([FromRoute] int cartItemId)
+        {
+            var userId = GetUserId();
+
+            if (userId is null)
+            {
+                return RedirectToAction(nameof(AuthController.Login), "Auth");
+            }
+
+            var result = await cartService.RemoveItemAsync(userId.Value, cartItemId);
+
+            if (!result.Success)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Edit));
+        }
+
+        [HttpPost("/cart/update")]
+        public async Task<IActionResult> UpdateCart(int cartItemId, byte quantity)
+        {
+            var userId = GetUserId();
+
+            if (userId is null)
+            {
+                return RedirectToAction(nameof(AuthController.Login), "Auth");
+            }
+
+            var result = await cartService.UpdateItemQuantityAsync(userId.Value, cartItemId, quantity);
+
+            if (!result.Success || result.Data is null)
+            {
+                return result.Type == ServiceResultType.NotFound
+                    ? NotFound()
+                    : BadRequest(result.Message);
+            }
+
+            return View(MapToViewModel(result.Data));
+        }
+
+        [HttpGet("/checkout")]
+        public async Task<IActionResult> Checkout()
+        {
+            var userId = GetUserId();
+
+            if (userId is null)
+            {
+                return RedirectToAction(nameof(AuthController.Login), "Auth");
+            }
+
+            var cart = await cartService.GetCartAsync(userId.Value);
+
+            return View(MapToViewModels(cart));
+        }
+
+        private void ApplyPreviousErrorMessage()
+        {
+            var previousErrorMessage = TempData["ErrorMessage"]?.ToString();
+
+            if (!string.IsNullOrEmpty(previousErrorMessage))
+            {
+                SetErrorMessage(previousErrorMessage);
+            }
+        }
+
+        private static CartItemViewModel MapToViewModel(CartItemDto item) => new()
+        {
+            Id = item.Id,
+            ProductName = item.ProductName,
+            ProductImage = item.ProductImage,
+            Quantity = item.Quantity,
+            Price = item.Price,
+        };
+
+        private static List<CartItemViewModel> MapToViewModels(CartDto cart) =>
+            cart.Items.Select(MapToViewModel).ToList();
+    }
+}

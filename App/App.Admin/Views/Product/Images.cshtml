@@ -1,0 +1,59 @@
+@model AdminProductImagesViewModel
+@{
+    ViewData["Title"] = "Ürün Görselleri";
+
+    // data URI base64 ile kodlanır; aksi halde SVG içindeki tek tırnaklar onerror'daki
+    // JS string'in tek tırnağıyla çakışıp handler'ın bozuk şekilde çalışmasına yol açar.
+    const string noImageSvg = "<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><rect width='120' height='120' fill='#e9ecef'/></svg>";
+    var noImagePlaceholder = "data:image/svg+xml;base64," + Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(noImageSvg));
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex">
+                <h4 class="card-title mr-auto mb-0">@Model.ProductName &mdash; Görseller</h4>
+                <a asp-action="List" class="btn btn-primary">Listeye Dön</a>
+            </div>
+            <div class="card-body">
+                <partial name="Partials/_ViewMessages" />
+
+                <h6>Mevcut Görseller</h6>
+                @if (Model.CurrentImages.Count == 0)
+                {
+                    <p class="text-muted">Bu ürüne ait görsel bulunmuyor.</p>
+                }
+                else
+                {
+                    <div class="d-flex flex-wrap mb-4">
+                        @foreach (var image in Model.CurrentImages)
+                        {
+                            <div class="mr-3 mb-3" style="width:120px;">
+                                <img src="@image.Url" alt="" style="width:120px;height:120px;object-fit:cover;"
+                                     onerror="this.onerror=null;this.src='@noImagePlaceholder';" />
+                                <form asp-action="DeleteImage" asp-route-productId="@Model.ProductId" asp-route-imageId="@image.Id"
+                                      method="post" onsubmit="return confirm('Bu görseli silmek istediğinize emin misiniz?');">
+                                    <button type="submit" class="btn btn-sm btn-danger btn-block mt-1">Sil</button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                }
+
+                <h6>Yeni Görsel Ekle</h6>
+                <form asp-action="Images" asp-route-productId="@Model.ProductId" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <input type="file" name="@nameof(Model.NewImages)" id="@nameof(Model.NewImages)"
+                               class="form-control" multiple accept="image/png, image/jpeg, image/webp" />
+                        <span asp-validation-for="NewImages" class="text-danger"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Yükle</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
