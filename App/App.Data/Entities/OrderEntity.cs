@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using App.Data.Seeding;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace App.Data.Entities;
@@ -31,5 +32,7 @@ internal class OrderEntityConfiguration : IEntityTypeConfiguration<OrderEntity>
             .WithMany()
             .HasForeignKey(d => d.UserId)
             .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasData(DemoData.Orders);
     }
 }

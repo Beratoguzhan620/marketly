@@ -1,4 +1,5 @@
-﻿using App.Data.Infrastructure;
+using App.Data.Infrastructure;
+using App.Data.Seeding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -27,10 +28,6 @@ internal class RoleEntitySeed : IEntityTypeSeed<RoleEntity>
 {
     public void SeedData(EntityTypeBuilder<RoleEntity> builder)
     {
-        builder.HasData(
-            new RoleEntity() { Id = 1, Name = "admin", CreatedAt = DateTime.UtcNow },
-            new RoleEntity() { Id = 2, Name = "seller", CreatedAt = DateTime.UtcNow },
-            new RoleEntity() { Id = 3, Name = "buyer", CreatedAt = DateTime.UtcNow }
-        );
+        builder.HasData(DemoData.Roles);
     }
 }

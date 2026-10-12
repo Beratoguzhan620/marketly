@@ -1,4 +1,5 @@
-﻿using App.Data.Infrastructure;
+using App.Data.Infrastructure;
+using App.Data.Seeding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -28,14 +29,7 @@ namespace App.Data.Entities
     {
         public void SeedData(EntityTypeBuilder<DiscountEntity> builder)
         {
-            builder.HasData(
-                new List<DiscountEntity>
-                {
-                    new() { Id = 1, DiscountRate = 10, StartDate = DateTime.UtcNow, EndDate = DateTime.UtcNow.AddMonths(6), Enabled = true, CreatedAt = DateTime.UtcNow },
-                    new() { Id = 2, DiscountRate = 20, StartDate = DateTime.UtcNow, EndDate = DateTime.UtcNow.AddMonths(6), Enabled = true, CreatedAt = DateTime.UtcNow },
-                    new() { Id = 3, DiscountRate = 30, StartDate = DateTime.UtcNow, EndDate = DateTime.UtcNow.AddMonths(6), Enabled = true, CreatedAt = DateTime.UtcNow }
-                }
-            );
+            builder.HasData(DemoData.Discounts);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using App.Data.Infrastructure;
+using App.Data.Infrastructure;
+using App.Data.Seeding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -46,10 +47,6 @@ internal class UserEntitySeed : IEntityTypeSeed<UserEntity>
 {
     public void SeedData(EntityTypeBuilder<UserEntity> builder)
     {
-        builder.HasData(
-            new UserEntity() { Id = 1, FirstName = "admin", LastName = "admin", Email = "admin@example.com", Enabled = true, RoleId = 1, Password = "1234", CreatedAt = DateTime.UtcNow },
-            new UserEntity() { Id = 2, FirstName = "seller", LastName = "seller", Email = "seller@example.com", Enabled = true, RoleId = 2, Password = "1234", CreatedAt = DateTime.UtcNow },
-            new UserEntity() { Id = 3, FirstName = "buyer", LastName = "buyer", Email = "buyer@example.com", Enabled = true, RoleId = 3, Password = "1234", CreatedAt = DateTime.UtcNow }
-        );
+        builder.HasData(DemoData.Users);
     }
 }
