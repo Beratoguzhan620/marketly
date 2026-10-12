@@ -1,3 +1,4 @@
+using App.Application.Security;
 using App.Application.Models.Dtos;
 using App.Application.Models.Requests;
 using App.Application.Results;
@@ -43,7 +44,7 @@ namespace App.Application.Services
 
             if (!string.IsNullOrWhiteSpace(request.Password) && request.Password != "******")
             {
-                user.Password = request.Password;
+                user.Password = PasswordHasher.Hash(request.Password);
             }
 
             await userRepo.UpdateAsync(user);

@@ -1,16 +1,24 @@
 using App.Application.Models.Dtos;
+using App.Application.Options;
 using App.Application.Models.Requests;
 using App.Application.Results;
+using App.Application.Security;
 using App.Application.Services.Interfaces;
 using App.Data.Entities;
 using App.Data.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Mail;
 
 namespace App.Application.Services
 {
-    public class AuthService(DataRepository<UserEntity> userRepo, DataRepository<RoleEntity> roleRepo) : IAuthService
+    public class AuthService(
+        DataRepository<UserEntity> userRepo,
+        DataRepository<RoleEntity> roleRepo,
+        IOptions<EmailOptions> emailOptions,
+        ILogger<AuthService> logger) : IAuthService
     {
         private const string BuyerRoleName = "buyer";
 
@@ -36,7 +44,7 @@ namespace App.Application.Services
                 FirstName = request.FirstName,
                 LastName = request.LastName,
                 Email = request.Email,
-                Password = request.Password,
+                Password = PasswordHasher.Hash(request.Password),
                 RoleId = buyerRole.Id,
             };
 
@@ -49,9 +57,9 @@ namespace App.Application.Services
         {
             var user = await userRepo.GetAll()
                 .Include(u => u.Role)
-                .SingleOrDefaultAsync(u => u.Email == request.Email && u.Password == request.Password);
+                .SingleOrDefaultAsync(u => u.Email == request.Email);
 
-            if (user is null)
+            if (user is null || !PasswordHasher.Verify(request.Password, user.Password))
             {
                 return ServiceResult<AuthUserDto>.ValidationError("Kullanıcı adı veya şifre hatalı.");
             }
@@ -114,7 +122,7 @@ namespace App.Application.Services
                 return ServiceResult.NotFound("Geçersiz veya süresi dolmuş doğrulama kodu.");
             }
 
-            user.Password = request.Password;
+            user.Password = PasswordHasher.Hash(request.Password);
             user.ResetPasswordToken = null;
 
             await userRepo.UpdateAsync(user);
@@ -122,24 +130,28 @@ namespace App.Application.Services
             return ServiceResult.Ok("Şifreniz başarıyla güncellendi. Giriş yapabilirsiniz.");
         }
 
-        private static async Task SendResetPasswordEmailAsync(UserEntity user)
+        private async Task SendResetPasswordEmailAsync(UserEntity user)
         {
-            // Gönderici mail bilgileri güncellenmeli
-            const string host = "smtp.gmail.com";
-            const int port = 587;
-            const string from = "mail";
-            const string password = "şifre";
+            var options = emailOptions.Value;
+            var resetLink = $"{options.StorefrontUrl.TrimEnd('/')}/renew-password/{user.ResetPasswordToken}";
 
-            using SmtpClient client = new(host, port)
+            if (!options.IsConfigured)
             {
-                Credentials = new NetworkCredential(from, password)
+                logger.LogWarning("SMTP is not configured; password reset link for {Email}: {ResetLink}", user.Email, resetLink);
+                return;
+            }
+
+            using SmtpClient client = new(options.Host, options.Port)
+            {
+                EnableSsl = options.EnableSsl,
+                Credentials = new NetworkCredential(options.Username, options.Password),
             };
 
-            MailMessage mail = new()
+            using MailMessage mail = new()
             {
-                From = new MailAddress(from),
-                Subject = "Şifre Sıfırlama",
-                Body = $"Merhaba {user.FirstName}, <br> Şifrenizi sıfırlamak için <a href='https://localhost:5001/renew-password/{user.ResetPasswordToken}'>tıklayınız</a>.",
+                From = new MailAddress(options.FromAddress, options.FromName),
+                Subject = "Şifre sıfırlama",
+                Body = $"Merhaba {WebUtility.HtmlEncode(user.FirstName)},<br>Şifrenizi sıfırlamak için <a href='{resetLink}'>bu bağlantıya</a> tıklayın.",
                 IsBodyHtml = true,
             };
 

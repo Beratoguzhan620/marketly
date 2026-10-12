@@ -33,3 +33,4 @@ docs/brief/
 .DS_Store
 Thumbs.db
 desktop.ini
+**/App_Data/

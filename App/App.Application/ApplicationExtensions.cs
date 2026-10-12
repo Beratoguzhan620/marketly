@@ -24,6 +24,8 @@ namespace App.Application
             services.AddScoped<IProductCommentService, ProductCommentService>();
             services.AddScoped<IContactService, ContactService>();
 
+            services.Configure<EmailOptions>(configuration.GetSection(EmailOptions.SectionName));
+
             services.AddFileApiClient(configuration);
         }
 

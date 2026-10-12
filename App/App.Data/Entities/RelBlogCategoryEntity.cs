@@ -1,4 +1,5 @@
-﻿using App.Data.Infrastructure;
+using App.Data.Infrastructure;
+using App.Data.Seeding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -44,15 +45,15 @@ internal class RelBlogCategoryEntitySeed : IEntityTypeSeed<RelBlogCategoryEntity
     public void SeedData(EntityTypeBuilder<RelBlogCategoryEntity> builder)
     {
         builder.HasData(new List<RelBlogCategoryEntity>() {
-            new () { Id = 1, BlogId = 1, CategoryId = 2, CreatedAt = DateTime.UtcNow },
-            new () { Id = 2, BlogId = 1, CategoryId = 4, CreatedAt = DateTime.UtcNow },
-            new () { Id = 3, BlogId = 2, CategoryId = 2, CreatedAt = DateTime.UtcNow },
-            new () { Id = 4, BlogId = 2, CategoryId = 3, CreatedAt = DateTime.UtcNow },
-            new () { Id = 5, BlogId = 3, CategoryId = 2, CreatedAt = DateTime.UtcNow },
-            new () { Id = 6, BlogId = 4, CategoryId = 2, CreatedAt = DateTime.UtcNow },
-            new () { Id = 7, BlogId = 5, CategoryId = 2, CreatedAt = DateTime.UtcNow },
-            new () { Id = 8, BlogId = 6, CategoryId = 2, CreatedAt = DateTime.UtcNow },
-            new () { Id = 9, BlogId = 7, CategoryId = 2, CreatedAt = DateTime.UtcNow },
+            new () { Id = 1, BlogId = 1, CategoryId = 2, CreatedAt = DemoData.BaseDate },
+            new () { Id = 2, BlogId = 1, CategoryId = 4, CreatedAt = DemoData.BaseDate },
+            new () { Id = 3, BlogId = 2, CategoryId = 2, CreatedAt = DemoData.BaseDate },
+            new () { Id = 4, BlogId = 2, CategoryId = 3, CreatedAt = DemoData.BaseDate },
+            new () { Id = 5, BlogId = 3, CategoryId = 2, CreatedAt = DemoData.BaseDate },
+            new () { Id = 6, BlogId = 4, CategoryId = 2, CreatedAt = DemoData.BaseDate },
+            new () { Id = 7, BlogId = 5, CategoryId = 2, CreatedAt = DemoData.BaseDate },
+            new () { Id = 8, BlogId = 6, CategoryId = 2, CreatedAt = DemoData.BaseDate },
+            new () { Id = 9, BlogId = 7, CategoryId = 2, CreatedAt = DemoData.BaseDate },
         });
     }
 }

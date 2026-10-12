@@ -1,7 +1,6 @@
 using App.Application;
 using App.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,10 +35,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<DbContext>();
-    await context.Database.EnsureCreatedAsync();
-}
+await app.Services.MigrateDatabaseAsync();
 
-app.Run();
+await app.RunAsync();
