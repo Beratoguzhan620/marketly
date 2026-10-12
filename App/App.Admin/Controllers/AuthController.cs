@@ -1,4 +1,4 @@
-﻿using App.Admin.Models.ViewModels;
+using App.Admin.Models.ViewModels;
 using App.Application.Models.Dtos;
 using App.Application.Models.Requests;
 using App.Application.Services.Interfaces;
@@ -55,7 +55,6 @@ namespace App.Admin.Controllers
 
         [Route("/logout")]
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await DoLogoutAsync();

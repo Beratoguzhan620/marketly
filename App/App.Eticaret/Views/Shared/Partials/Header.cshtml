@@ -1,9 +1,9 @@
-﻿@using App.Data.Entities
+@using App.Data.Entities
 @using App.Data.Infrastructure
 @using Microsoft.EntityFrameworkCore
 @inject DataRepository<CartItemEntity> cartItemRepository
 @{
-    var IsCurrentPage = (string action, string controller) =>
+    var IsCurrentPage = (string? action, string? controller) =>
     {
         var routeData = ViewContext.RouteData.Values;
         var routeAction = routeData["action"] as string;
