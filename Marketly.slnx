@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="App/App.Data/App.Data.csproj" />
+    <Project Path="App/App.Application/App.Application.csproj" />
+    <Project Path="App/App.FileService/App.FileService.csproj" />
+    <Project Path="App/App.Eticaret/App.Eticaret.csproj" />
+    <Project Path="App/App.Admin/App.Admin.csproj" />
+    <Project Path="App/App.FileApi/App.FileApi.csproj" />
+  </Folder>
+</Solution>
