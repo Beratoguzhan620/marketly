@@ -9,12 +9,13 @@ Satıcı başvurusu, sepet, sipariş ve yorum onayı olan çok satıcılı e-tic
 Her aşama ayrı bir branch ve PR olarak yapılır (`stage/<no>-<kisa-ad>`). Bir aşama ancak tüm maddeleri bitince, build/testler geçince ve ekran görüntüleri eklenince tamamlanmış sayılır. Biten maddeler `[x]` yapılır.
 
 ## Aşama 1 — Altyapı ve temizlik
-- [ ] Proje adını "Marketly" yap (solution, namespace'ler `App.*` kalabilir ama başlıklar/marka Marketly)
-- [ ] .NET 8 → .NET 10'a yükselt; paketleri güncelle; build uyarılarını temizle
-- [ ] `EnsureCreated` yerine EF Core migrations; ilk migration + seed (kategoriler, 40+ ürün, görseller, kullanıcılar, siparişler, blog yazıları)
-- [ ] Kullanıcı şifreleri düz metin yerine hash'lenerek saklanır (seed'deki "1234" şifreleri dahil); giriş akışı buna göre güncellenir
-- [ ] API key / connection string'ler user-secrets / env; `appsettings.json` içinde gerçek değer yok
-- [ ] Hazır temaların (SB Admin 2, Ogani) lisans/kredi durumu kontrolü — kullanılmayan vendor dosyalarını sil
+- [x] Proje adını "Marketly" yap (solution, namespace'ler `App.*` kalabilir ama başlıklar/marka Marketly)
+- [x] .NET 8 → .NET 10'a yükselt; paketleri güncelle; build uyarılarını temizle
+- [x] `EnsureCreated` yerine EF Core migrations; ilk migration + seed (kategoriler, 40+ ürün, görseller, kullanıcılar, siparişler, blog yazıları)
+- [x] Kullanıcı şifreleri düz metin yerine hash'lenerek saklanır (seed'deki "1234" şifreleri dahil); giriş akışı buna göre güncellenir
+- [x] API key / connection string'ler user-secrets / env; `appsettings.json` içinde gerçek değer yok
+- [x] Hazır temaların (SB Admin 2, Ogani) lisans/kredi durumu kontrolü — kullanılmayan vendor dosyalarını sil (`docs/THIRD_PARTY.md`)
+- [x] CI: build (uyarılar hata sayılır) + bekleyen model değişikliği kontrolü
 
 ## Aşama 2 — Mağaza arayüzü (Eticaret) yeniden tasarım
 - [ ] `docs/DESIGN.md` token'larıyla yeni layout: header (arama, sepet sayacı, kullanıcı menüsü), footer
