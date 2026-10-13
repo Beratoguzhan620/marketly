@@ -22,6 +22,8 @@ namespace App.Application.Services
                     FirstName = u.FirstName,
                     LastName = u.LastName,
                     Email = u.Email,
+                    RoleName = u.Role.Name,
+                    HasSellerRequest = u.HasSellerRequest,
                 })
                 .FirstOrDefaultAsync();
 

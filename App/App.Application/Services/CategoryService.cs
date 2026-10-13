@@ -18,8 +18,10 @@ namespace App.Application.Services
                     Id = c.Id,
                     Name = c.Name,
                     Color = c.Color,
-                    IconCssClass = c.IconCssClass
+                    IconCssClass = c.IconCssClass,
+                    ProductCount = productRepo.GetAll().Count(p => p.Enabled && p.CategoryId == c.Id),
                 })
+                .OrderBy(c => c.Name)
                 .ToListAsync();
         }
 

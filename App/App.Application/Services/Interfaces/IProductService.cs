@@ -6,7 +6,7 @@ namespace App.Application.Services.Interfaces
 {
     public interface IProductService
     {
-        Task<List<ProductListDto>> GetListingAsync(string? searchTerm = null);
+        Task<PagedResult<ProductListDto>> GetListingAsync(ProductListingQuery query);
 
         Task<ServiceResult<ProductDetailDto>> GetDetailAsync(int productId);
 
