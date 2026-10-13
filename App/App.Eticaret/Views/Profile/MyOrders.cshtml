@@ -1,33 +1,54 @@
-﻿@model List<OrderViewModel>
+@model List<OrderViewModel>
 @{
-    ViewData["Title"] = "My Orders";
+    ViewData["Title"] = "Siparişlerim";
 }
 
-<div class="container">
-    <h2>@ViewData["Title"]</h2>
-    <partial name="Partials/ViewMessages" />
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Order Code</th>
-                <th>Order Date</th>
-                <th>Products</th>
-                <th>Total Price</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var order in Model)
-            {
-                <tr>
-                    <td>@order.OrderCode</td>
-                    <td>@order.CreatedAt</td>
-                    <td>@order.TotalQuantity</td>
-                    <td>@order.TotalPrice</td>
-                    <td>
-                        <a asp-action="Details" asp-controller="Order" asp-route-orderCode="@order.OrderCode" class="btn btn-primary">Details</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+<div class="page-header">
+    <div>
+        <h1>Siparişlerim</h1>
+        <p>Verdiğiniz siparişler, en yenisi en üstte.</p>
+    </div>
+</div>
+
+<div class="account-layout">
+    <partial name="Partials/AccountNav" />
+
+    <div>
+        @if (Model.Count == 0)
+        {
+            <partial name="Partials/EmptyState" model="@(new EmptyStateViewModel("Henüz siparişiniz yok", "İlk siparişinizi verdiğinizde burada görünecek.", "bi-receipt", "Ürünlere göz at", Url.Action("Listing", "Home")))" />
+        }
+        else
+        {
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Sipariş no</th>
+                                <th>Tarih</th>
+                                <th class="num">Ürün</th>
+                                <th class="num">Tutar</th>
+                                <th><span class="visually-hidden">İşlem</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in Model.OrderByDescending(o => o.CreatedAt))
+                            {
+                                <tr>
+                                    <td class="font-mono">@order.OrderCode</td>
+                                    <td class="text-muted">@Display.Date(order.CreatedAt)</td>
+                                    <td class="num">@order.TotalQuantity</td>
+                                    <td class="num">@Display.Money(order.TotalPrice)</td>
+                                    <td class="text-end">
+                                        <a class="btn btn-outline-secondary btn-sm" asp-action="Details" asp-controller="Order" asp-route-orderCode="@order.OrderCode">Detay</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+</div>

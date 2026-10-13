@@ -1,0 +1,68 @@
+@using App.Data.Entities
+@using Microsoft.EntityFrameworkCore
+@model SaveProductViewModel
+@inject App.Data.Infrastructure.DataRepository<DiscountEntity> discountRepository
+@inject App.Data.Infrastructure.DataRepository<CategoryEntity> categoryRepository
+@{
+    var discounts = await discountRepository.GetAll()
+        .Where(d => d.Enabled)
+        .OrderBy(d => d.DiscountRate)
+        .Select(d => new SelectListItem($"%{d.DiscountRate} indirim", d.Id.ToString()))
+        .ToListAsync();
+    var categories = await categoryRepository.GetAll()
+        .OrderBy(c => c.Name)
+        .Select(c => new SelectListItem(c.Name, c.Id.ToString()))
+        .ToListAsync();
+    var isEdit = ViewData["IsEdit"] is true;
+}
+
+<div class="mb-3">
+    <label class="form-label" asp-for="Name"></label>
+    <input class="form-control" asp-for="Name" placeholder="Ör. Amasya elması, 2 kg" />
+    <span asp-validation-for="Name"></span>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-sm-6">
+        <label class="form-label" asp-for="CategoryId"></label>
+        <select class="form-select" asp-for="CategoryId" asp-items="categories">
+            <option value="">Kategori seçin</option>
+        </select>
+        <span asp-validation-for="CategoryId"></span>
+    </div>
+    <div class="col-sm-6">
+        <label class="form-label" asp-for="DiscountId"></label>
+        <select class="form-select" asp-for="DiscountId" asp-items="discounts">
+            <option value="">İndirim yok</option>
+        </select>
+        <span asp-validation-for="DiscountId"></span>
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-sm-6">
+        <label class="form-label" asp-for="Price">Fiyat (₺)</label>
+        <input class="form-control font-mono" asp-for="Price" type="number" step="0.01" min="0.01" inputmode="decimal"
+               value="@(Model?.Price > 0 ? Model.Price.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) : null)" />
+        <span asp-validation-for="Price"></span>
+    </div>
+    <div class="col-sm-6">
+        <label class="form-label" asp-for="StockAmount"></label>
+        <input class="form-control font-mono" asp-for="StockAmount" type="number" min="1" max="255" />
+        <div class="form-text">En fazla 255 adet.</div>
+        <span asp-validation-for="StockAmount"></span>
+    </div>
+</div>
+
+<div class="mb-3">
+    <label class="form-label" asp-for="Description"></label>
+    <textarea class="form-control" asp-for="Description" rows="5" placeholder="Menşei, gramaj, saklama koşulları…"></textarea>
+    <span asp-validation-for="Description"></span>
+</div>
+
+<div class="mb-4">
+    <label class="form-label" for="Images">@(isEdit ? "Yeni görsel ekle" : "Görseller")</label>
+    <input class="form-control" type="file" id="Images" name="Images" multiple accept="image/png, image/jpeg, image/webp" @(isEdit ? null : "required") />
+    <div class="form-text">JPG, PNG veya WEBP. @(isEdit ? "Seçtikleriniz mevcut görsellere eklenir." : "En az bir görsel gerekli.")</div>
+    <span asp-validation-for="Images"></span>
+</div>

@@ -1,0 +1,14 @@
+@model ProductMediaViewModel
+<div class="product-media @Model.CssClass">
+    @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+    {
+        <img src="@Model.ImageUrl" alt="@Model.ProductName" loading="lazy" />
+    }
+    else
+    {
+        <div class="product-placeholder @Display.CategoryTint(Model.CategoryId)" role="img" aria-label="@Model.ProductName">
+            <i class="bi @Display.CategoryIcon(Model.CategoryName)" aria-hidden="true"></i>
+            <span>@Model.CategoryName</span>
+        </div>
+    }
+</div>

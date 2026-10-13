@@ -1,0 +1,39 @@
+@model ProductListDto
+@{
+    var canShop = User.IsInRole("buyer") || User.IsInRole("seller");
+    var isAnonymous = !(User.Identity?.IsAuthenticated ?? false);
+}
+<article class="product-card">
+    @if (Model.DiscountPercentage is > 0)
+    {
+        <span class="discount-tag">-%@Model.DiscountPercentage</span>
+    }
+    <partial name="Partials/ProductMedia" model="@(new ProductMediaViewModel(Model.ImageUrl, Model.Name, Model.CategoryId, Model.CategoryName))" />
+    <div class="product-card-body">
+        <span class="product-category">@Model.CategoryName</span>
+        <h3><a asp-controller="Home" asp-action="ProductDetail" asp-route-productId="@Model.Id">@Model.Name</a></h3>
+        @if (Model.ReviewCount > 0)
+        {
+            <span class="rating"><partial name="Partials/ReviewStars" model="Model.AverageRating" /><span class="count">(@Model.ReviewCount)</span></span>
+        }
+        <div class="product-card-footer">
+            <div class="price">
+                <span class="current">@Display.Money(Model.FinalPrice)</span>
+                @if (Model.DiscountPercentage is > 0)
+                {
+                    <span class="old">@Display.Money(Model.Price)</span>
+                }
+            </div>
+            @if (Model.StockAmount == 0)
+            {
+                <span class="badge badge-neutral">Tükendi</span>
+            }
+            else if (canShop || isAnonymous)
+            {
+                <a class="btn btn-outline-secondary btn-cart" asp-controller="Cart" asp-action="AddProduct" asp-route-productId="@Model.Id" aria-label="@Model.Name ürününü sepete ekle" title="Sepete ekle">
+                    <i class="bi bi-bag-plus"></i>
+                </a>
+            }
+        </div>
+    </div>
+</article>

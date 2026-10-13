@@ -31,14 +31,9 @@ namespace App.Eticaret.Controllers
                 FirstName = result.Data.FirstName,
                 LastName = result.Data.LastName,
                 Email = result.Data.Email,
+                RoleName = result.Data.RoleName,
+                HasSellerRequest = result.Data.HasSellerRequest,
             };
-
-            string? previousSuccessMessage = TempData["SuccessMessage"]?.ToString();
-
-            if (previousSuccessMessage is not null)
-            {
-                SetSuccessMessage(previousSuccessMessage);
-            }
 
             return View(userViewModel);
         }
@@ -55,6 +50,7 @@ namespace App.Eticaret.Controllers
 
             if (!ModelState.IsValid)
             {
+                await FillAccountStateAsync(editMyProfileModel, userId.Value);
                 return View(nameof(Details), editMyProfileModel);
             }
 
@@ -68,6 +64,7 @@ namespace App.Eticaret.Controllers
             if (!result.Success)
             {
                 ModelState.AddModelError(string.Empty, result.Message ?? "Profil güncellenemedi.");
+                await FillAccountStateAsync(editMyProfileModel, userId.Value);
                 return View(nameof(Details), editMyProfileModel);
             }
 
@@ -76,7 +73,7 @@ namespace App.Eticaret.Controllers
             return RedirectToAction(nameof(Details));
         }
 
-        [HttpGet("/become-seller")]
+        [HttpPost("/become-seller")]
         public async Task<IActionResult> RequestSellerRole()
         {
             var userId = GetUserId();
@@ -88,7 +85,7 @@ namespace App.Eticaret.Controllers
 
             var result = await userService.RequestSellerRoleAsync(userId.Value);
 
-            TempData["SuccessMessage"] = result.Message;
+            TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
 
             return RedirectToAction(nameof(Details));
         }
@@ -143,6 +140,13 @@ namespace App.Eticaret.Controllers
             }).ToList();
 
             return View(viewModel);
+        }
+
+        private async Task FillAccountStateAsync(ProfileDetailsViewModel model, int userId)
+        {
+            var profile = await userService.GetProfileAsync(userId);
+            model.RoleName = profile.Data?.RoleName ?? string.Empty;
+            model.HasSellerRequest = profile.Data?.HasSellerRequest ?? false;
         }
     }
 }

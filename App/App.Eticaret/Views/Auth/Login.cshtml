@@ -1,30 +1,39 @@
-﻿@model LoginViewModel
-<div class="container-fluid">
-    <div class="row">
-        <h2 class="col-12 text-center">Login</h2>
-        <div class="col-12 col-md-6 offset-md-3">
-            <partial name="Partials/ViewMessages" />
-            <form asp-controller="Auth" asp-action="Login" method="post">
-                <div class="form-group">
-                    <label asp-for="Email">Email</label>
-                    <input asp-for="Email" class="form-control" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
-                </div>
+@model LoginViewModel
+@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Giriş yap";
+    var returnUrl = ViewBag.ReturnUrl as string;
+}
 
-                <div class="form-group">
-                    <label asp-for="Password">Password</label>
-                    <input asp-for="Password" class="form-control" />
-                    <span asp-validation-for="Password" class="text-danger"></span>
-                </div>
-                <div class="d-flex justify-content-between">
-                    <button type="submit" class="site-btn mr-auto">Login</button>
-                    <a asp-controller="Auth" asp-action="Register" class="site-btn mr-2">Register</a>
-                    <a asp-controller="Auth" asp-action="ForgotPassword" class="site-btn">Forgot Password</a>
-                </div>
-            </form>
-        </div>
+<h1>Tekrar hoş geldiniz</h1>
+<p class="lead-text">Siparişlerinizi ve sepetinizi görmek için giriş yapın.</p>
+
+<partial name="Partials/ViewMessages" />
+
+<form method="post" asp-controller="Auth" asp-action="Login" asp-route-returnUrl="@returnUrl" novalidate>
+    <div class="mb-3">
+        <label class="form-label" asp-for="Email"></label>
+        <input class="form-control" asp-for="Email" type="email" autocomplete="email" autofocus />
+        <span asp-validation-for="Email"></span>
     </div>
+    <div class="mb-2">
+        <label class="form-label" asp-for="Password"></label>
+        <input class="form-control" asp-for="Password" autocomplete="current-password" />
+        <span asp-validation-for="Password"></span>
+    </div>
+    <div class="text-end mb-4">
+        <a class="small" asp-controller="Auth" asp-action="ForgotPassword">Şifremi unuttum</a>
+    </div>
+    <button type="submit" class="btn btn-primary w-100">Giriş yap</button>
+</form>
+
+<p class="auth-switch">Hesabınız yok mu? <a asp-controller="Auth" asp-action="Register">Kayıt olun</a></p>
+
+<div class="alert alert-info-soft mt-4 small" role="note">
+    <i class="bi bi-info-circle"></i>
+    <span>Demo hesapları: <span class="font-mono">buyer@example.com</span> (alıcı), <span class="font-mono">seller@example.com</span> (satıcı). Şifre: <span class="font-mono">Demo123!</span></span>
 </div>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

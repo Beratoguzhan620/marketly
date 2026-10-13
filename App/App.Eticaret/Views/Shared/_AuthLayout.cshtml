@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <partial name="Partials/PageHead" />
+</head>
+<body>
+    <div class="auth-shell">
+        <aside class="auth-aside">
+            <a class="brand" asp-controller="Home" asp-action="Index"><span class="brand-mark">M</span>Marketly</a>
+            <div>
+                <h2>Yerel üreticilerden, kapınıza kadar.</h2>
+                <p>Marketly; çiftçileri, küçük üreticileri ve onların ürünlerini arayanları aynı pazarda buluşturur.</p>
+                <ul class="auth-points">
+                    <li><i class="bi bi-shop"></i><span>Onaylı satıcılardan taze ve mevsimlik ürünler</span></li>
+                    <li><i class="bi bi-chat-square-text"></i><span>Gerçek alıcıların yorumları ve puanları</span></li>
+                    <li><i class="bi bi-truck"></i><span>Siparişinizi tek sayfadan takip edin</span></li>
+                </ul>
+            </div>
+            <p class="small mb-0">© @DateTime.UtcNow.Year Marketly</p>
+        </aside>
+        <main class="auth-main" id="main">
+            <div class="auth-card">
+                <a class="brand auth-mobile-brand" asp-controller="Home" asp-action="Index"><span class="brand-mark">M</span>Marketly</a>
+                @RenderBody()
+            </div>
+        </main>
+    </div>
+
+    <partial name="Partials/PageScripts" />
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

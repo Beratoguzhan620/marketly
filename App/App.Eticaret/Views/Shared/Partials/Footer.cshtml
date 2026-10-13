@@ -1,51 +1,44 @@
-﻿<!-- Footer Section Begin -->
-<footer class="footer spad">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-3 col-md-6 col-sm-6">
-                <div class="footer__about">
-                    <div class="footer__about__logo">
-                        <a asp-controller="Home" asp-action="Index"><img src="~/theme/img/logo.png" alt=""></a>
-                    </div>
-                    <ul>
-                        <li>Address: 60-49 Road 11378 New York</li>
-                        <li>Phone: +65 11.188.888</li>
-                        <li>Email: destek@marketly.example</li>
-                    </ul>
-                </div>
+<footer class="shop-footer">
+    <div class="container-shop">
+        <div class="row g-4">
+            <div class="col-12 col-lg-4">
+                <a class="brand mb-3" asp-controller="Home" asp-action="Index"><span class="brand-mark">M</span>Marketly</a>
+                <p class="text-muted mb-0" style="max-width: 320px">Yerel üreticileri ve onların ürünlerini arayanları buluşturan çok satıcılı pazar yeri.</p>
             </div>
-            <div class="col-lg-4 col-md-6 col-sm-6 offset-lg-1">
-                <div class="footer__widget">
-                    <h6>Useful Links</h6>
-                    <ul>
-                        <li><a asp-controller="Home" asp-action="AboutUs">About Us</a></li>
-                    </ul>
-                </div>
+            <div class="col-6 col-lg-2">
+                <h2>Alışveriş</h2>
+                <ul>
+                    <li><a asp-controller="Home" asp-action="Listing">Tüm ürünler</a></li>
+                    <li><a href="@Url.Action("Listing", "Home", new { discounted = true })">İndirimdekiler</a></li>
+                    <li><a asp-controller="Cart" asp-action="Edit">Sepetim</a></li>
+                </ul>
             </div>
-            <div class="col-lg-4 col-md-12">
-                <div class="footer__widget">
-                    <h6>Join Our Newsletter Now</h6>
-                    <p>Get E-mail updates about our latest shop and special offers.</p>
-                    <form action="#">
-                        <input type="text" placeholder="Enter your mail">
-                        <button type="submit" class="site-btn">Subscribe</button>
-                    </form>
-                    <div class="footer__widget__social">
-                        <a href="#"><i class="fa fa-facebook"></i></a>
-                        <a href="#"><i class="fa fa-instagram"></i></a>
-                        <a href="#"><i class="fa fa-twitter"></i></a>
-                        <a href="#"><i class="fa fa-pinterest"></i></a>
-                    </div>
-                </div>
+            <div class="col-6 col-lg-2">
+                <h2>Hesap</h2>
+                <ul>
+                    <li><a asp-controller="Profile" asp-action="Details">Hesabım</a></li>
+                    <li><a asp-controller="Profile" asp-action="MyOrders">Siparişlerim</a></li>
+                    <li><a asp-controller="Auth" asp-action="Register">Kayıt ol</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-lg-2">
+                <h2>Marketly</h2>
+                <ul>
+                    <li><a asp-controller="Home" asp-action="AboutUs">Hakkımızda</a></li>
+                    <li><a asp-controller="Home" asp-action="Contact">İletişim</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-lg-2">
+                <h2>Destek</h2>
+                <ul>
+                    <li><a href="mailto:destek@marketly.example">destek@marketly.example</a></li>
+                    <li class="text-muted">Hafta içi 09.00–18.00</li>
+                </ul>
             </div>
         </div>
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="footer__copyright">
-                    <div class="footer__copyright__payment"><img src="~/theme/img/payment-item.png" alt=""></div>
-                </div>
-            </div>
+        <div class="footer-bottom">
+            <span>© @DateTime.UtcNow.Year Marketly. Portföy projesidir; gerçek satış yapılmaz.</span>
+            <span>Fiyatlara KDV dahildir.</span>
         </div>
     </div>
 </footer>
-<!-- Footer Section End -->

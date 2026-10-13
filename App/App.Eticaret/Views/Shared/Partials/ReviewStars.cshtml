@@ -1,23 +1,13 @@
-﻿@model double? // Rating
-
+@model double?
 @{
-    var rating = Model ?? 0;
-    var fullStars = (int)rating;
-    var halfStar = rating - fullStars;
-    var emptyStars = 5 - fullStars - (halfStar > 0 ? 1 : 0);
+    var rating = Math.Clamp(Model ?? 0, 0, 5);
+    var rounded = Math.Round(rating * 2, MidpointRounding.AwayFromZero) / 2;
+    var full = (int)rounded;
+    var half = rounded - full >= .5;
 }
-
-@for (var i = 0; i < fullStars; i++)
+<span class="visually-hidden">5 üzerinden @Display.Rating(rating) puan</span>
+@for (var i = 1; i <= 5; i++)
 {
-    <i class="fa fa-star"></i>
-}
-
-@if (halfStar > 0)
-{
-    <i class="fa fa-star-half-o"></i>
-}
-
-@for (var i = 0; i < emptyStars; i++)
-{
-    <i class="fa fa-star-o"></i>
+    var icon = i <= full ? "bi-star-fill" : (half && i == full + 1 ? "bi-star-half" : "bi-star");
+    <i class="bi @icon" aria-hidden="true"></i>
 }

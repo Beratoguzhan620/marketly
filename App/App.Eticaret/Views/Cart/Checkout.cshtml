@@ -1,47 +1,49 @@
-﻿@model List<CartItemViewModel>
+@model List<CartItemViewModel>
 @{
-    ViewData["Title"] = "Checkout";
+    ViewData["Title"] = "Teslimat bilgileri";
+    var address = Context.Request.HasFormContentType ? Context.Request.Form["Address"].ToString() : string.Empty;
+    var addressError = ViewData.ModelState["Address"]?.Errors.FirstOrDefault()?.ErrorMessage;
 }
 
-<div class="container">
-    <div class="row">
-        <div class="col-lg-12 mb-4">
-            <h1>@ViewData["Title"]</h1>
-        </div>
-        <div class="col-12 mb-4">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Product Name</th>
-                        <th>Quantity</th>
-                        <th>Unit Price</th>
-                        <th>Total Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>@item.ProductName</td>
-                            <td>@item.Quantity</td>
-                            <td>@item.Price</td>
-                            <td>@item.TotalPrice</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-        <div class="col-12">
-            <partial name="Partials/ViewMessages" />
-            <form asp-controller="Order" asp-action="Create" method="post">
-                <h2>Checkout Information</h2>
-                <div class="form-floating mb-3">
-                    <label for="floatingTextarea">Address</label>
-                    <textarea class="form-control" placeholder="Enter your address" id="floatingTextarea" name="Address"></textarea>
-                </div>
-                <button type="submit" class="primary-btn">Place Order</button>
-            </form>
+<partial name="Partials/CheckoutSteps" model="2" />
 
-        </div>
+<div class="page-header">
+    <div>
+        <h1>Teslimat bilgileri</h1>
+        <p>Siparişiniz bu adrese gönderilecek. Ödeme alınmaz; bu bir demo mağazadır.</p>
     </div>
+</div>
+
+<partial name="Partials/ViewMessages" />
+
+<div class="cart-layout">
+    <form class="card" method="post" asp-controller="Order" asp-action="Create" id="checkoutForm" novalidate>
+        <div class="card-body p-4">
+            <div class="mb-3">
+                <label class="form-label" for="Address">Teslimat adresi</label>
+                <textarea class="form-control @(addressError is null ? null : "input-validation-error")" id="Address" name="Address" rows="4" minlength="10" maxlength="250" required
+                          placeholder="Mahalle, sokak, bina ve daire no, ilçe / il">@address</textarea>
+                @if (addressError is not null)
+                {
+                    <span class="field-validation-error">@addressError</span>
+                }
+                <div class="form-text">En az 10 karakter. Kapı numarası ve ilçeyi eklemeyi unutmayın.</div>
+            </div>
+            <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mt-4">
+                <a class="btn btn-link px-0" asp-controller="Cart" asp-action="Edit"><i class="bi bi-arrow-left"></i>Sepete dön</a>
+                <button class="btn btn-primary" type="submit">Siparişi onayla</button>
+            </div>
+        </div>
+    </form>
+
+    <aside class="summary-card" aria-label="Sipariş özeti">
+        <h2>Sipariş özeti</h2>
+        <ul class="summary-items">
+            @foreach (var item in Model)
+            {
+                <li><span>@item.ProductName <span class="qty">× @item.Quantity</span></span><span class="font-mono">@Display.Money(item.TotalPrice)</span></li>
+            }
+        </ul>
+        <partial name="Partials/OrderSummary" model="Model" />
+    </aside>
 </div>

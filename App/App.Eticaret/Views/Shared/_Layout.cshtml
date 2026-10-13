@@ -1,28 +1,23 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="tr">
 <head>
-    <partial name="Partials/PageHead.cshtml">
+    <partial name="Partials/PageHead" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
-
 <body>
-    <!-- Page Preloder -->
-    <div id="preloder">
-        <div class="loader"></div>
-    </div>
+    <a class="visually-hidden-focusable btn btn-primary position-absolute m-2" href="#main">İçeriğe geç</a>
 
-    <partial name="Partials/HamburgerMenu.cshtml">
+    <partial name="Partials/Header" />
 
-    <partial name="Partials/Header.cshtml">
+    <main class="shop-main" id="main">
+        <div class="container-shop">
+            @RenderBody()
+        </div>
+    </main>
 
-    <partial name="Partials/Hero.cshtml">
+    <partial name="Partials/Footer" />
 
-    @RenderBody()
-
-    <partial name="Partials/Footer.cshtml">
-
-    <partial name="Partials/PageScripts.cshtml">
-
+    <partial name="Partials/PageScripts" />
     @await RenderSectionAsync("Scripts", required: false)
 </body>
-
 </html>

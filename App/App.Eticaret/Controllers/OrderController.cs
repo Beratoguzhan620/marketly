@@ -23,7 +23,7 @@ namespace App.Eticaret.Controllers
             if (!ModelState.IsValid)
             {
                 var cart = await cartService.GetCartAsync(userId.Value);
-                return View("Checkout", MapToViewModels(cart));
+                return View("~/Views/Cart/Checkout.cshtml", MapToViewModels(cart));
             }
 
             var result = await orderService.CreateOrderAsync(userId.Value, new OrderCreateRequest
@@ -35,10 +35,10 @@ namespace App.Eticaret.Controllers
             {
                 ModelState.AddModelError(string.Empty, result.Message ?? "Sipariş oluşturulamadı.");
                 var cart = await cartService.GetCartAsync(userId.Value);
-                return View("Checkout", MapToViewModels(cart));
+                return View("~/Views/Cart/Checkout.cshtml", MapToViewModels(cart));
             }
 
-            return RedirectToAction(nameof(Details), new { orderCode = result.Data.OrderCode });
+            return RedirectToAction(nameof(Details), new { orderCode = result.Data.OrderCode, placed = true });
         }
 
         [HttpGet("/order/{orderCode}/details")]
@@ -81,9 +81,15 @@ namespace App.Eticaret.Controllers
             {
                 Id = i.Id,
                 ProductName = i.ProductName,
+                ProductId = i.ProductId,
+                CategoryId = i.CategoryId,
+                CategoryName = i.CategoryName,
                 ProductImage = i.ProductImage,
                 Quantity = i.Quantity,
                 Price = i.Price,
+                ListPrice = i.ListPrice,
+                DiscountRate = i.DiscountRate,
+                StockAmount = i.StockAmount,
             }).ToList();
     }
 }

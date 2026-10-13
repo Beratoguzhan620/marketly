@@ -1,43 +1,38 @@
-﻿@{
-    ViewData["Title"] = "About Us";
+@{
+    ViewData["Title"] = "Hakkımızda";
 }
 
-<!-- Breadcrumb Section Begin -->
-<section class="breadcrumb-section set-bg" data-setbg="/theme/img/breadcrumb.jpg">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12 text-center">
-                <div class="breadcrumb__text">
-                    <h2>About Us</h2>
-                    <div class="breadcrumb__option">
-                        <a asp-controller="Home">Home</a>
-                        <span>About Us</span>
-                    </div>
-                </div>
-            </div>
+<div class="page-header">
+    <div>
+        <h1>Hakkımızda</h1>
+        <p>Marketly'nin nasıl çalıştığı ve kimler için olduğu.</p>
+    </div>
+</div>
+
+<div class="row g-5">
+    <div class="col-lg-7">
+        <div class="prose">
+            <p>Marketly, yerel üreticileri ve küçük işletmeleri doğrudan alıcılarla buluşturan çok satıcılı bir pazar yeridir. Her satıcı kendi ürünlerini listeler, stoklarını ve fiyatlarını kendisi yönetir; alıcılar ise farklı satıcıların ürünlerini tek sepette toplayıp sipariş verir.</p>
+
+            <h2>Nasıl çalışır?</h2>
+            <p>Hesap açan herkes alıcı olarak alışverişe başlar. Ürün satmak isteyenler hesap sayfasından satıcı başvurusu yapar; başvuru yönetici tarafından onaylandıktan sonra ürün ekleme ekranı açılır.</p>
+            <p>Ürün yorumları da yönetici onayından geçer. Böylece listelenen puanlar gerçek alıcı deneyimlerini yansıtır.</p>
+
+            <h2>Bu proje hakkında</h2>
+            <p>Marketly bir portföy projesidir: ASP.NET Core MVC, Entity Framework Core ve SQL Server ile geliştirilmiştir. Sitede gerçek ödeme alınmaz ve sipariş gönderilmez.</p>
         </div>
     </div>
-</section>
-<!-- Breadcrumb Section End -->
-<div class="spad">
-    <div class="container">
-        <div class="row">
-            <section class="col-lg-12">
-                <h2 class="mb-3">Our Story</h2>
-                <p>
-                    Our platform is a comprehensive ecosystem designed to cater to a wide range of user needs. We have a robust user management system, with distinct roles for different types of users. Our product catalog is extensive, with each product having its own set of images and user comments. We also have a category system in place to help users navigate through our diverse product offerings.
-                </p>
-                <p>
-                    In addition to our e-commerce offerings, we have a cart and order management system that ensures a smooth shopping experience from product selection to checkout. We also offer discounts on various products to provide the best value to our customers.
-                </p>
-                <p>
-                    Beyond e-commerce, we have a vibrant blog section where users can read about various topics. Each blog post can be categorized and tagged for easy navigation. Users can also leave comments on blog posts, fostering a community of engaged readers.
-                </p>
-                <p>
-                    Lastly, we have a contact form system in place to ensure we're always reachable for any inquiries or concerns. We value our customers' feedback and strive to improve our platform based on their inputs.
-                    Join us in this journey as we strive to provide the best online shopping and reading experience.
-                </p>
-            </section>
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-body p-4">
+                <h2 class="h6 mb-3">Kısaca</h2>
+                <dl class="spec-list">
+                    <dt>Satıcı onayı</dt><dd>Yönetici incelemesiyle</dd>
+                    <dt>Yorumlar</dt><dd>Onaylandıktan sonra yayında</dd>
+                    <dt>Sepet</dt><dd>Birden çok satıcıdan tek sepet</dd>
+                    <dt>Destek</dt><dd><a href="mailto:destek@marketly.example">destek@marketly.example</a></dd>
+                </dl>
+            </div>
         </div>
     </div>
 </div>

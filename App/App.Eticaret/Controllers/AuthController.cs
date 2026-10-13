@@ -45,23 +45,30 @@ namespace App.Eticaret.Controllers
                 return View(newUser);
             }
 
-            ViewBag.SuccessMessage = result.Message;
-            ModelState.Clear();
+            TempData["SuccessMessage"] = "Hesabınız oluşturuldu. Şimdi giriş yapabilirsiniz.";
 
-            return View();
+            return RedirectToAction(nameof(Login));
         }
 
         [Route("/login")]
         [HttpGet]
-        public IActionResult Login()
+        public IActionResult Login([FromQuery] string? returnUrl = null)
         {
+            if (User.Identity?.IsAuthenticated ?? false)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            ViewBag.ReturnUrl = returnUrl;
             return View();
         }
 
         [Route("/login")]
         [HttpPost]
-        public async Task<IActionResult> Login([FromForm] LoginViewModel loginModel)
+        public async Task<IActionResult> Login([FromForm] LoginViewModel loginModel, [FromQuery] string? returnUrl = null)
         {
+            ViewBag.ReturnUrl = returnUrl;
+
             if (!ModelState.IsValid)
             {
                 return View(loginModel);
@@ -80,6 +87,11 @@ namespace App.Eticaret.Controllers
             }
 
             await LogInAsync(result.Data);
+
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return LocalRedirect(returnUrl);
+            }
 
             return RedirectToAction("Index", "Home");
         }
