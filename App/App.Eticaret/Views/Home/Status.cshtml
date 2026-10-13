@@ -1,0 +1,15 @@
+@model StatusPageViewModel
+@{
+    ViewData["Title"] = Model.Title;
+}
+<div class="py-5">
+    <div class="empty-state" style="max-width: 560px; margin: 0 auto;">
+        <div class="empty-state-icon font-mono" style="width:auto;padding:0 12px">@Model.StatusCode</div>
+        <h2>@Model.Title</h2>
+        <p>@Model.Description</p>
+        <div class="d-flex justify-content-center gap-2">
+            <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Ana sayfaya dön</a>
+            <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Listing">Ürünlere göz at</a>
+        </div>
+    </div>
+</div>

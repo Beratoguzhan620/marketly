@@ -4,6 +4,7 @@ namespace App.Eticaret.Models.ViewModels
 {
     public class CheckoutViewModel
     {
+        [Display(Name = "Teslimat adresi")]
         [Required, MinLength(10), MaxLength(250), DataType(DataType.MultilineText)]
         public string Address { get; set; } = null!;
     }

@@ -1,0 +1,13 @@
+@{
+    var action = ViewContext.RouteData.Values["action"] as string;
+    string? Active(string a) => string.Equals(action, a, StringComparison.OrdinalIgnoreCase) ? "active" : null;
+}
+<nav class="account-nav" aria-label="Hesap menüsü">
+    <a class="@Active("Details")" asp-controller="Profile" asp-action="Details"><i class="bi bi-person"></i>Hesap bilgileri</a>
+    <a class="@Active("MyOrders")" asp-controller="Profile" asp-action="MyOrders"><i class="bi bi-receipt"></i>Siparişlerim</a>
+    @if (User.IsInRole("seller"))
+    {
+        <a class="@Active("MyProducts")" asp-controller="Profile" asp-action="MyProducts"><i class="bi bi-box-seam"></i>Ürünlerim</a>
+    }
+    <a asp-controller="Auth" asp-action="Logout"><i class="bi bi-box-arrow-right"></i>Çıkış yap</a>
+</nav>

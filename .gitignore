@@ -25,8 +25,6 @@ secrets.json
 *.db-wal
 
 # Local tooling
-.claude/
-CLAUDE.md
 docs/brief/
 
 # OS

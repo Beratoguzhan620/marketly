@@ -31,15 +31,20 @@ namespace App.Eticaret.Controllers
 
                 TempData["ErrorMessage"] = result.Message;
             }
+            else
+            {
+                TempData["SuccessMessage"] = "Ürün sepete eklendi.";
+            }
 
             var prevUrl = Request.Headers.Referer.FirstOrDefault();
 
-            if (prevUrl is null)
+            // Only bounce back to pages of this site.
+            if (prevUrl is null || !Uri.TryCreate(prevUrl, UriKind.Absolute, out var prevUri) || prevUri.Host != Request.Host.Host)
             {
                 return RedirectToAction(nameof(Edit));
             }
 
-            return Redirect(prevUrl);
+            return LocalRedirect(prevUri.PathAndQuery);
         }
 
         [HttpGet("/cart")]
@@ -59,7 +64,7 @@ namespace App.Eticaret.Controllers
             return View(MapToViewModels(cart));
         }
 
-        [HttpGet("/cart/{cartItemId:int}/remove")]
+        [HttpPost("/cart/{cartItemId:int}/remove")]
         public async Task<IActionResult> Remove([FromRoute] int cartItemId)
         {
             var userId = GetUserId();
@@ -76,6 +81,7 @@ namespace App.Eticaret.Controllers
                 return NotFound();
             }
 
+            TempData["SuccessMessage"] = "Ürün sepetten çıkarıldı.";
             return RedirectToAction(nameof(Edit));
         }
 
@@ -91,14 +97,17 @@ namespace App.Eticaret.Controllers
 
             var result = await cartService.UpdateItemQuantityAsync(userId.Value, cartItemId, quantity);
 
-            if (!result.Success || result.Data is null)
+            if (!result.Success)
             {
-                return result.Type == ServiceResultType.NotFound
-                    ? NotFound()
-                    : BadRequest(result.Message);
+                if (result.Type == ServiceResultType.NotFound)
+                {
+                    return NotFound();
+                }
+
+                TempData["ErrorMessage"] = result.Message;
             }
 
-            return View(MapToViewModel(result.Data));
+            return RedirectToAction(nameof(Edit));
         }
 
         [HttpGet("/checkout")]
@@ -112,6 +121,11 @@ namespace App.Eticaret.Controllers
             }
 
             var cart = await cartService.GetCartAsync(userId.Value);
+
+            if (cart.Items.Count == 0)
+            {
+                return RedirectToAction(nameof(Edit));
+            }
 
             return View(MapToViewModels(cart));
         }
@@ -130,9 +144,15 @@ namespace App.Eticaret.Controllers
         {
             Id = item.Id,
             ProductName = item.ProductName,
+            ProductId = item.ProductId,
+            CategoryId = item.CategoryId,
+            CategoryName = item.CategoryName,
             ProductImage = item.ProductImage,
             Quantity = item.Quantity,
             Price = item.Price,
+            ListPrice = item.ListPrice,
+            DiscountRate = item.DiscountRate,
+            StockAmount = item.StockAmount,
         };
 
         private static List<CartItemViewModel> MapToViewModels(CartDto cart) =>

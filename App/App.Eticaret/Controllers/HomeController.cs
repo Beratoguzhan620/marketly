@@ -1,3 +1,4 @@
+using App.Application.Models.Dtos;
 using App.Application.Models.Requests;
 using App.Application.Services.Interfaces;
 using App.Eticaret.Models.ViewModels;
@@ -5,11 +6,42 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace App.Eticaret.Controllers
 {
-    public class HomeController(IContactService contactService, IProductService productService) : BaseController
+    public class HomeController(
+        IContactService contactService,
+        IProductService productService,
+        ICategoryService categoryService) : BaseController
     {
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var newArrivals = await productService.GetListingAsync(new ProductListingQuery { Sort = ProductSort.Newest, PageSize = 8 });
+            var discounted = await productService.GetListingAsync(new ProductListingQuery { OnlyDiscounted = true, Sort = ProductSort.PriceAsc, PageSize = 4 });
+            var topRated = await productService.GetListingAsync(new ProductListingQuery { Sort = ProductSort.TopRated, PageSize = 4 });
+
+            var viewModel = new HomeIndexViewModel
+            {
+                Categories = (await categoryService.GetAllAsync()).Where(c => c.ProductCount > 0).ToList(),
+                NewArrivals = newArrivals.Items,
+                Discounted = discounted.Items,
+                TopRated = topRated.Items.Where(p => p.ReviewCount > 0).ToList(),
+                ProductCount = newArrivals.TotalCount,
+                DiscountedCount = discounted.TotalCount,
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpGet("/not-found")]
+        public IActionResult PageNotFound()
+        {
+            Response.StatusCode = StatusCodes.Status404NotFound;
+            return View("Status", new StatusPageViewModel(404, "Sayfa bulunamadı", "Aradığınız sayfa kaldırılmış ya da adresi değişmiş olabilir."));
+        }
+
+        [HttpGet("/access-denied")]
+        public IActionResult AccessDenied()
+        {
+            Response.StatusCode = StatusCodes.Status403Forbidden;
+            return View("Status", new StatusPageViewModel(403, "Bu sayfaya erişiminiz yok", "Bu işlem için alıcı veya satıcı hesabıyla giriş yapmanız gerekiyor."));
         }
 
         [HttpGet("/about-us")]
@@ -45,20 +77,40 @@ namespace App.Eticaret.Controllers
         }
 
         [HttpGet("/product/list")]
-        public async Task<IActionResult> Listing([FromQuery] string? search = null)
+        public async Task<IActionResult> Listing(
+            [FromQuery] string? search = null,
+            [FromQuery] int? category = null,
+            [FromQuery] decimal? min = null,
+            [FromQuery] decimal? max = null,
+            [FromQuery] bool discounted = false,
+            [FromQuery] ProductSort sort = ProductSort.Newest,
+            [FromQuery] int page = 1)
         {
-            // TODO: add paging support
-            var products = await productService.GetListingAsync(search);
-
-            var viewModel = products.Select(p => new ProductListingViewModel
+            if (min is not null && max is not null && min > max)
             {
-                Id = p.Id,
-                Name = p.Name,
-                Price = p.Price,
-                CategoryName = p.CategoryName,
-                DiscountPercentage = p.DiscountPercentage,
-                ImageUrl = p.ImageUrl
-            }).ToList();
+                (min, max) = (max, min);
+            }
+
+            var query = new ProductListingQuery
+            {
+                Search = string.IsNullOrWhiteSpace(search) ? null : search.Trim(),
+                CategoryId = category,
+                MinPrice = min is >= 0 ? min : null,
+                MaxPrice = max is >= 0 ? max : null,
+                OnlyDiscounted = discounted,
+                Sort = Enum.IsDefined(sort) ? sort : ProductSort.Newest,
+                Page = page,
+            };
+
+            var viewModel = new ProductListingPageViewModel
+            {
+                Query = query,
+                Result = await productService.GetListingAsync(query),
+                Categories = await categoryService.GetAllAsync(),
+            };
+
+            // The service clamps out-of-range pages; reflect that in the links.
+            query.Page = viewModel.Result.Page;
 
             return View(viewModel);
         }
@@ -75,11 +127,19 @@ namespace App.Eticaret.Controllers
 
             var product = result.Data;
 
+            var related = await productService.GetListingAsync(new ProductListingQuery
+            {
+                CategoryId = product.CategoryId,
+                ExcludeProductId = product.Id,
+                PageSize = 4,
+            });
+
             var viewModel = new HomeProductDetailViewModel
             {
                 Id = product.Id,
                 Name = product.Name,
                 Price = product.Price,
+                FinalPrice = product.FinalPrice,
                 DiscountRate = product.DiscountRate,
                 Description = product.Description,
                 StockAmount = product.StockAmount,
@@ -92,8 +152,10 @@ namespace App.Eticaret.Controllers
                     Id = c.Id,
                     Text = c.Text,
                     StarCount = c.StarCount,
-                    UserName = c.UserName
-                }).ToArray()
+                    UserName = c.UserName,
+                    CreatedAt = c.CreatedAt,
+                }).ToArray(),
+                RelatedProducts = related.Items,
             };
 
             return View(viewModel);

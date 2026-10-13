@@ -1,0 +1,13 @@
+@model List<CartItemViewModel>
+@{
+    var listTotal = Model.Sum(i => i.ListTotalPrice);
+    var total = Model.Sum(i => i.TotalPrice);
+    var discount = listTotal - total;
+}
+<div class="summary-row"><span>Ürünler (@Model.Sum(i => i.Quantity) adet)</span><span class="value">@Display.Money(listTotal)</span></div>
+@if (discount > 0)
+{
+    <div class="summary-row text-success"><span>İndirim</span><span class="value">−@Display.Money(discount)</span></div>
+}
+<div class="summary-row"><span>Kargo</span><span class="value">Ücretsiz</span></div>
+<div class="summary-row total"><span>Toplam</span><span class="value" data-cart-total>@Display.Money(total)</span></div>

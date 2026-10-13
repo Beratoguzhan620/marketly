@@ -1,29 +1,35 @@
-﻿@{
-    var modelStateErrors = ViewData.ModelState.Values.SelectMany(v => v.Errors)
+@{
+    var modelStateErrors = ViewData.ModelState
+        .Where(kv => string.IsNullOrEmpty(kv.Key))
+        .SelectMany(kv => kv.Value!.Errors)
         .Select(e => e.ErrorMessage)
+        .Where(m => !string.IsNullOrWhiteSpace(m))
         .ToList();
+
+    var success = ViewBag.SuccessMessage as string ?? TempData["SuccessMessage"] as string;
+    var error = ViewBag.ErrorMessage as string ?? TempData["ErrorMessage"] as string;
 }
-@if (!string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
+@if (!string.IsNullOrWhiteSpace(success))
 {
-    <div class="alert alert-success" role="alert">
-        @ViewBag.SuccessMessage
+    <div class="alert alert-success" role="status">
+        <i class="bi bi-check-circle"></i><span>@success</span>
     </div>
 }
-@if (!string.IsNullOrWhiteSpace(ViewBag.ErrorMessage))
+@if (!string.IsNullOrWhiteSpace(error))
 {
     <div class="alert alert-danger" role="alert">
-        @ViewBag.ErrorMessage
+        <i class="bi bi-exclamation-circle"></i><span>@error</span>
     </div>
 }
-
 @if (modelStateErrors.Count > 0)
 {
     <div class="alert alert-danger" role="alert">
-        <ul>
-            @foreach (var error in modelStateErrors)
+        <i class="bi bi-exclamation-circle"></i>
+        <div>
+            @foreach (var message in modelStateErrors)
             {
-                <li>@error</li>
+                <div>@message</div>
             }
-        </ul>
+        </div>
     </div>
 }

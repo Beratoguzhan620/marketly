@@ -1,42 +1,77 @@
-﻿@model ProfileDetailsViewModel
-
+@model ProfileDetailsViewModel
 @{
-    ViewData["Title"] = "Profile Details";
+    ViewData["Title"] = "Hesap bilgileri";
+    var isSeller = User.IsInRole("seller");
 }
 
-<div class="container">
-    <h2>@ViewData["Title"]</h2>
-    <partial name="Partials/ViewMessages" />
-    <form asp-action="Edit" asp-controller="Profile" method="post">
-        <div class="form-group">
-            <label asp-for="FirstName">First Name</label>
-            <input asp-for="FirstName" class="form-control">
-            <span asp-validation-for="FirstName" class="text-danger"></span>
-        </div>
-        
-        <div class="form-group">
-            <label asp-for="LastName">Last Name</label>
-            <input asp-for="LastName" class="form-control">
-            <span asp-validation-for="LastName" class="text-danger"></span>
-        </div>
-        
-        <div class="form-group">
-            <label asp-for="Email">Email</label>
-            <input asp-for="Email" class="form-control" readonly>
-        </div>
-        
-        <div class="form-group">
-            <label asp-for="Password">Password</label>
-            <input asp-for="Password" class="form-control" value="******">
-            <span asp-validation-for="Password" class="text-danger"></span>
-        </div>
-        
-        <button type="submit" class="btn btn-primary">Save</button>
-    </form>
-
-    @if (User.IsInRole("buyer"))
-    {
-        <hr />
-        <a asp-controller="Profile" asp-action="RequestSellerRole" class="btn btn-secondary">Satıcı Olmak İstiyorum</a>
-    }
+<div class="page-header">
+    <div>
+        <h1>Hesabım</h1>
+        <p>@Model.FirstName @Model.LastName · @(isSeller ? "Satıcı" : "Alıcı") hesabı</p>
+    </div>
 </div>
+
+<div class="account-layout">
+    <partial name="Partials/AccountNav" />
+
+    <div>
+        <partial name="Partials/ViewMessages" />
+
+        <div class="card mb-4">
+            <div class="card-body p-4">
+                <h2 class="h6 mb-3">Hesap bilgileri</h2>
+                <form class="form-narrow" asp-action="Edit" asp-controller="Profile" method="post" novalidate>
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label" asp-for="FirstName"></label>
+                            <input class="form-control" asp-for="FirstName" autocomplete="given-name" />
+                            <span asp-validation-for="FirstName"></span>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label" asp-for="LastName"></label>
+                            <input class="form-control" asp-for="LastName" autocomplete="family-name" />
+                            <span asp-validation-for="LastName"></span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Email"></label>
+                        <input class="form-control" asp-for="Email" readonly aria-describedby="emailHelp" />
+                        <div class="form-text" id="emailHelp">E-posta adresi giriş için kullanıldığından değiştirilemez.</div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label" asp-for="Password"></label>
+                        <input class="form-control" asp-for="Password" value="" autocomplete="new-password" aria-describedby="passwordHelp" />
+                        <div class="form-text" id="passwordHelp">Değiştirmek istemiyorsanız boş bırakın.</div>
+                        <span asp-validation-for="Password"></span>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Kaydet</button>
+                </form>
+            </div>
+        </div>
+
+        @if (!isSeller)
+        {
+            <div class="card" id="seller">
+                <div class="card-body p-4">
+                    <h2 class="h6 mb-1">Satıcı başvurusu</h2>
+                    @if (Model.HasSellerRequest)
+                    {
+                        <p class="text-muted small mb-3">Başvurunuz alındı ve yönetici onayı bekliyor. Onaylandığında bir sonraki girişinizde ürün ekleyebilirsiniz.</p>
+                        <span class="badge badge-warning">İnceleniyor</span>
+                    }
+                    else
+                    {
+                        <p class="text-muted small mb-3">Ürünlerinizi Marketly'de listelemek için başvurun. Onaydan sonra “Ürünlerim” sayfası açılır.</p>
+                        <form method="post" asp-controller="Profile" asp-action="RequestSellerRole">
+                            <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-shop"></i>Satıcı olmak istiyorum</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

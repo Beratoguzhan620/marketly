@@ -62,10 +62,9 @@ namespace App.Eticaret.Controllers
                     return View(newProductModel);
                 }
 
-                ViewBag.SuccessMessage = result.Message;
-                ModelState.Clear();
+                TempData["SuccessMessage"] = result.Message;
 
-                return View();
+                return RedirectToAction("MyProducts", "Profile");
             }
             finally
             {
@@ -105,7 +104,7 @@ namespace App.Eticaret.Controllers
 
             if (!result.Success || result.Data is null)
             {
-                return result.Type == ServiceResultType.Forbidden ? Unauthorized() : NotFound();
+                return result.Type == ServiceResultType.Forbidden ? Forbid() : NotFound();
             }
 
             var product = result.Data;
@@ -213,7 +212,7 @@ namespace App.Eticaret.Controllers
             return RedirectToAction(nameof(Edit), new { productId });
         }
 
-        [HttpGet("{productId:int}/delete")]
+        [HttpPost("{productId:int}/delete")]
         [Authorize(Roles = "seller")]
         public async Task<IActionResult> Delete([FromRoute] int productId)
         {
@@ -235,13 +234,13 @@ namespace App.Eticaret.Controllers
 
                 if (result.Type == ServiceResultType.Forbidden)
                 {
-                    return Unauthorized();
+                    return Forbid();
                 }
             }
 
-            ViewBag.SuccessMessage = result.Message;
+            TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
 
-            return View();
+            return RedirectToAction("MyProducts", "Profile");
         }
 
         [HttpPost("{productId:int}/comment")]
@@ -257,7 +256,9 @@ namespace App.Eticaret.Controllers
 
             if (!ModelState.IsValid)
             {
-                return BadRequest();
+                TempData["ErrorMessage"] = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).FirstOrDefault()
+                    ?? "Yorum gönderilemedi.";
+                return RedirectToReviews(productId);
             }
 
             var result = await productCommentService.AddCommentAsync(userId.Value, productId, new ProductCommentCreateRequest
@@ -266,17 +267,19 @@ namespace App.Eticaret.Controllers
                 StarCount = newProductCommentModel.StarCount,
             });
 
-            if (!result.Success)
+            if (!result.Success && result.Type == ServiceResultType.NotFound)
             {
-                return result.Type switch
-                {
-                    ServiceResultType.NotFound => NotFound(),
-                    ServiceResultType.Forbidden => Unauthorized(),
-                    _ => BadRequest(result.Message)
-                };
+                return NotFound();
             }
 
-            return Ok();
+            TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Success
+                ? "Teşekkürler! Yorumunuz onaylandıktan sonra yayınlanacak."
+                : result.Message ?? "Yorum gönderilemedi.";
+
+            return RedirectToReviews(productId);
         }
+
+        private RedirectResult RedirectToReviews(int productId) =>
+            Redirect(Url.Action("ProductDetail", "Home", new { productId }) + "#reviews");
     }
 }

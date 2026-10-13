@@ -1,20 +1,12 @@
-﻿<meta charset="UTF-8">
-<meta name="description" content="Marketly — yerel üreticilerden taze ürünler.">
-<meta name="keywords" content="Marketly, pazar yeri, e-ticaret">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<title>@ViewData["Title"] · Marketly</title>
-
-<!-- Google Font -->
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;900&display=swap" rel="stylesheet">
-
-<!-- Css Styles -->
-<link rel="stylesheet" href="~/theme/css/bootstrap.min.css" type="text/css">
-<link rel="stylesheet" href="~/theme/css/font-awesome.min.css" type="text/css">
-<link rel="stylesheet" href="~/theme/css/elegant-icons.css" type="text/css">
-<link rel="stylesheet" href="~/theme/css/nice-select.css" type="text/css">
-<link rel="stylesheet" href="~/theme/css/jquery-ui.min.css" type="text/css">
-<link rel="stylesheet" href="~/theme/css/owl.carousel.min.css" type="text/css">
-<link rel="stylesheet" href="~/theme/css/slicknav.min.css" type="text/css">
-<link rel="stylesheet" href="~/theme/css/style.css" type="text/css">
-<link rel="stylesheet" href="~/css/site.css" type="text/css">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Marketly — yerel üreticilerden taze ürünler." />
+<title>@(ViewData["Title"] is string title && title.Length > 0 ? $"{title} · Marketly" : "Marketly")</title>
+<link rel="icon" href="~/favicon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="~/css/design.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />

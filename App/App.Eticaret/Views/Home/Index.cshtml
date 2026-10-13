@@ -1,44 +1,124 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model HomeIndexViewModel
+@{
+    ViewData["Title"] = "Yerel üreticilerden taze ürünler";
+    var maxDiscount = Model.Discounted.Select(p => (int?)p.DiscountPercentage).Max();
 }
 
-<vc:categories-slider />
-
-<vc:featured-products />
-
-<!-- Banner Begin -->
-<div class="banner">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-6 col-md-6 col-sm-6">
-                <div class="banner__pic">
-                    <img src="~/theme/img/banner/banner-1.jpg" alt="">
-                </div>
-            </div>
-            <div class="col-lg-6 col-md-6 col-sm-6">
-                <div class="banner__pic">
-                    <img src="~/theme/img/banner/banner-2.jpg" alt="">
-                </div>
-            </div>
+<section class="home-hero">
+    <div>
+        <div class="eyebrow">Çok satıcılı yerel pazar</div>
+        <h1>Mevsiminde, üreticisinden, aracısız.</h1>
+        <p>Meyveden kuruyemişe, kahvaltılıktan bakliyata; onaylı satıcıların ürünlerini karşılaştırın, yorumları okuyun ve tek sepette sipariş verin.</p>
+        <div class="hero-actions">
+            <a class="btn btn-primary" asp-action="Listing">Ürünlere göz atın<i class="bi bi-arrow-right"></i></a>
+            <a class="btn btn-outline-secondary" href="@Url.Action("Listing", new { discounted = true })">İndirimdekiler</a>
         </div>
     </div>
-</div>
-<!-- Banner End -->
-<!-- Latest Product Section Begin -->
-<section class="latest-product spad">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-4 col-md-6">
-                <vc:latest-products />
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <vc:top-rated-products />
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <vc:review-products />
-            </div>
-        </div>
+    <div class="hero-facts" aria-label="Pazar özeti">
+        <div><strong>@Model.ProductCount</strong><span>ürün satışta</span></div>
+        <div><strong>@Model.Categories.Count</strong><span>kategori</span></div>
+        <div><strong>@(maxDiscount is null ? "—" : $"%{maxDiscount}")</strong><span>varan indirim</span></div>
     </div>
 </section>
-<!-- Latest Product Section End -->
-<vc:from-the-blog />
+
+@if (Model.Categories.Count > 0)
+{
+    <section class="home-section" aria-labelledby="categories-title">
+        <div class="section-header">
+            <div>
+                <h2 id="categories-title">Kategoriler</h2>
+            </div>
+        </div>
+        <div class="category-grid">
+            @foreach (var category in Model.Categories)
+            {
+                <a class="category-tile" href="@Url.Action("Listing", new { category = category.Id })">
+                    <span class="tile-icon @Display.CategoryTint(category.Id)"><i class="bi @Display.CategoryIcon(category.Name, category.IconCssClass)"></i></span>
+                    <span>
+                        <strong>@category.Name</strong>
+                        <span>@category.ProductCount ürün</span>
+                    </span>
+                </a>
+            }
+        </div>
+    </section>
+}
+
+<section class="home-section" aria-labelledby="new-title">
+    <div class="section-header">
+        <div>
+            <h2 id="new-title">Yeni eklenenler</h2>
+            <p>Satıcıların son eklediği ürünler.</p>
+        </div>
+        <a class="btn btn-outline-secondary btn-sm" asp-action="Listing">Tümünü gör</a>
+    </div>
+    @if (Model.NewArrivals.Count == 0)
+    {
+        <partial name="Partials/EmptyState" model="@(new EmptyStateViewModel("Henüz ürün yok", "Satıcılar ürün ekledikçe burada listelenecek.", "bi-box-seam"))" />
+    }
+    else
+    {
+        <div class="product-grid cols-4">
+            @foreach (var product in Model.NewArrivals)
+            {
+                <partial name="Partials/ProductCard" model="product" />
+            }
+        </div>
+    }
+</section>
+
+@if (Model.Discounted.Count > 0)
+{
+    <section class="home-section" aria-labelledby="discount-title">
+        <div class="section-header">
+            <div>
+                <h2 id="discount-title">İndirimdekiler</h2>
+                <p>@Model.DiscountedCount üründe geçerli indirim var.</p>
+            </div>
+            <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("Listing", new { discounted = true })">Tümünü gör</a>
+        </div>
+        <div class="product-grid cols-4">
+            @foreach (var product in Model.Discounted)
+            {
+                <partial name="Partials/ProductCard" model="product" />
+            }
+        </div>
+    </section>
+}
+
+@if (Model.TopRated.Count > 0)
+{
+    <section class="home-section" aria-labelledby="rated-title">
+        <div class="section-header">
+            <div>
+                <h2 id="rated-title">Alıcıların favorileri</h2>
+                <p>Onaylı yorumlarda en yüksek puanı alanlar.</p>
+            </div>
+            <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("Listing", new { sort = "TopRated" })">Tümünü gör</a>
+        </div>
+        <div class="product-grid cols-4">
+            @foreach (var product in Model.TopRated)
+            {
+                <partial name="Partials/ProductCard" model="product" />
+            }
+        </div>
+    </section>
+}
+
+@if (!User.IsInRole("seller"))
+{
+    <section class="seller-band" aria-labelledby="seller-title">
+        <div>
+            <h2 id="seller-title">Ürünlerinizi Marketly'de satın</h2>
+            <p>Hesabınızdan satıcı başvurusu yapın; onaylandıktan sonra ürünlerinizi hemen listeleyin.</p>
+        </div>
+        @if (User.Identity?.IsAuthenticated ?? false)
+        {
+            <a class="btn btn-light" asp-controller="Profile" asp-action="Details" asp-fragment="seller">Satıcı başvurusu</a>
+        }
+        else
+        {
+            <a class="btn btn-light" asp-controller="Auth" asp-action="Register">Hesap oluşturun</a>
+        }
+    </section>
+}

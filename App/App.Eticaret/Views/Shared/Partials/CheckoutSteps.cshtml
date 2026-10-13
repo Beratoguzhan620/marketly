@@ -1,0 +1,9 @@
+@model int
+@{
+    string State(int step) => step < Model ? "done" : step == Model ? "current" : "";
+}
+<ol class="checkout-steps" aria-label="Sipariş adımları">
+    <li class="@State(1)" aria-current="@(Model == 1 ? "step" : null)">Sepet</li>
+    <li class="@State(2)" aria-current="@(Model == 2 ? "step" : null)">Teslimat</li>
+    <li class="@State(3)" aria-current="@(Model == 3 ? "step" : null)">Onay</li>
+</ol>

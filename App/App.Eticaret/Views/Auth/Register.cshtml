@@ -1,49 +1,46 @@
-﻿@model RegisterUserViewModel
+@model RegisterUserViewModel
 @{
-    ViewData["Title"] = "Register";
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Kayıt ol";
 }
 
-<div class="container-fluid">
-    <div class="row">
-        <h2 class="col-12 text-center">Register</h2>
-        <partial name="Partials/ViewMessages" />
-        <div class="col-12 col-md-6 offset-md-3">
-            <form method="post" asp-action="Register" asp-controller="Auth">
-                <div class="form-group">
-                    <label asp-for="FirstName">First Name</label>
-                    <input asp-for="FirstName" class="form-control">
-                    <span asp-validation-for="FirstName" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="LastName">Last Name</label>
-                    <input asp-for="LastName" class="form-control">
-                    <span asp-validation-for="LastName" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Email">Email</label>
-                    <input asp-for="Email" class="form-control">
-                    <span asp-validation-for="Email" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Password">Password</label>
-                    <input asp-for="Password" class="form-control">
-                    <span asp-validation-for="Password" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="PasswordConfirm">Confirm Password</label>
-                    <input asp-for="PasswordConfirm" class="form-control">
-                    <span asp-validation-for="PasswordConfirm" class="text-danger"></span>
-                </div>
+<h1>Hesap oluşturun</h1>
+<p class="lead-text">Alışverişe hemen başlayın; satıcı olmak için daha sonra hesabınızdan başvurabilirsiniz.</p>
 
-                <div class="d-flex justify-content-between">
-                    <button type="submit" class="site-btn mr-auto">Register</button>
-                    <a asp-controller="Auth" asp-action="Login" class="site-btn mr-2">Login</a>
-                    <a asp-controller="Auth" asp-action="ForgotPassword" class="site-btn">Forgot Password</a>
-                </div>
-            </form>
+<partial name="Partials/ViewMessages" />
+
+<form method="post" asp-controller="Auth" asp-action="Register" novalidate>
+    <div class="row g-3 mb-3">
+        <div class="col-sm-6">
+            <label class="form-label" asp-for="FirstName"></label>
+            <input class="form-control" asp-for="FirstName" autocomplete="given-name" autofocus />
+            <span asp-validation-for="FirstName"></span>
+        </div>
+        <div class="col-sm-6">
+            <label class="form-label" asp-for="LastName"></label>
+            <input class="form-control" asp-for="LastName" autocomplete="family-name" />
+            <span asp-validation-for="LastName"></span>
         </div>
     </div>
-</div>
+    <div class="mb-3">
+        <label class="form-label" asp-for="Email"></label>
+        <input class="form-control" asp-for="Email" type="email" autocomplete="email" />
+        <span asp-validation-for="Email"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label" asp-for="Password"></label>
+        <input class="form-control" asp-for="Password" autocomplete="new-password" />
+        <span asp-validation-for="Password"></span>
+    </div>
+    <div class="mb-4">
+        <label class="form-label" asp-for="PasswordConfirm"></label>
+        <input class="form-control" asp-for="PasswordConfirm" autocomplete="new-password" />
+        <span asp-validation-for="PasswordConfirm"></span>
+    </div>
+    <button type="submit" class="btn btn-primary w-100">Kayıt ol</button>
+</form>
+
+<p class="auth-switch">Zaten hesabınız var mı? <a asp-controller="Auth" asp-action="Login">Giriş yapın</a></p>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

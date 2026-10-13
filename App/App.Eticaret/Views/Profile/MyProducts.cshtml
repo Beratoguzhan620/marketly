@@ -1,35 +1,107 @@
-﻿@model List<MyProductsViewModel>
+@model List<MyProductsViewModel>
 @{
-    ViewData["Title"] = "My Products";
+    ViewData["Title"] = "Ürünlerim";
 }
 
-<div class="container">
-    <h2>@ViewData["Title"]</h2>
-    <partial name="Partials/ViewMessages" />
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Product Name</th>
-                <th>Price</th>
-                <th>Has Discount</th>
-                <th>Stock</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var product in Model)
-            {
-                <tr>
-                    <td>@product.Name</td>
-                    <td>@product.Price</td>
-                    <td>@product.HasDiscount</td>
-                    <td>@product.Stock</td>
-                    <td>
-                        <a asp-action="Edit" asp-controller="Product" asp-route-productId="@product.Id" class="btn btn-primary">Edit</a>
-                        <a asp-action="Delete" asp-controller="Product" asp-route-productId="@product.Id" class="btn btn-danger">Delete</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+<div class="page-header">
+    <div>
+        <h1>Ürünlerim</h1>
+        <p>Satıştaki ürünleriniz. Stok ve fiyatı düzenle ekranından güncelleyebilirsiniz.</p>
+    </div>
+    <div class="page-header-actions">
+        <a class="btn btn-primary" asp-controller="Product" asp-action="Create"><i class="bi bi-plus-lg"></i>Ürün ekle</a>
+    </div>
 </div>
+
+<div class="account-layout">
+    <partial name="Partials/AccountNav" />
+
+    <div>
+        <partial name="Partials/ViewMessages" />
+
+        @if (Model.Count == 0)
+        {
+            <partial name="Partials/EmptyState" model="@(new EmptyStateViewModel("Henüz ürününüz yok", "İlk ürününüzü ekleyin; onaydan sonra mağazada görünür.", "bi-box-seam", "Ürün ekle", Url.Action("Create", "Product")))" />
+        }
+        else
+        {
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Ürün</th>
+                                <th class="num">Fiyat</th>
+                                <th class="num">Stok</th>
+                                <th>Durum</th>
+                                <th><span class="visually-hidden">İşlemler</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var product in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <a class="fw-medium text-body text-decoration-none" asp-controller="Home" asp-action="ProductDetail" asp-route-productId="@product.Id">@product.Name</a>
+                                        <div class="text-muted small">@Display.Date(product.CreatedAt) tarihinde eklendi</div>
+                                    </td>
+                                    <td class="num">@Display.Money(product.Price)</td>
+                                    <td class="num">@product.Stock</td>
+                                    <td>
+                                        @if (product.Stock == 0)
+                                        {
+                                            <span class="badge badge-danger">Tükendi</span>
+                                        }
+                                        else if (product.HasDiscount)
+                                        {
+                                            <span class="badge badge-accent">İndirimde</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-success">Satışta</span>
+                                        }
+                                    </td>
+                                    <td class="text-end text-nowrap">
+                                        <a class="btn btn-outline-secondary btn-sm" asp-controller="Product" asp-action="Edit" asp-route-productId="@product.Id">Düzenle</a>
+                                        <button class="btn btn-ghost btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#removeProduct"
+                                                data-product-name="@product.Name" data-remove-url="@Url.Action("Delete", "Product", new { productId = product.Id })">
+                                            Kaldır
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="modal fade" id="removeProduct" tabindex="-1" aria-labelledby="removeProductTitle" aria-hidden="true">
+    <div class="modal-dialog">
+        <form class="modal-content" method="post" asp-controller="Product" asp-action="Delete" asp-route-productId="0">
+            <div class="modal-header">
+                <h2 class="modal-title h5" id="removeProductTitle">Ürünü satıştan kaldır</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0"><strong data-product-label></strong> mağazada artık görünmeyecek. Geçmiş siparişler etkilenmez.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                <button type="submit" class="btn btn-danger">Kaldır</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("removeProduct").addEventListener("show.bs.modal", function (event) {
+            var trigger = event.relatedTarget;
+            this.querySelector("form").action = trigger.dataset.removeUrl;
+            this.querySelector("[data-product-label]").textContent = trigger.dataset.productName;
+        });
+    </script>
+}

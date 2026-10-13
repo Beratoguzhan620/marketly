@@ -99,51 +99,9 @@ internal static class DemoData
         new() { Id = 42, Name = "Ev Yapımı Burger Köftesi", CategoryId = 7, SellerId = 5, Price = 239.90m, StockAmount = 35, DiscountId = null, Enabled = true, Description = "Pişirmeye hazır 4 adet 150 g dana burger köftesi.", CreatedAt = BaseDate.AddDays(2) },
     ];
 
-    public static readonly ProductImageEntity[] ProductImages =
-    [
-        new() { Id = 1, ProductId = 1, Url = "/theme/img/product/product-2.jpg", CreatedAt = BaseDate },
-        new() { Id = 2, ProductId = 2, Url = "/theme/img/product/product-2.jpg", CreatedAt = BaseDate },
-        new() { Id = 3, ProductId = 3, Url = "/theme/img/product/product-3.jpg", CreatedAt = BaseDate },
-        new() { Id = 4, ProductId = 4, Url = "/theme/img/product/product-3.jpg", CreatedAt = BaseDate },
-        new() { Id = 5, ProductId = 5, Url = "/theme/img/product/product-4.jpg", CreatedAt = BaseDate },
-        new() { Id = 6, ProductId = 6, Url = "/theme/img/product/product-4.jpg", CreatedAt = BaseDate },
-        new() { Id = 7, ProductId = 7, Url = "/theme/img/product/product-6.jpg", CreatedAt = BaseDate },
-        new() { Id = 8, ProductId = 8, Url = "/theme/img/product/product-6.jpg", CreatedAt = BaseDate },
-        new() { Id = 9, ProductId = 9, Url = "/theme/img/product/product-7.jpg", CreatedAt = BaseDate },
-        new() { Id = 10, ProductId = 10, Url = "/theme/img/product/product-7.jpg", CreatedAt = BaseDate },
-        new() { Id = 11, ProductId = 11, Url = "/theme/img/product/product-8.jpg", CreatedAt = BaseDate },
-        new() { Id = 12, ProductId = 12, Url = "/theme/img/product/product-8.jpg", CreatedAt = BaseDate },
-        new() { Id = 13, ProductId = 13, Url = "/theme/img/categories/cat-1.jpg", CreatedAt = BaseDate },
-        new() { Id = 14, ProductId = 14, Url = "/theme/img/categories/cat-1.jpg", CreatedAt = BaseDate },
-        new() { Id = 15, ProductId = 15, Url = "/theme/img/product/product-12.jpg", CreatedAt = BaseDate },
-        new() { Id = 16, ProductId = 16, Url = "/theme/img/product/product-12.jpg", CreatedAt = BaseDate },
-        new() { Id = 17, ProductId = 17, Url = "/theme/img/latest-product/lp-1.jpg", CreatedAt = BaseDate },
-        new() { Id = 18, ProductId = 18, Url = "/theme/img/latest-product/lp-1.jpg", CreatedAt = BaseDate },
-        new() { Id = 19, ProductId = 19, Url = "/theme/img/latest-product/lp-2.jpg", CreatedAt = BaseDate },
-        new() { Id = 20, ProductId = 20, Url = "/theme/img/latest-product/lp-2.jpg", CreatedAt = BaseDate },
-        new() { Id = 21, ProductId = 21, Url = "/theme/img/latest-product/lp-2.jpg", CreatedAt = BaseDate },
-        new() { Id = 22, ProductId = 22, Url = "/theme/img/latest-product/lp-2.jpg", CreatedAt = BaseDate },
-        new() { Id = 23, ProductId = 23, Url = "/theme/img/product/discount/pd-2.jpg", CreatedAt = BaseDate },
-        new() { Id = 24, ProductId = 24, Url = "/theme/img/categories/cat-3.jpg", CreatedAt = BaseDate },
-        new() { Id = 25, ProductId = 25, Url = "/theme/img/product/discount/pd-2.jpg", CreatedAt = BaseDate },
-        new() { Id = 26, ProductId = 26, Url = "/theme/img/categories/cat-3.jpg", CreatedAt = BaseDate },
-        new() { Id = 27, ProductId = 27, Url = "/theme/img/product/product-1.jpg", CreatedAt = BaseDate },
-        new() { Id = 28, ProductId = 28, Url = "/theme/img/featured/feature-1.jpg", CreatedAt = BaseDate },
-        new() { Id = 29, ProductId = 29, Url = "/theme/img/product/product-1.jpg", CreatedAt = BaseDate },
-        new() { Id = 30, ProductId = 30, Url = "/theme/img/featured/feature-1.jpg", CreatedAt = BaseDate },
-        new() { Id = 31, ProductId = 31, Url = "/theme/img/product/product-1.jpg", CreatedAt = BaseDate },
-        new() { Id = 32, ProductId = 32, Url = "/theme/img/product/product-10.jpg", CreatedAt = BaseDate },
-        new() { Id = 33, ProductId = 33, Url = "/theme/img/latest-product/lp-3.jpg", CreatedAt = BaseDate },
-        new() { Id = 34, ProductId = 34, Url = "/theme/img/product/product-10.jpg", CreatedAt = BaseDate },
-        new() { Id = 35, ProductId = 35, Url = "/theme/img/latest-product/lp-3.jpg", CreatedAt = BaseDate },
-        new() { Id = 36, ProductId = 36, Url = "/theme/img/product/product-10.jpg", CreatedAt = BaseDate },
-        new() { Id = 37, ProductId = 37, Url = "/theme/img/product/product-5.jpg", CreatedAt = BaseDate },
-        new() { Id = 38, ProductId = 38, Url = "/theme/img/featured/feature-6.jpg", CreatedAt = BaseDate },
-        new() { Id = 39, ProductId = 39, Url = "/theme/img/product/product-5.jpg", CreatedAt = BaseDate },
-        new() { Id = 40, ProductId = 40, Url = "/theme/img/featured/feature-6.jpg", CreatedAt = BaseDate },
-        new() { Id = 41, ProductId = 41, Url = "/theme/img/product/product-5.jpg", CreatedAt = BaseDate },
-        new() { Id = 42, ProductId = 42, Url = "/theme/img/featured/feature-6.jpg", CreatedAt = BaseDate },
-    ];
+    // Products ship without photos: the storefront renders a category-tinted placeholder,
+    // and sellers add real images through the File API.
+    public static readonly ProductImageEntity[] ProductImages = [];
 
     public static readonly ProductCommentEntity[] ProductComments =
     [

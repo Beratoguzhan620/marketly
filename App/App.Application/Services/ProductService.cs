@@ -1,4 +1,5 @@
 using App.Application.Models.Dtos;
+using App.Application.Pricing;
 using App.Application.Models.Requests;
 using App.Application.Results;
 using App.Application.Services.Interfaces;
@@ -16,30 +17,114 @@ namespace App.Application.Services
         IFileApiClient fileApiClient,
         ILogger<ProductService> logger) : IProductService
     {
-        public async Task<List<ProductListDto>> GetListingAsync(string? searchTerm = null)
+        public async Task<PagedResult<ProductListDto>> GetListingAsync(ProductListingQuery query)
         {
-            var query = productRepo.GetAll().Where(p => p.Enabled);
+            var now = DateTime.UtcNow;
+            var pageSize = Math.Clamp(query.PageSize, 1, ProductListingQuery.MaxPageSize);
 
-            if (!string.IsNullOrWhiteSpace(searchTerm))
+            var products = productRepo.GetAll().Where(p => p.Enabled);
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
             {
-                query = query.Where(p => p.Name.Contains(searchTerm));
+                var term = query.Search.Trim();
+                products = products.Where(p => p.Name.Contains(term) || p.Category.Name.Contains(term));
             }
 
-            return await query
-                .Select(p => new ProductListDto
+            if (query.CategoryId is not null)
+            {
+                products = products.Where(p => p.CategoryId == query.CategoryId);
+            }
+
+            if (query.ExcludeProductId is not null)
+            {
+                products = products.Where(p => p.Id != query.ExcludeProductId);
+            }
+
+            // The price a customer pays depends on an active discount, so filters and
+            // sorting work on that value rather than on the list price.
+            var priced = products
+                .Select(p => new
                 {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Price = p.Price,
-                    CategoryName = p.Category.Name,
-                    DiscountPercentage = p.Discount == null ? null : p.Discount.DiscountRate,
-                    ImageUrl = p.Images.Count != 0 ? p.Images.First().Url : null
+                    Product = p,
+                    Rate = p.Discount != null && p.Discount.Enabled && p.Discount.StartDate <= now && p.Discount.EndDate >= now
+                        ? (byte?)p.Discount.DiscountRate
+                        : null,
+                })
+                .Select(x => new
+                {
+                    x.Product,
+                    x.Rate,
+                    FinalPrice = x.Rate == null ? x.Product.Price : x.Product.Price * (100 - x.Rate.Value) / 100m,
+                    Rating = x.Product.Comments.Where(c => c.IsConfirmed).Average(c => (double?)c.StarCount),
+                });
+
+            if (query.OnlyDiscounted)
+            {
+                priced = priced.Where(x => x.Rate != null);
+            }
+
+            if (query.MinPrice is not null)
+            {
+                priced = priced.Where(x => x.FinalPrice >= query.MinPrice);
+            }
+
+            if (query.MaxPrice is not null)
+            {
+                priced = priced.Where(x => x.FinalPrice <= query.MaxPrice);
+            }
+
+            priced = query.Sort switch
+            {
+                ProductSort.PriceAsc => priced.OrderBy(x => x.FinalPrice).ThenBy(x => x.Product.Id),
+                ProductSort.PriceDesc => priced.OrderByDescending(x => x.FinalPrice).ThenBy(x => x.Product.Id),
+                ProductSort.Name => priced.OrderBy(x => x.Product.Name).ThenBy(x => x.Product.Id),
+                ProductSort.TopRated => priced.OrderByDescending(x => x.Rating ?? 0).ThenByDescending(x => x.Product.CreatedAt),
+                _ => priced.OrderByDescending(x => x.Product.CreatedAt).ThenByDescending(x => x.Product.Id),
+            };
+
+            var totalCount = await priced.CountAsync();
+            var totalPages = Math.Max(1, (int)Math.Ceiling(totalCount / (double)pageSize));
+            var page = Math.Clamp(query.Page, 1, totalPages);
+
+            var items = await priced
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new ProductListDto
+                {
+                    Id = x.Product.Id,
+                    Name = x.Product.Name,
+                    CategoryId = x.Product.CategoryId,
+                    CategoryName = x.Product.Category.Name,
+                    SellerName = x.Product.Seller.FirstName + " " + x.Product.Seller.LastName,
+                    Price = x.Product.Price,
+                    FinalPrice = x.FinalPrice,
+                    DiscountPercentage = x.Rate,
+                    StockAmount = x.Product.StockAmount,
+                    ImageUrl = x.Product.Images.OrderBy(i => i.Id).Select(i => i.Url).FirstOrDefault(),
+                    AverageRating = x.Rating,
+                    ReviewCount = x.Product.Comments.Count(c => c.IsConfirmed),
+                    CreatedAt = x.Product.CreatedAt,
                 })
                 .ToListAsync();
+
+            foreach (var item in items)
+            {
+                item.FinalPrice = ProductPricing.Apply(item.Price, item.DiscountPercentage);
+            }
+
+            return new PagedResult<ProductListDto>
+            {
+                Items = items,
+                Page = page,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+            };
         }
 
         public async Task<ServiceResult<ProductDetailDto>> GetDetailAsync(int productId)
         {
+            var now = DateTime.UtcNow;
+
             var product = await productRepo.GetAll()
                 .Where(p => p.Enabled && p.Id == productId)
                 .Select(p => new ProductDetailDto
@@ -47,13 +132,15 @@ namespace App.Application.Services
                     Id = p.Id,
                     Name = p.Name,
                     Price = p.Price,
-                    DiscountRate = p.Discount == null ? null : p.Discount.DiscountRate,
+                    DiscountRate = p.Discount != null && p.Discount.Enabled && p.Discount.StartDate <= now && p.Discount.EndDate >= now
+                        ? p.Discount.DiscountRate
+                        : null,
                     Description = p.Description,
                     StockAmount = p.StockAmount,
                     SellerName = p.Seller.FirstName + " " + p.Seller.LastName,
                     CategoryName = p.Category.Name,
                     CategoryId = p.CategoryId,
-                    ImageUrls = p.Images.Select(i => i.Url).ToArray(),
+                    ImageUrls = p.Images.OrderBy(i => i.Id).Select(i => i.Url).ToArray(),
                 })
                 .FirstOrDefaultAsync();
 

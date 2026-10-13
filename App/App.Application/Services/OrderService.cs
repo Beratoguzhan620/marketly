@@ -1,4 +1,5 @@
 using App.Application.Models.Dtos;
+using App.Application.Pricing;
 using App.Application.Models.Requests;
 using App.Application.Results;
 using App.Application.Services.Interfaces;
@@ -17,9 +18,14 @@ namespace App.Application.Services
         public async Task<ServiceResult<OrderDto>> CreateOrderAsync(int userId, OrderCreateRequest request)
         {
             var cartItems = await cartItemRepo.GetAll()
-                .Include(ci => ci.Product)
+                .Include(ci => ci.Product.Discount)
                 .Where(ci => ci.UserId == userId)
                 .ToListAsync();
+
+            var now = DateTime.UtcNow;
+            var unitPrices = cartItems.ToDictionary(
+                ci => ci.Id,
+                ci => ProductPricing.Apply(ci.Product.Price, ProductPricing.ActiveRate(ci.Product.Discount, now)));
 
             if (cartItems.Count == 0)
             {
@@ -56,7 +62,7 @@ namespace App.Application.Services
                         OrderId = order.Id,
                         ProductId = cartItem.ProductId,
                         Quantity = cartItem.Quantity,
-                        UnitPrice = cartItem.Product.Price,
+                        UnitPrice = unitPrices[cartItem.Id],
                     });
 
                     cartItem.Product.StockAmount -= cartItem.Quantity;
@@ -72,7 +78,7 @@ namespace App.Application.Services
                     OrderCode = order.OrderCode,
                     Address = order.Address,
                     CreatedAt = order.CreatedAt,
-                    TotalPrice = cartItems.Sum(ci => ci.Quantity * ci.Product.Price),
+                    TotalPrice = cartItems.Sum(ci => ci.Quantity * unitPrices[ci.Id]),
                     TotalProducts = cartItems.Count,
                     TotalQuantity = cartItems.Sum(ci => ci.Quantity),
                 });

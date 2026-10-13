@@ -1,0 +1,121 @@
+// Visual smoke test for the storefront: walks the shopping flow as the demo buyer and
+// the seller pages as the demo seller, saving desktop and 360px-wide screenshots.
+import { chromium } from "playwright";
+import { mkdir } from "node:fs/promises";
+
+const baseUrl = process.env.BASE_URL ?? "http://localhost:5080";
+const out = new URL("./output/", import.meta.url).pathname;
+const password = "Demo123!";
+
+const viewports = {
+  desktop: { viewport: { width: 1440, height: 900 } },
+  mobile: { viewport: { width: 360, height: 780 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true },
+};
+
+await mkdir(out, { recursive: true });
+const browser = await chromium.launch();
+const problems = [];
+
+async function shot(page, name) {
+  await page.waitForLoadState("networkidle").catch(() => {});
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  if (overflow > 1) problems.push(`${name}: page is ${overflow}px wider than the viewport`);
+  await page.screenshot({ path: `${out}${name}.png`, fullPage: true });
+  console.log(`saved ${name}.png`);
+}
+
+async function login(page, email) {
+  await page.goto(`${baseUrl}/login`);
+  await page.fill("#Email", email);
+  await page.fill("#Password", password);
+  await Promise.all([page.waitForNavigation(), page.click("form button[type=submit]")]);
+}
+
+for (const [device, options] of Object.entries(viewports)) {
+  const context = await browser.newContext({ ...options, locale: "tr-TR" });
+  const page = await context.newPage();
+
+  await page.goto(`${baseUrl}/`);
+  await shot(page, `${device}-home`);
+
+  await page.goto(`${baseUrl}/product/list`);
+  await shot(page, `${device}-listing`);
+
+  await page.goto(`${baseUrl}/product/list?category=3&sort=PriceAsc&discounted=true`);
+  await shot(page, `${device}-listing-filtered`);
+
+  await page.goto(`${baseUrl}/product/list?search=zzzz`);
+  await shot(page, `${device}-listing-empty`);
+
+  await page.goto(`${baseUrl}/product/list?page=2`);
+  await shot(page, `${device}-listing-page-2`);
+
+  await page.goto(`${baseUrl}/product/12/details`);
+  await shot(page, `${device}-product`);
+
+  await page.goto(`${baseUrl}/login`);
+  await page.click("form button[type=submit]");
+  await shot(page, `${device}-login-validation`);
+
+  await page.goto(`${baseUrl}/register`);
+  await shot(page, `${device}-register`);
+
+  // Buyer: add to cart, check out, see the order.
+  await login(page, "buyer@example.com");
+  for (const id of [12, 2, 30]) {
+    await page.goto(`${baseUrl}/add-to-cart/${id}`);
+  }
+  await page.goto(`${baseUrl}/cart`);
+  await shot(page, `${device}-cart`);
+
+  if (device === "desktop") {
+    await Promise.all([page.waitForNavigation(), page.click(".qty-form [data-qty-step='1'] >> nth=0")]);
+    await shot(page, `${device}-cart-updated`);
+  }
+
+  await page.goto(`${baseUrl}/checkout`);
+  await page.click("#checkoutForm button[type=submit]");
+  await page.waitForLoadState("networkidle").catch(() => {});
+  await shot(page, `${device}-checkout-validation`);
+
+  await page.fill("#Address", "Bağdat Cad. No: 214 D: 7, Kadıköy / İstanbul");
+  await shot(page, `${device}-checkout`);
+  await Promise.all([page.waitForNavigation(), page.click("#checkoutForm button[type=submit]")]);
+  await shot(page, `${device}-order-confirmed`);
+
+  await page.goto(`${baseUrl}/my-orders`);
+  await shot(page, `${device}-my-orders`);
+
+  await page.goto(`${baseUrl}/profile`);
+  await shot(page, `${device}-profile`);
+
+  await page.goto(`${baseUrl}/logout`);
+
+  // Seller pages.
+  await login(page, "seller@example.com");
+  await page.goto(`${baseUrl}/my-products`);
+  await shot(page, `${device}-my-products`);
+
+  await page.goto(`${baseUrl}/product`);
+  await shot(page, `${device}-product-create`);
+
+  if (device === "mobile") {
+    await page.goto(`${baseUrl}/`);
+    await page.click(".header-actions .dropdown button");
+    await page.waitForTimeout(300);
+    await page.screenshot({ path: `${out}${device}-account-menu.png` });
+    console.log(`saved ${device}-account-menu.png`);
+  }
+
+  await page.goto(`${baseUrl}/does-not-exist`);
+  await shot(page, `${device}-not-found`);
+
+  await context.close();
+}
+
+await browser.close();
+
+if (problems.length > 0) {
+  console.error("Layout problems:\n" + problems.join("\n"));
+  process.exit(1);
+}

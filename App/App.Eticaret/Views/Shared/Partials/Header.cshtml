@@ -1,136 +1,91 @@
-@using App.Data.Entities
-@using App.Data.Infrastructure
-@using Microsoft.EntityFrameworkCore
-@inject DataRepository<CartItemEntity> cartItemRepository
+@using System.Security.Claims
+@using App.Application.Services.Interfaces
+@inject ICartService cartService
 @{
-    var IsCurrentPage = (string? action, string? controller) =>
+    var controller = ViewContext.RouteData.Values["controller"] as string;
+    var action = ViewContext.RouteData.Values["action"] as string;
+    bool Is(string c, string? a = null) =>
+        string.Equals(controller, c, StringComparison.OrdinalIgnoreCase)
+        && (a is null || string.Equals(action, a, StringComparison.OrdinalIgnoreCase));
+
+    var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+    var firstName = User.FindFirstValue(ClaimTypes.Name);
+    var isSeller = User.IsInRole("seller");
+    var canShop = User.IsInRole("buyer") || isSeller;
+
+    var cartCount = 0;
+    if (canShop && int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
     {
-        var routeData = ViewContext.RouteData.Values;
-        var routeAction = routeData["action"] as string;
-        var routeController = routeData["controller"] as string;
-
-        if (string.IsNullOrEmpty(action))
-        {
-            action = routeAction;
-        }
-
-        if (string.IsNullOrEmpty(controller))
-        {
-            controller = routeController;
-        }
-
-        return string.Equals(action, routeAction, StringComparison.OrdinalIgnoreCase) &&
-               string.Equals(controller, routeController, StringComparison.OrdinalIgnoreCase);
-    };
-
-    string? currentUserName = Context.Request.Cookies["name"];
-    string? currentUserId = Context.Request.Cookies["userId"];
-
-    bool IsAuthenticated = !string.IsNullOrEmpty(currentUserName);
-
-    int cartItemCount = 0;
-    decimal cartTotalPrice = 0;
-
-    if (IsAuthenticated && int.TryParse(currentUserId, out int userId))
-    {
-        var cartItems = await cartItemRepository.GetAll()
-            .Where(x => x.UserId == userId)
-            .Select(x => x.Product.Price * x.Quantity)
-            .ToListAsync();
-
-        cartItemCount = cartItems.Count;
-        cartTotalPrice = cartItems.Sum();
+        var cart = await cartService.GetCartAsync(userId);
+        cartCount = cart.Items.Sum(i => i.Quantity);
     }
+
+    var search = Context.Request.Query["search"].ToString();
 }
-<!-- Header Section Begin -->
-<header class="header">
-    <div class="header__top">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="header__top__left">
-                        <ul>
-                            <li><i class="fa fa-envelope"></i> destek@marketly.example</li>
-                            <li>Free Shipping for all Order of $99</li>
+
+<header class="shop-header">
+    <div class="container-shop">
+        <div class="shop-header-row">
+            <a class="brand" asp-controller="Home" asp-action="Index"><span class="brand-mark">M</span>Marketly</a>
+
+            <form class="shop-search ms-md-4" role="search" method="get" asp-controller="Home" asp-action="Listing">
+                <i class="bi bi-search" aria-hidden="true"></i>
+                <input class="form-control" type="search" name="search" value="@search" placeholder="Ürün veya kategori ara" aria-label="Ürün ara" />
+            </form>
+
+            <div class="header-actions">
+                @if (isAuthenticated)
+                {
+                    <div class="dropdown">
+                        <button class="header-icon-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Hesabım">
+                            <i class="bi bi-person"></i><span class="header-label">@firstName</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" asp-controller="Profile" asp-action="Details"><i class="bi bi-person me-2"></i>Hesabım</a></li>
+                            <li><a class="dropdown-item" asp-controller="Profile" asp-action="MyOrders"><i class="bi bi-receipt me-2"></i>Siparişlerim</a></li>
+                            @if (isSeller)
+                            {
+                                <li><a class="dropdown-item" asp-controller="Profile" asp-action="MyProducts"><i class="bi bi-box-seam me-2"></i>Ürünlerim</a></li>
+                                <li><a class="dropdown-item" asp-controller="Product" asp-action="Create"><i class="bi bi-plus-lg me-2"></i>Ürün ekle</a></li>
+                            }
+                            <li><hr class="dropdown-divider" /></li>
+                            <li><a class="dropdown-item" asp-controller="Auth" asp-action="Logout"><i class="bi bi-box-arrow-right me-2"></i>Çıkış yap</a></li>
                         </ul>
                     </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="header__top__right">
-                        <div class="header__top__right__social">
-                            <a href="#"><i class="fa fa-facebook"></i></a>
-                            <a href="#"><i class="fa fa-twitter"></i></a>
-                            <a href="#"><i class="fa fa-linkedin"></i></a>
-                            <a href="#"><i class="fa fa-pinterest-p"></i></a>
-                        </div>
-                        <div class="header__top__right__language">
-                            <img src="~/theme/img/language.png" alt="">
-                            <div>English</div>
-                            <span class="arrow_carrot-down"></span>
-                            <ul>
-                                <li><a href="#">Türkçe</a></li>
-                                <li><a href="#">English</a></li>
-                            </ul>
-                        </div>
-                        <div class="header__top__right__auth header__top__right__language">
-                            @if (IsAuthenticated)
-                            {
-                                <a href="#"><i class="fa fa-user"></i> @currentUserName</a>
-                                <ul>
-                                    <li><a asp-controller="Profile" asp-action="Details">Profile</a></li>
-                                    <li><a asp-controller="Profile" asp-action="MyProducts">My Products</a></li>
-                                    <li><a asp-controller="Profile" asp-action="MyOrders">My Orders</a></li>
-                                    <li><a asp-action="Logout" asp-controller="Auth" class="border-top">Logout</a></li>
-                                </ul>
-                            }
-                            else
-                            {
-                                <a asp-controller="Auth" asp-action="Login"><i class="fa fa-user"></i> Login</a>
-                            }
-                        </div>
-                    </div>
-                </div>
+                }
+                else
+                {
+                    <a class="header-icon-btn" asp-controller="Auth" asp-action="Login" aria-label="Giriş yap">
+                        <i class="bi bi-person"></i><span class="header-label">Giriş yap</span>
+                    </a>
+                }
+
+                <a class="header-icon-btn" asp-controller="Cart" asp-action="Edit" aria-label="Sepet, @cartCount ürün">
+                    <i class="bi bi-bag"></i>
+                    @if (cartCount > 0)
+                    {
+                        <span class="cart-count" data-cart-count>@cartCount</span>
+                    }
+                    <span class="header-label">Sepet</span>
+                </a>
             </div>
         </div>
-    </div>
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-3">
-                <div class="header__logo">
-                    <a asp-controller="Home" asp-action="Index"><img src="~/theme/img/logo.png" alt=""></a>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <nav class="header__menu">
-                    <ul>
-                        <li @(IsCurrentPage("Index", "Home") ? "class=active" : "")><a asp-controller="Home" asp-action="Index">Home</a></li>
-                        <li @(IsCurrentPage("Listing", "Home") ? "class=active" : "")><a asp-controller="Home" asp-action="Listing">Shop</a></li>
-                        <li @(IsCurrentPage("Index", "Blog") ? "class=active" : "")><a asp-controller="Blog" asp-action="Index">Blog</a></li>
-                        <li>
-                            <a href="#">Pages</a>
-                            <ul class="header__menu__dropdown">
-                                <li><a asp-controller="Home" asp-action="ProductDetail" asp-route-productId="1">Shop Details</a></li>
-                                <li><a asp-controller="Cart" asp-action="Edit">Shoping Cart</a></li>
-                            </ul>
-                        </li>
-                        <li @(IsCurrentPage("Contact", "Home") ? "class=active" : "")><a asp-controller="Home" asp-action="Contact">Contact</a></li>
-                    </ul>
-                </nav>
-            </div>
-            <div class="col-lg-3">
-                <div class="header__cart">
-                    <ul>
-                        <li><a asp-controller="Product" asp-action="Create" title="Add New Product"><i class="fa fa-plus"></i></a></li>
-                        <li><a href="#"><i class="fa fa-heart"></i> <span>1</span></a></li>
-                        <li><a asp-controller="Cart" asp-action="Edit"><i class="fa fa-shopping-bag"></i> <span>@cartItemCount</span></a></li>
-                    </ul>
-                    <div class="header__cart__price">item: <span>@(cartTotalPrice.ToString("C"))</span></div>
-                </div>
-            </div>
-        </div>
-        <div class="humberger__open">
-            <i class="fa fa-bars"></i>
-        </div>
+
+        <form class="mobile-search shop-search" role="search" method="get" asp-controller="Home" asp-action="Listing">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <input class="form-control" type="search" name="search" value="@search" placeholder="Ürün veya kategori ara" aria-label="Ürün ara" />
+        </form>
+
+        <nav class="shop-nav" aria-label="Ana menü">
+            <a class="@(Is("Home", "Index") ? "active" : null)" asp-controller="Home" asp-action="Index">Ana sayfa</a>
+            <a class="@(Is("Home", "Listing") || Is("Home", "ProductDetail") ? "active" : null)" asp-controller="Home" asp-action="Listing">Tüm ürünler</a>
+            <a href="@Url.Action("Listing", "Home", new { discounted = true })">İndirimdekiler</a>
+            <a class="@(Is("Home", "AboutUs") ? "active" : null)" asp-controller="Home" asp-action="AboutUs">Hakkımızda</a>
+            <a class="@(Is("Home", "Contact") ? "active" : null)" asp-controller="Home" asp-action="Contact">İletişim</a>
+            @if (isAuthenticated && !isSeller)
+            {
+                <a class="ms-auto" asp-controller="Profile" asp-action="Details" asp-fragment="seller">Satıcı olun</a>
+            }
+        </nav>
     </div>
 </header>
-<!-- Header Section End -->

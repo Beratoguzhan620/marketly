@@ -1,1 +1,12 @@
-﻿
+@{
+    ViewData["Title"] = "Blog";
+}
+
+<div class="page-header">
+    <div>
+        <h1>Blog</h1>
+        <p>Üreticilerden tarifler, mevsim rehberleri ve pazar haberleri.</p>
+    </div>
+</div>
+
+<partial name="Partials/EmptyState" model="@(new EmptyStateViewModel("Yazılar hazırlanıyor", "Blog bölümü yakında açılacak. Bu sırada mevsimin ürünlerine göz atabilirsiniz.", "bi-journal-text", "Ürünlere göz at", Url.Action("Listing", "Home")))" />
