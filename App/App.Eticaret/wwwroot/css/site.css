@@ -1143,3 +1143,9 @@ main.shop-main {
 @media (min-width: 992px) {
     .brand.auth-mobile-brand { display: none; }
 }
+
+@media (max-width: 575.98px) {
+    .cart-line .line-total { grid-column: 2 / 4; text-align: left; }
+}
+
+.shop-footer a { overflow-wrap: anywhere; }
