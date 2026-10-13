@@ -18,11 +18,11 @@ Her aşama ayrı bir branch ve PR olarak yapılır (`stage/<no>-<kisa-ad>`). Bir
 - [x] CI: build (uyarılar hata sayılır) + bekleyen model değişikliği kontrolü
 
 ## Aşama 2 — Mağaza arayüzü (Eticaret) yeniden tasarım
-- [ ] `docs/DESIGN.md` token'larıyla yeni layout: header (arama, sepet sayacı, kullanıcı menüsü), footer
-- [ ] Ana sayfa, kategori/ürün listesi (filtre + sıralama + **sayfalama**), ürün detayı (galeri, yorumlar, puan)
-- [ ] Sepet, ödeme (checkout) ve sipariş detay sayfaları; adım göstergesi
-- [ ] Profil: siparişlerim, ürünlerim (satıcı), satıcı başvurusu
-- [ ] Mobil uyum (360px'te kusursuz)
+- [x] `docs/DESIGN.md` token'larıyla yeni layout: header (arama, sepet sayacı, kullanıcı menüsü), footer
+- [x] Ana sayfa, kategori/ürün listesi (filtre + sıralama + **sayfalama**), ürün detayı (galeri, yorumlar, puan)
+- [x] Sepet, ödeme (checkout) ve sipariş detay sayfaları; adım göstergesi
+- [x] Profil: siparişlerim, ürünlerim (satıcı), satıcı başvurusu
+- [x] Mobil uyum (360px'te kusursuz)
 
 ## Aşama 3 — Admin paneli yeniden tasarım
 - [ ] SB Admin 2 görünümü kaldırılır; kendi sade admin layout'u
