@@ -1,4 +1,5 @@
 using App.Application.Models.Dtos;
+using App.Application.Pricing;
 using App.Application.Results;
 using App.Application.Services.Interfaces;
 using App.Data.Entities;
@@ -11,22 +12,15 @@ namespace App.Application.Services
     {
         public async Task<CartDto> GetCartAsync(int userId)
         {
-            var items = await cartItemRepo.GetAll()
+            var cartItems = await cartItemRepo.GetAll()
                 .Include(ci => ci.Product.Images)
+                .Include(ci => ci.Product.Discount)
+                .Include(ci => ci.Product.Category)
                 .Where(ci => ci.UserId == userId)
-                .Select(ci => new CartItemDto
-                {
-                    Id = ci.Id,
-                    ProductId = ci.ProductId,
-                    ProductName = ci.Product.Name,
-                    ProductImage = ci.Product.Images.Count != 0 ? ci.Product.Images.First().Url : null,
-                    Quantity = ci.Quantity,
-                    Price = ci.Product.Price,
-                    StockAmount = ci.Product.StockAmount
-                })
+                .OrderBy(ci => ci.Id)
                 .ToListAsync();
 
-            return new CartDto { Items = items };
+            return new CartDto { Items = cartItems.Select(ToDto).ToList() };
         }
 
         public async Task<ServiceResult> AddProductAsync(int userId, int productId)
@@ -85,6 +79,8 @@ namespace App.Application.Services
         {
             var cartItem = await cartItemRepo.GetAll()
                 .Include(ci => ci.Product.Images)
+                .Include(ci => ci.Product.Discount)
+                .Include(ci => ci.Product.Category)
                 .FirstOrDefaultAsync(ci => ci.UserId == userId && ci.Id == cartItemId);
 
             if (cartItem is null)
@@ -105,16 +101,27 @@ namespace App.Application.Services
             cartItem.Quantity = quantity;
             cartItem = (await cartItemRepo.UpdateAsync(cartItem))!;
 
-            return ServiceResult<CartItemDto>.Ok(new CartItemDto
+            return ServiceResult<CartItemDto>.Ok(ToDto(cartItem));
+        }
+
+        private static CartItemDto ToDto(CartItemEntity cartItem)
+        {
+            var discountRate = ProductPricing.ActiveRate(cartItem.Product.Discount, DateTime.UtcNow);
+
+            return new CartItemDto
             {
                 Id = cartItem.Id,
                 ProductId = cartItem.ProductId,
                 ProductName = cartItem.Product.Name,
-                ProductImage = cartItem.Product.Images.Count != 0 ? cartItem.Product.Images.First().Url : null,
+                CategoryId = cartItem.Product.CategoryId,
+                CategoryName = cartItem.Product.Category.Name,
+                ProductImage = cartItem.Product.Images.Count != 0 ? cartItem.Product.Images.OrderBy(i => i.Id).First().Url : null,
                 Quantity = cartItem.Quantity,
-                Price = cartItem.Product.Price,
+                ListPrice = cartItem.Product.Price,
+                DiscountRate = discountRate,
+                Price = ProductPricing.Apply(cartItem.Product.Price, discountRate),
                 StockAmount = cartItem.Product.StockAmount
-            });
+            };
         }
     }
 }
