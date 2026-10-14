@@ -30,7 +30,7 @@ internal static class DemoData
         new() { Id = 5, FirstName = "Can", LastName = "Öztürk", Email = "can.ozturk@example.com", RoleId = 2, Enabled = true, Password = "PBKDF2$SHA256$100000$bTZmf1M+6AS7I3dAk9F75Q==$n93i2P5h6HDQydpjHwVDYL2+xVMGQ3CUD5BZfu7uQTU=", CreatedAt = BaseDate.AddDays(4) },
         new() { Id = 6, FirstName = "Burak", LastName = "Şahin", Email = "burak.sahin@example.com", RoleId = 3, Enabled = true, Password = "PBKDF2$SHA256$100000$oZWe2/+ZtrZHyZKGcraqyg==$V/j+Gg3u5PpNKcoanoBLpfDmzQnjTu6sCzPrL9z3v2w=", CreatedAt = BaseDate.AddDays(5) },
         new() { Id = 7, FirstName = "Elif", LastName = "Arslan", Email = "elif.arslan@example.com", RoleId = 3, Enabled = true, Password = "PBKDF2$SHA256$100000$98Ew7jvHIeazB1EZMM9LkQ==$ya2mAmHGwwDtyynoGCt2KdVZvNXEbBAsRI8EdHdrTFU=", CreatedAt = BaseDate.AddDays(6) },
-        new() { Id = 8, FirstName = "Deniz", LastName = "Çelik", Email = "deniz.celik@example.com", RoleId = 3, Enabled = true, Password = "PBKDF2$SHA256$100000$FbdScsnyf1oZdqyp4m0XFg==$Mh+1x/gZsfVHerhelZF9/3oquThA9i0WGeilIwgP7Ac=", CreatedAt = BaseDate.AddDays(7) },
+        new() { Id = 8, FirstName = "Deniz", LastName = "Çelik", Email = "deniz.celik@example.com", RoleId = 3, Enabled = true, HasSellerRequest = true, Password = "PBKDF2$SHA256$100000$FbdScsnyf1oZdqyp4m0XFg==$Mh+1x/gZsfVHerhelZF9/3oquThA9i0WGeilIwgP7Ac=", CreatedAt = BaseDate.AddDays(7) },
     ];
 
     public static readonly CategoryEntity[] Categories =
