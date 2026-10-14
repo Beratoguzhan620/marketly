@@ -25,10 +25,10 @@ Her aşama ayrı bir branch ve PR olarak yapılır (`stage/<no>-<kisa-ad>`). Bir
 - [x] Mobil uyum (360px'te kusursuz)
 
 ## Aşama 3 — Admin paneli yeniden tasarım
-- [ ] SB Admin 2 görünümü kaldırılır; kendi sade admin layout'u
-- [ ] Dashboard: özet kartlar (sipariş, ciro, yeni kullanıcı, bekleyen yorum) + basit grafik
-- [ ] Ürün, kategori, kullanıcı, yorum listeleri: arama, filtre, sayfalama, toplu işlem
-- [ ] Satıcı başvurusu onay akışı, yorum onay akışı
+- [x] SB Admin 2 görünümü kaldırılır; kendi sade admin layout'u
+- [x] Dashboard: özet kartlar (sipariş, ciro, yeni kullanıcı, bekleyen yorum) + basit grafik
+- [x] Ürün, kategori, kullanıcı, yorum listeleri: arama, filtre, sayfalama, toplu işlem
+- [x] Satıcı başvurusu onay akışı, yorum onay akışı
 
 ## Aşama 4 — Özellik tamamlama
 - [ ] Blog: seed verisi ve TODO'ların kaldırılması, kategori/etiket filtreleri

@@ -3,6 +3,7 @@ using App.Application.Services;
 using App.Application.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace App.Application
 {
@@ -17,6 +18,8 @@ namespace App.Application
         {
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAdminService, AdminService>();
+            services.TryAddSingleton(TimeProvider.System);
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<ICartService, CartService>();

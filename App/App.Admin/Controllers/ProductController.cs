@@ -1,4 +1,5 @@
 using App.Admin.Models.ViewModels;
+using App.Application.Models.Requests;
 using App.Application.Results;
 using App.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -8,33 +9,34 @@ using ApplicationFileUploadRequest = App.Application.Models.Requests.FileUploadR
 namespace App.Admin.Controllers
 {
     [Authorize(Roles = "admin")]
-    public class ProductController(IProductService productService) : Controller
+    public class ProductController(IProductService productService, IAdminService adminService, ICategoryService categoryService) : Controller
     {
-        [Route("/products/")]
+        [Route("/products")]
         [HttpGet]
-        public async Task<IActionResult> List()
+        public async Task<IActionResult> List([FromQuery] AdminProductQuery query)
         {
-            var products = await productService.GetAllForAdminAsync();
-
-            var viewModel = products.Select(p => new AdminProductListItemViewModel
+            return View(new ProductListPageViewModel
             {
-                Id = p.Id,
-                Name = p.Name,
-                SellerName = p.SellerName,
-                Price = p.Price,
-                Enabled = p.Enabled,
-                ImageUrl = p.ImageUrl
-            }).ToList();
-
-            return View(viewModel);
+                Query = query,
+                Result = await adminService.GetProductsAsync(query),
+                Categories = await categoryService.GetAllAsync(),
+            });
         }
 
-        [Route("/products/filter")]
-        [HttpGet]
-        public IActionResult Filter([FromQuery] object filterOptions)
+        [Route("/products/bulk")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Bulk([FromForm] int[] ids, [FromForm] string operation, [FromForm] string? returnUrl)
         {
-            // will return filtered products as json
-            return Json(new { });
+            var result = operation switch
+            {
+                "enable" => await adminService.SetProductsEnabledAsync(ids, true),
+                "disable" => await adminService.SetProductsEnabledAsync(ids, false),
+                _ => ServiceResult.ValidationError("Bilinmeyen işlem."),
+            };
+
+            TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
+            return Url.IsLocalUrl(returnUrl) ? LocalRedirect(returnUrl!) : RedirectToAction(nameof(List));
         }
 
         [Route("/products/{productId:int}/images")]
@@ -58,6 +60,7 @@ namespace App.Admin.Controllers
 
         [Route("/products/{productId:int}/images")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Images([FromRoute] int productId, [FromForm] AdminProductImagesViewModel model)
         {
             model.ProductId = productId;
@@ -95,11 +98,8 @@ namespace App.Admin.Controllers
                     return View(model);
                 }
 
-                ViewBag.SuccessMessage = result.Message;
-                model.NewImages = [];
-
-                await RefreshCurrentImagesAsync(productId, model);
-                return View(model);
+                TempData["SuccessMessage"] = result.Message;
+                return RedirectToAction(nameof(Images), new { productId });
             }
             finally
             {
@@ -109,6 +109,7 @@ namespace App.Admin.Controllers
 
         [Route("/products/{productId:int}/images/{imageId:int}/delete")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteImage([FromRoute] int productId, [FromRoute] int imageId)
         {
             var result = await productService.DeleteProductImageAsAdminAsync(productId, imageId);
@@ -122,14 +123,8 @@ namespace App.Admin.Controllers
                 };
             }
 
+            TempData["SuccessMessage"] = "Görsel silindi.";
             return RedirectToAction(nameof(Images), new { productId });
-        }
-
-        [Route("/products/{productId:int}/delete")]
-        [HttpGet]
-        public IActionResult Delete([FromRoute] int productId)
-        {
-            return View();
         }
 
         private async Task RefreshCurrentImagesAsync(int productId, AdminProductImagesViewModel model)

@@ -1,56 +1,87 @@
-﻿@model List<ProductCommentViewModel>
+@model CommentListPageViewModel
 @{
-    ViewBag.Title = "Product Comments";
+    ViewData["Title"] = "Yorumlar";
+    var q = Model.Query;
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
 }
 
-<h2>Ürün Yorumları</h2>
+<partial name="Partials/_ViewMessages" />
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Ürün</th>
-            <th>Yorum</th>
-            <th>Puan</th>
-            <th>Sahibi</th>
-            <th>İşlemler</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model.Count == 0)
+<div class="page-header">
+    <div>
+        <h1>Yorumlar</h1>
+        <p>Yorumlar onaylandıktan sonra ürün sayfasında yayınlanır.</p>
+    </div>
+</div>
+
+<div class="card" data-bulk>
+    <form class="filter-bar" method="get" asp-action="List" role="search">
+        <div class="search">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <input class="form-control form-control-sm" type="search" name="search" value="@q.Search" placeholder="Yorum veya ürün ara" aria-label="Yorum veya ürün ara" />
+        </div>
+        <div class="btn-group btn-group-sm" role="group" aria-label="Durum">
+            @foreach (var (value, text) in new[] { (CommentStatusFilter.Pending, "Bekleyen"), (CommentStatusFilter.Approved, "Onaylı"), (CommentStatusFilter.All, "Tümü") })
+            {
+                <a class="btn @(q.Status == value ? "btn-primary" : "btn-outline-secondary")" href="@Url.Action("List", new { status = value, search = q.Search })">@text</a>
+            }
+        </div>
+        <input type="hidden" name="status" value="@q.Status" />
+        <button class="btn btn-outline-secondary btn-sm" type="submit">Ara</button>
+    </form>
+
+    <form method="post" asp-action="Bulk">
+        <input type="hidden" name="returnUrl" value="@returnUrl" />
+        <div class="bulk-bar" data-bulk-bar>
+            <span class="count" data-bulk-count></span>
+            <button class="btn btn-primary btn-sm" type="submit" name="operation" value="approve">Onayla</button>
+            <button class="btn btn-outline-secondary btn-sm" type="submit" name="operation" value="delete"
+                    data-confirm="Seçili yorumlar kalıcı olarak silinecek." data-confirm-title="Yorumları sil" data-confirm-ok="Sil">Sil</button>
+        </div>
+
+        @if (Model.Result.Items.Count == 0)
         {
-            <tr>
-                <td colspan="5">Onay bekleyen yorum bulunmuyor.</td>
-            </tr>
+            <partial name="Partials/_EmptyState" model="@(q.Status == CommentStatusFilter.Pending
+                ? ("Onay bekleyen yorum yok", "Yeni yorumlar geldiğinde burada listelenir.", "bi-check2-circle")
+                : ("Yorum bulunamadı", "Filtreleri değiştirerek tekrar deneyin.", "bi-chat-square-text"))" />
         }
-        @foreach (var comment in Model)
+        else
         {
-            <tr id="comment-row-@comment.Id">
-                <td>@comment.ProductName</td>
-                <td><i>@comment.Text</i></td>
-                <td>@comment.StarCount</td>
-                <td>@comment.UserName</td>
-                <td>
-                    <button class="btn btn-primary" onclick="approveComment(@comment.Id)">Approve</button>
-                </td>
-            </tr>
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th class="check-col"><input class="form-check-input" type="checkbox" data-bulk-all aria-label="Tümünü seç" /></th>
+                            <th>Yorum</th>
+                            <th>Ürün</th>
+                            <th>Tarih</th>
+                            <th>Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var c in Model.Result.Items)
+                        {
+                            <tr>
+                                <td class="check-col"><input class="form-check-input" type="checkbox" name="ids" value="@c.Id" data-bulk-item aria-label="Yorumu seç" /></td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <span class="fw-medium small">@c.UserName</span>
+                                        <span class="stars" aria-label="5 üzerinden @c.StarCount">
+                                            @for (var i = 1; i <= 5; i++) { <i class="bi @(i <= c.StarCount ? "bi-star-fill" : "bi-star")"></i> }
+                                        </span>
+                                    </div>
+                                    <div class="comment-text">@c.Text</div>
+                                </td>
+                                <td>@c.ProductName</td>
+                                <td class="text-muted text-nowrap">@Display.Date(c.CreatedAt)</td>
+                                <td>@if (c.IsConfirmed) { <span class="badge badge-success">Onaylı</span> } else { <span class="badge badge-warning">Bekliyor</span> }</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         }
-    </tbody>
-</table>
+    </form>
 
-@section scripts {
-    <script>
-        function approveComment(commentId) {
-            // Make a fetch request to the server to approve the comment
-
-            fetch(`/comment/${commentId}/approve`)
-                .then(response => response.json())
-                .then(data => {
-                    // Refresh the page to update the approved status
-                    location.reload();
-                })
-                .catch(error => {
-                    alert('Yorum onaylanamadı...');
-                });
-        }
-    </script>
-}
+    <partial name="Partials/_Pager" model="Model.Pager" />
+</div>

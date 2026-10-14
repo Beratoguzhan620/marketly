@@ -1,45 +1,41 @@
-﻿using App.Admin.Models.ViewModels;
+using App.Admin.Models.ViewModels;
+using App.Application.Models.Requests;
+using App.Application.Results;
 using App.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace App.Admin.Controllers
 {
-    [Route("/comment")]
+    [Route("/comments")]
     [Authorize(Roles = "admin")]
-    public class CommentController(IProductCommentService productCommentService) : Controller
+    public class CommentController(IAdminService adminService) : Controller
     {
         [Route("")]
         [HttpGet]
-        public async Task<IActionResult> List()
+        public async Task<IActionResult> List([FromQuery] AdminCommentQuery query)
         {
-            var comments = await productCommentService.GetPendingCommentsAsync();
-
-            var viewModel = comments.Select(c => new ProductCommentViewModel
+            return View(new CommentListPageViewModel
             {
-                Id = c.Id,
-                ProductName = c.ProductName,
-                Text = c.Text,
-                StarCount = c.StarCount,
-                UserName = c.UserName,
-                CreatedAt = c.CreatedAt,
-            }).ToList();
-
-            return View(viewModel);
+                Query = query,
+                Result = await adminService.GetCommentsAsync(query),
+            });
         }
 
-        [Route("{commentId:int}/approve")]
-        [HttpGet]
-        public async Task<IActionResult> Approve([FromRoute] int commentId)
+        [Route("bulk")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Bulk([FromForm] int[] ids, [FromForm] string operation, [FromForm] string? returnUrl)
         {
-            var result = await productCommentService.ApproveCommentAsync(commentId);
-
-            if (!result.Success)
+            var result = operation switch
             {
-                return NotFound(new { message = result.Message });
-            }
+                "approve" => await adminService.ApproveCommentsAsync(ids),
+                "delete" => await adminService.DeleteCommentsAsync(ids),
+                _ => ServiceResult.ValidationError("Bilinmeyen işlem."),
+            };
 
-            return Json(new { success = true });
+            TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
+            return Url.IsLocalUrl(returnUrl) ? LocalRedirect(returnUrl!) : RedirectToAction(nameof(List));
         }
     }
 }

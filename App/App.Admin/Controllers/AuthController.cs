@@ -24,6 +24,7 @@ namespace App.Admin.Controllers
 
         [Route("/login")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([FromForm] LoginViewModel loginModel)
         {
             if (!ModelState.IsValid)
@@ -77,7 +78,7 @@ namespace App.Admin.Controllers
             var authProperties = new AuthenticationProperties
             {
                 IsPersistent = true,
-                ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30),
+                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8),
             };
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);

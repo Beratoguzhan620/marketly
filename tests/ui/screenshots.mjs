@@ -113,6 +113,51 @@ for (const [device, options] of Object.entries(viewports)) {
   await context.close();
 }
 
+// Admin panel.
+const adminUrl = process.env.ADMIN_URL ?? "http://localhost:5081";
+for (const [device, options] of Object.entries(viewports)) {
+  const context = await browser.newContext({ ...options, locale: "tr-TR" });
+  const page = await context.newPage();
+
+  await page.goto(`${adminUrl}/login`);
+  await shot(page, `${device}-admin-login`);
+  await page.fill("#Email", "admin@example.com");
+  await page.fill("#Password", password);
+  await Promise.all([page.waitForNavigation(), page.click("form button[type=submit]")]);
+  await shot(page, `${device}-admin-dashboard`);
+
+  await page.goto(`${adminUrl}/products`);
+  await shot(page, `${device}-admin-products`);
+  await page.goto(`${adminUrl}/users?onlySellerRequests=true`);
+  await shot(page, `${device}-admin-seller-requests`);
+  await page.goto(`${adminUrl}/comments`);
+  await shot(page, `${device}-admin-comments`);
+  await page.goto(`${adminUrl}/categories`);
+  await shot(page, `${device}-admin-categories`);
+
+  if (device === "desktop") {
+    // Bulk action: select two products and take them off sale, through the confirm dialog.
+    await page.goto(`${adminUrl}/products?search=Muz`);
+    await page.check("input[data-bulk-all]");
+    await shot(page, `${device}-admin-products-selected`);
+    await page.click("button[value=disable]");
+    await page.waitForTimeout(400);
+    await shot(page, `${device}-admin-confirm`);
+    await Promise.all([page.waitForNavigation(), page.click("[data-confirm-accept]")]);
+    await shot(page, `${device}-admin-products-disabled`);
+
+    // Approve the pending seller request and every pending comment.
+    await page.goto(`${adminUrl}/users?onlySellerRequests=true`);
+    await Promise.all([page.waitForNavigation(), page.click("form[action$='/approve'] button")]);
+    await page.goto(`${adminUrl}/comments`);
+    await page.check("input[data-bulk-all]");
+    await Promise.all([page.waitForNavigation(), page.click("button[value=approve]")]);
+    await shot(page, `${device}-admin-comments-approved`);
+  }
+
+  await context.close();
+}
+
 await browser.close();
 
 if (problems.length > 0) {

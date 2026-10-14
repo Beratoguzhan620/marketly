@@ -1818,7 +1818,7 @@ namespace App.Data.Migrations
                             Email = "deniz.celik@example.com",
                             Enabled = true,
                             FirstName = "Deniz",
-                            HasSellerRequest = false,
+                            HasSellerRequest = true,
                             LastName = "Çelik",
                             Password = "PBKDF2$SHA256$100000$FbdScsnyf1oZdqyp4m0XFg==$Mh+1x/gZsfVHerhelZF9/3oquThA9i0WGeilIwgP7Ac=",
                             RoleId = 3

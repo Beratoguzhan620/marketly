@@ -68,6 +68,7 @@ namespace App.Application.Services
 
             category.Name = request.Name;
             category.Color = request.Color;
+            category.IconCssClass = request.IconCssClass?.Trim() ?? string.Empty;
 
             await categoryRepo.UpdateAsync(category);
 

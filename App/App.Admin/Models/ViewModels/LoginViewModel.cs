@@ -1,13 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace App.Admin.Models.ViewModels
 {
     public class LoginViewModel
     {
-        [Required, EmailAddress]
+        [Display(Name = "E-posta")]
+        [Required(ErrorMessage = "E-posta gereklidir."), EmailAddress(ErrorMessage = "Geçerli bir e-posta adresi girin.")]
         public string Email { get; set; } = null!;
 
-        [Required, MinLength(4)]
+        [Display(Name = "Şifre")]
+        [Required(ErrorMessage = "Şifre gereklidir."), MinLength(4, ErrorMessage = "Şifre en az 4 karakter olmalıdır.")]
         public string Password { get; set; } = null!;
     }
 }

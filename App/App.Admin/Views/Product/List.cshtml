@@ -1,55 +1,95 @@
-@model List<AdminProductListItemViewModel>
+@model ProductListPageViewModel
 @{
     ViewData["Title"] = "Ürünler";
-
-    // data URI base64 ile kodlanır; aksi halde SVG içindeki tek tırnaklar onerror'daki
-    // JS string'in tek tırnağıyla çakışıp handler'ın bozuk şekilde çalışmasına yol açar.
-    const string noImageSvg = "<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60'><rect width='60' height='60' fill='#e9ecef'/></svg>";
-    var noImagePlaceholder = "data:image/svg+xml;base64," + Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(noImageSvg));
+    var q = Model.Query;
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
 }
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header d-flex">
-                <h4 class="card-title mr-auto mb-0">Ürünler</h4>
-            </div>
-            <div class="card-body">
-                <partial name="Partials/_ViewMessages" />
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Görsel</th>
-                                <th>Adı</th>
-                                <th>Satıcı</th>
-                                <th>Fiyat</th>
-                                <th>Durum</th>
-                                <th>İşlemler</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var product in Model)
-                            {
-                                <tr>
-                                    <td>
-                                        <img src="@(product.ImageUrl ?? noImagePlaceholder)" alt=""
-                                             style="width:60px;height:60px;object-fit:cover;"
-                                             onerror="this.onerror=null;this.src='@noImagePlaceholder';" />
-                                    </td>
-                                    <td>@product.Name</td>
-                                    <td>@product.SellerName</td>
-                                    <td>@product.Price.ToString("C")</td>
-                                    <td>@(product.Enabled ? "Aktif" : "Pasif")</td>
-                                    <td>
-                                        <a asp-action="Images" asp-route-productId="@product.Id" class="btn btn-primary">Görselleri Yönet</a>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+<partial name="Partials/_ViewMessages" />
+
+<div class="page-header">
+    <div>
+        <h1>Ürünler</h1>
+        <p>Satıcıların eklediği ürünler. Satıştan kaldırılan ürünler mağazada görünmez.</p>
     </div>
+</div>
+
+<div class="card" data-bulk>
+    <form class="filter-bar" method="get" asp-action="List" role="search">
+        <div class="search">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <input class="form-control form-control-sm" type="search" name="search" value="@q.Search" placeholder="Ürün veya satıcı ara" aria-label="Ürün veya satıcı ara" />
+        </div>
+        <select class="form-select form-select-sm" name="categoryId" aria-label="Kategori">
+            <option value="">Tüm kategoriler</option>
+            @foreach (var c in Model.Categories)
+            {
+                <option value="@c.Id" selected="@(q.CategoryId == c.Id)">@c.Name</option>
+            }
+        </select>
+        <select class="form-select form-select-sm" name="status" aria-label="Durum">
+            <option value="All" selected="@(q.Status == ActiveFilter.All)">Tüm durumlar</option>
+            <option value="Active" selected="@(q.Status == ActiveFilter.Active)">Satışta</option>
+            <option value="Inactive" selected="@(q.Status == ActiveFilter.Inactive)">Satıştan kaldırıldı</option>
+        </select>
+        <button class="btn btn-outline-secondary btn-sm" type="submit">Filtrele</button>
+        @if (!string.IsNullOrEmpty(q.Search) || q.CategoryId is not null || q.Status != ActiveFilter.All)
+        {
+            <a class="btn btn-ghost btn-sm" asp-action="List">Temizle</a>
+        }
+    </form>
+
+    <form method="post" asp-action="Bulk" id="bulkForm">
+        <input type="hidden" name="returnUrl" value="@returnUrl" />
+        <div class="bulk-bar" data-bulk-bar>
+            <span class="count" data-bulk-count></span>
+            <button class="btn btn-outline-secondary btn-sm" type="submit" name="operation" value="enable">Satışa aç</button>
+            <button class="btn btn-outline-secondary btn-sm" type="submit" name="operation" value="disable"
+                    data-confirm="Seçili ürünler mağazada görünmeyecek." data-confirm-title="Satıştan kaldır" data-confirm-ok="Kaldır">Satıştan kaldır</button>
+        </div>
+
+        @if (Model.Result.Items.Count == 0)
+        {
+            <partial name="Partials/_EmptyState" model="@(("Ürün bulunamadı", "Filtreleri değiştirerek tekrar deneyin.", "bi-box-seam"))" />
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th class="check-col"><input class="form-check-input" type="checkbox" data-bulk-all aria-label="Tümünü seç" /></th>
+                            <th>Ürün</th>
+                            <th>Satıcı</th>
+                            <th class="num">Fiyat</th>
+                            <th class="num">Stok</th>
+                            <th>Durum</th>
+                            <th><span class="visually-hidden">İşlem</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model.Result.Items)
+                        {
+                            <tr>
+                                <td class="check-col"><input class="form-check-input" type="checkbox" name="ids" value="@p.Id" data-bulk-item aria-label="@p.Name ürününü seç" /></td>
+                                <td>
+                                    <div class="fw-medium">@p.Name</div>
+                                    <div class="text-muted small">@p.CategoryName</div>
+                                </td>
+                                <td>@p.SellerName</td>
+                                <td class="num">@Display.Money(p.Price)</td>
+                                <td class="num">@if (p.Stock == 0) { <span class="badge badge-danger">0</span> } else { @p.Stock }</td>
+                                <td><span class="status-dot @(p.Enabled ? null : "off")">@(p.Enabled ? "Satışta" : "Kaldırıldı")</span></td>
+                                <td class="text-end">
+                                    <a class="btn btn-ghost btn-sm" asp-action="Images" asp-route-productId="@p.Id"><i class="bi bi-images"></i>Görseller <span class="text-muted font-mono">@p.ImageCount</span></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </form>
+
+    <partial name="Partials/_Pager" model="Model.Pager" />
 </div>
