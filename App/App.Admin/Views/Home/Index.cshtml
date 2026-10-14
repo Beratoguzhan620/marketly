@@ -68,11 +68,13 @@
                         <rect class="bar @(m.Revenue <= 0 ? "empty" : null)" x="@x.ToString("0.#", inv)" y="@y.ToString("0.#", inv)" width="@barWidth.ToString("0.#", inv)" height="@height.ToString("0.#", inv)" rx="3">
                             <title>@Display.MonthShort(m.Year, m.Month) @m.Year: @Display.Money(m.Revenue), @m.OrderCount sipariş</title>
                         </rect>
-                        @if (m.Revenue > 0)
+                        // Razor reserves <text>, so the SVG labels are written as raw markup.
+                        var cx = (x + barWidth / 2).ToString("0.#", inv);
+                        if (m.Revenue > 0)
                         {
-                            <text class="value-label" x="@((x + barWidth / 2).ToString("0.#", inv))" y="@((y - 6).ToString("0.#", inv))" text-anchor="middle">@m.OrderCount</text>
+                            @:@Html.Raw($"<text class=\"value-label\" x=\"{cx}\" y=\"{(y - 6).ToString("0.#", inv)}\" text-anchor=\"middle\">{m.OrderCount}</text>")
                         }
-                        <text class="axis" x="@((x + barWidth / 2).ToString("0.#", inv))" y="@(chartHeight - 8)" text-anchor="middle">@Display.MonthShort(m.Year, m.Month)</text>
+                        @:@Html.Raw($"<text class=\"axis\" x=\"{cx}\" y=\"{chartHeight - 8}\" text-anchor=\"middle\">{System.Net.WebUtility.HtmlEncode(Display.MonthShort(m.Year, m.Month))}</text>")
                     }
                 </svg>
                 <p class="text-muted small mb-0 mt-2">Çubuk yüksekliği ciroyu, üstündeki sayı sipariş adedini gösterir.</p>
