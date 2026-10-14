@@ -1,46 +1,114 @@
-﻿@model List<UserListItemViewModel>
+@model UserListPageViewModel
+@{
+    ViewData["Title"] = "Kullanıcılar";
+    var q = Model.Query;
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+    var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+}
 
-<div class="container">
-    <h1>User List</h1>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Surname</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Is Enabled</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in Model)
-            {
-                <tr>
-                    <td>@user.Id</td>
-                    <td>@user.FirstName</td>
-                    <td>@user.LastName</td>
-                    <td>@user.Email</td>
-                    <td>@user.Role</td>
-                    <td>@(user.Enabled ? "YES" : "NO")</td>
-                    <td>
-                        @if(user.Enabled)
-                        {
-                            <a asp-controller="User" asp-action="Disable" asp-route-id="@user.Id" class="btn btn-danger">Disable</a>
-                        }
-                        else
-                        {
-                            <a asp-controller="User" asp-action="Enable" asp-route-id="@user.Id" class="btn btn-success">Enable</a>
-                        }
+<partial name="Partials/_ViewMessages" />
 
-                        @if(user.HasSellerRequest)
-                        {
-                            <a asp-controller="User" asp-action="ApproveSellerRequest" asp-route-id="@user.Id" class="btn btn-success">Approve Seller Request</a>
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+<div class="page-header">
+    <div>
+        <h1>Kullanıcılar</h1>
+        <p>Hesapları yönetin ve satıcı başvurularını karara bağlayın.</p>
+    </div>
+</div>
+
+<div class="card">
+    <form class="filter-bar" method="get" asp-action="List" role="search">
+        <div class="search">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <input class="form-control form-control-sm" type="search" name="search" value="@q.Search" placeholder="Ad veya e-posta ara" aria-label="Ad veya e-posta ara" />
+        </div>
+        <select class="form-select form-select-sm" name="role" aria-label="Rol">
+            <option value="">Tüm roller</option>
+            <option value="buyer" selected="@(q.Role == "buyer")">Alıcı</option>
+            <option value="seller" selected="@(q.Role == "seller")">Satıcı</option>
+            <option value="admin" selected="@(q.Role == "admin")">Yönetici</option>
+        </select>
+        <select class="form-select form-select-sm" name="status" aria-label="Durum">
+            <option value="All" selected="@(q.Status == ActiveFilter.All)">Tüm durumlar</option>
+            <option value="Active" selected="@(q.Status == ActiveFilter.Active)">Etkin</option>
+            <option value="Inactive" selected="@(q.Status == ActiveFilter.Inactive)">Devre dışı</option>
+        </select>
+        <div class="form-check form-check-inline mb-0">
+            <input class="form-check-input" type="checkbox" id="onlySellerRequests" name="onlySellerRequests" value="true" checked="@q.OnlySellerRequests" />
+            <label class="form-check-label small" for="onlySellerRequests">Yalnızca satıcı başvuruları</label>
+        </div>
+        <button class="btn btn-outline-secondary btn-sm" type="submit">Filtrele</button>
+        @if (!string.IsNullOrEmpty(q.Search) || !string.IsNullOrEmpty(q.Role) || q.Status != ActiveFilter.All || q.OnlySellerRequests)
+        {
+            <a class="btn btn-ghost btn-sm" asp-action="List">Temizle</a>
+        }
+    </form>
+
+    @if (Model.Result.Items.Count == 0)
+    {
+        <partial name="Partials/_EmptyState" model="@(("Kullanıcı bulunamadı", "Filtreleri değiştirerek tekrar deneyin.", "bi-people"))" />
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr><th>Kullanıcı</th><th>Rol</th><th>Kayıt</th><th>Durum</th><th><span class="visually-hidden">İşlemler</span></th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var u in Model.Result.Items)
+                    {
+                        <tr>
+                            <td>
+                                <div class="fw-medium">@u.FullName</div>
+                                <div class="text-muted small">@u.Email</div>
+                            </td>
+                            <td>
+                                @Display.RoleLabel(u.Role)
+                                @if (u.HasSellerRequest)
+                                {
+                                    <div><span class="badge badge-accent">Satıcı başvurusu</span></div>
+                                }
+                            </td>
+                            <td class="text-muted">@Display.Date(u.CreatedAt)</td>
+                            <td><span class="status-dot @(u.Enabled ? null : "off")">@(u.Enabled ? "Etkin" : "Devre dışı")</span></td>
+                            <td class="text-end text-nowrap">
+                                @if (u.HasSellerRequest)
+                                {
+                                    <form class="d-inline" method="post" asp-action="ApproveSellerRequest" asp-route-id="@u.Id">
+                                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                        <button class="btn btn-primary btn-sm" type="submit">Onayla</button>
+                                    </form>
+                                    <form class="d-inline" method="post" asp-action="RejectSellerRequest" asp-route-id="@u.Id"
+                                          data-confirm="@u.FullName kullanıcısının satıcı başvurusu reddedilecek." data-confirm-title="Başvuruyu reddet" data-confirm-ok="Reddet">
+                                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                        <button class="btn btn-outline-secondary btn-sm" type="submit">Reddet</button>
+                                    </form>
+                                }
+                                @if (u.Id.ToString() != currentUserId)
+                                {
+                                    if (u.Enabled)
+                                    {
+                                        <form class="d-inline" method="post" asp-action="Disable" asp-route-id="@u.Id"
+                                              data-confirm="@u.FullName giriş yapamayacak." data-confirm-title="Hesabı devre dışı bırak" data-confirm-ok="Devre dışı bırak">
+                                            <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                            <button class="btn btn-ghost btn-sm" type="submit">Devre dışı bırak</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form class="d-inline" method="post" asp-action="Enable" asp-route-id="@u.Id">
+                                            <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                            <button class="btn btn-ghost btn-sm" type="submit">Etkinleştir</button>
+                                        </form>
+                                    }
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <partial name="Partials/_Pager" model="Model.Pager" />
 </div>

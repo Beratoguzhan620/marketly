@@ -1,0 +1,20 @@
+@model SaveCategoryViewModel
+<div class="mb-3">
+    <label class="form-label" asp-for="Name"></label>
+    <input class="form-control" asp-for="Name" placeholder="Ör. Meyve" />
+    <span asp-validation-for="Name"></span>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-sm-6">
+        <label class="form-label" asp-for="Color"></label>
+        <input class="form-control" asp-for="Color" placeholder="Ör. Orange veya #E8A33D" />
+        <div class="form-text">CSS renk adı veya #hex değeri.</div>
+        <span asp-validation-for="Color"></span>
+    </div>
+    <div class="col-sm-6">
+        <label class="form-label" asp-for="IconCssClass"></label>
+        <input class="form-control font-mono" asp-for="IconCssClass" placeholder="bi-basket" />
+        <div class="form-text"><a href="https://icons.getbootstrap.com" target="_blank" rel="noopener">Bootstrap Icons</a> sınıf adı; boş bırakılırsa mağaza uygun ikonu seçer.</div>
+        <span asp-validation-for="IconCssClass"></span>
+    </div>
+</div>

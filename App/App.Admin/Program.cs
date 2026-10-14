@@ -1,10 +1,11 @@
 using App.Application;
 using App.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
 
 builder.Services.AddDataLayer(builder.Configuration.GetConnectionString("SqlServer")!);
 builder.Services.AddApplicationLayer(builder.Configuration);
@@ -14,6 +15,7 @@ builder.Services
     .AddCookie(options =>
     {
         options.LoginPath = "/login";
+        options.AccessDeniedPath = "/login";
     });
 
 var app = builder.Build();
@@ -23,6 +25,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseStatusCodePagesWithReExecute("/not-found");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

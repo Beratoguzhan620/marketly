@@ -14,13 +14,6 @@ namespace App.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> List()
         {
-            var previousErrorMessage = TempData["ErrorMessage"]?.ToString();
-
-            if (!string.IsNullOrEmpty(previousErrorMessage))
-            {
-                ViewBag.ErrorMessage = previousErrorMessage;
-            }
-
             var categories = await categoryService.GetAllAsync();
 
             var viewModel = categories.Select(c => new CategoryListViewModel
@@ -28,7 +21,8 @@ namespace App.Admin.Controllers
                 Id = c.Id,
                 Name = c.Name,
                 Color = c.Color,
-                IconCssClass = c.IconCssClass
+                IconCssClass = c.IconCssClass,
+                ProductCount = c.ProductCount,
             }).ToList();
 
             return View(viewModel);
@@ -43,6 +37,7 @@ namespace App.Admin.Controllers
 
         [Route("create")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([FromForm] SaveCategoryViewModel newCategoryModel)
         {
             if (!ModelState.IsValid)
@@ -63,10 +58,8 @@ namespace App.Admin.Controllers
                 return View(newCategoryModel);
             }
 
-            ViewBag.SuccessMessage = result.Message;
-            ModelState.Clear();
-
-            return View();
+            TempData["SuccessMessage"] = result.Message ?? "Kategori eklendi.";
+            return RedirectToAction(nameof(List));
         }
 
         [Route("{categoryId:int}/edit")]
@@ -92,6 +85,7 @@ namespace App.Admin.Controllers
 
         [Route("{categoryId:int}/edit")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit([FromRoute] int categoryId, [FromForm] SaveCategoryViewModel editCategoryModel)
         {
             if (!ModelState.IsValid)
@@ -103,6 +97,7 @@ namespace App.Admin.Controllers
             {
                 Name = editCategoryModel.Name,
                 Color = editCategoryModel.Color,
+                IconCssClass = editCategoryModel.IconCssClass,
             });
 
             if (!result.Success)
@@ -116,14 +111,13 @@ namespace App.Admin.Controllers
                 return View(editCategoryModel);
             }
 
-            ViewBag.SuccessMessage = result.Message;
-            ModelState.Clear();
-
-            return View();
+            TempData["SuccessMessage"] = result.Message ?? "Kategori güncellendi.";
+            return RedirectToAction(nameof(List));
         }
 
         [Route("{categoryId:int}/delete")]
-        [HttpGet]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete([FromRoute] int categoryId)
         {
             var result = await categoryService.DeleteAsync(categoryId);
@@ -136,6 +130,10 @@ namespace App.Admin.Controllers
                 }
 
                 TempData["ErrorMessage"] = result.Message;
+            }
+            else
+            {
+                TempData["SuccessMessage"] = result.Message ?? "Kategori silindi.";
             }
 
             return RedirectToAction(nameof(List));

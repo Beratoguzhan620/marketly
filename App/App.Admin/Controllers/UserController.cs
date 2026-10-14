@@ -1,5 +1,5 @@
-﻿using App.Admin.Models.ViewModels;
-using App.Application.Results;
+using App.Admin.Models.ViewModels;
+using App.Application.Models.Requests;
 using App.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,70 +7,66 @@ using Microsoft.AspNetCore.Mvc;
 namespace App.Admin.Controllers
 {
     [Authorize(Roles = "admin")]
-    public class UserController(IUserService userService) : Controller
+    public class UserController(IUserService userService, IAdminService adminService) : Controller
     {
         [Route("/users")]
         [HttpGet]
-        public async Task<IActionResult> List()
+        public async Task<IActionResult> List([FromQuery] AdminUserQuery query)
         {
-            var result = await userService.GetUsersAsync();
-
-            var viewModel = (result.Data ?? []).Select(u => new UserListItemViewModel
+            return View(new UserListPageViewModel
             {
-                Id = u.Id,
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                Email = u.Email,
-                Role = u.Role,
-                Enabled = u.Enabled,
-                HasSellerRequest = u.HasSellerRequest
-            }).ToList();
-
-            return View(viewModel);
+                Query = query,
+                Result = await adminService.GetUsersAsync(query),
+            });
         }
 
         [Route("/users/{id:int}/approve")]
-        [HttpGet]
-        public async Task<IActionResult> ApproveSellerRequest([FromRoute] int id)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveSellerRequest([FromRoute] int id, [FromForm] string? returnUrl)
         {
             var result = await userService.ApproveSellerRequestAsync(id);
+            TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message ?? "Satıcı başvurusu onaylandı.";
+            return Back(returnUrl);
+        }
 
-            if (!result.Success)
-            {
-                return result.Type switch
-                {
-                    ServiceResultType.NotFound => NotFound(),
-                    _ => BadRequest(result.Message)
-                };
-            }
-
-            return RedirectToAction(nameof(List));
+        [Route("/users/{id:int}/reject")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectSellerRequest([FromRoute] int id, [FromForm] string? returnUrl)
+        {
+            var result = await adminService.RejectSellerRequestAsync(id);
+            TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
+            return Back(returnUrl);
         }
 
         [Route("/users/{id:int}/enable")]
-        public async Task<IActionResult> Enable([FromRoute] int id)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Enable([FromRoute] int id, [FromForm] string? returnUrl)
         {
             var result = await userService.SetUserEnabledAsync(id, true);
-
-            if (!result.Success)
-            {
-                return NotFound();
-            }
-
-            return RedirectToAction(nameof(List));
+            TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Success ? "Hesap etkinleştirildi." : result.Message;
+            return Back(returnUrl);
         }
 
         [Route("/users/{id:int}/disable")]
-        public async Task<IActionResult> Disable([FromRoute] int id)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Disable([FromRoute] int id, [FromForm] string? returnUrl)
         {
-            var result = await userService.SetUserEnabledAsync(id, false);
-
-            if (!result.Success)
+            if (User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value == id.ToString())
             {
-                return NotFound();
+                TempData["ErrorMessage"] = "Kendi hesabınızı devre dışı bırakamazsınız.";
+                return Back(returnUrl);
             }
 
-            return RedirectToAction(nameof(List));
+            var result = await userService.SetUserEnabledAsync(id, false);
+            TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Success ? "Hesap devre dışı bırakıldı." : result.Message;
+            return Back(returnUrl);
         }
+
+        private IActionResult Back(string? returnUrl) =>
+            Url.IsLocalUrl(returnUrl) ? LocalRedirect(returnUrl!) : RedirectToAction(nameof(List));
     }
 }

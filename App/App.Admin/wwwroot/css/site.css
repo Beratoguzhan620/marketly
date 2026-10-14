@@ -1,22 +1,179 @@
-html {
-    font-size: 14px;
+/*
+ * Admin page styles. Tokens, app shell and base components live in design.css.
+ */
+
+/* ---------- Dashboard ---------- */
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
 }
 
-@media (min-width: 768px) {
-    html {
-        font-size: 16px;
-    }
+@media (min-width: 992px) {
+    .stat-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.stat-card {
+    display: block;
+    padding: 16px 18px;
+    background: var(--mk-surface);
+    border: 1px solid var(--mk-border);
+    border-radius: var(--mk-radius-md);
+    color: var(--mk-text);
+    text-decoration: none;
 }
 
-html {
+a.stat-card:hover { border-color: #C9C5BC; color: var(--mk-text); }
+
+.stat-card .label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--mk-text-muted);
+    font-size: var(--mk-text-sm);
+}
+
+.stat-card .value {
+    display: block;
+    margin-top: 6px;
+    font-family: var(--mk-font-mono);
+    font-size: var(--mk-text-xl);
+    font-weight: 500;
+}
+
+.stat-card .hint {
+    color: var(--mk-text-muted);
+    font-size: var(--mk-text-xs);
+}
+
+.stat-card.attention .value { color: var(--mk-accent); }
+
+.chart {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.chart .bar { fill: var(--mk-accent); }
+.chart .bar.empty { fill: var(--mk-surface-2); }
+.chart .axis { fill: var(--mk-text-muted); font-family: var(--mk-font); font-size: 11px; }
+.chart .value-label { fill: var(--mk-text); font-family: var(--mk-font-mono); font-size: 11px; }
+.chart .gridline { stroke: var(--mk-border); stroke-width: 1; }
+
+/* ---------- Lists ---------- */
+
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--mk-border);
+    align-items: center;
+}
+
+.filter-bar .search {
     position: relative;
-    min-height: 100%;
+    flex: 1 1 220px;
+    max-width: 360px;
 }
 
-body {
-    margin-bottom: 60px;
+.filter-bar .search i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--mk-text-muted);
 }
+
+.filter-bar .search .form-control { padding-left: 32px; }
+.filter-bar .form-select { width: auto; }
+
+.bulk-bar {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--mk-accent-soft);
+    border-bottom: 1px solid #EBCDBF;
+    font-size: var(--mk-text-sm);
+}
+
+.bulk-bar.visible { display: flex; flex-wrap: wrap; }
+.bulk-bar .count { font-weight: 600; margin-right: auto; }
+
+.table .check-col { width: 40px; }
+
+.status-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--mk-text-sm);
+}
+
+.status-dot::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--mk-success);
+}
+
+.status-dot.off { color: var(--mk-text-muted); }
+.status-dot.off::before { background: #B9B6AF; }
+
+.comment-text {
+    max-width: 460px;
+    white-space: pre-line;
+    font-size: var(--mk-text-sm);
+}
+
+.stars { color: #B7791F; font-size: 12px; white-space: nowrap; }
+
+.color-swatch {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    border: 1px solid var(--mk-border);
+    vertical-align: -2px;
+    margin-right: 6px;
+}
+
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+.image-grid figure {
+    margin: 0;
+    border: 1px solid var(--mk-border);
+    border-radius: var(--mk-radius-sm);
+    overflow: hidden;
+    background: var(--mk-surface);
+}
+
+.image-grid img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    display: block;
+    background: var(--mk-surface-2);
+}
+
+.image-grid figcaption { padding: 6px; }
+
+/* ---------- Login ---------- */
+
+.admin-login {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px 16px;
+}
+
+.admin-login .card { width: 100%; max-width: 400px; }
+
+.form-card { max-width: 760px; }
