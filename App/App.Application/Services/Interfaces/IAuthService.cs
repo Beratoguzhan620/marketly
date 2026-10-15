@@ -10,7 +10,8 @@ namespace App.Application.Services.Interfaces
 
         Task<ServiceResult<AuthUserDto>> ValidateLoginAsync(LoginRequest request);
 
-        Task<ServiceResult> RequestPasswordResetAsync(string email);
+        /// <param name="requestBaseUrl">Scheme and host of the current request, used when Email:StorefrontUrl is empty.</param>
+        Task<ServiceResult<PasswordResetRequestDto>> RequestPasswordResetAsync(string email, string requestBaseUrl);
 
         Task<ServiceResult<bool>> VerifyResetTokenAsync(string verificationCode);
 

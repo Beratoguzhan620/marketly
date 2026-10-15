@@ -18,9 +18,15 @@ namespace App.Application.Services
         DataRepository<UserEntity> userRepo,
         DataRepository<RoleEntity> roleRepo,
         IOptions<EmailOptions> emailOptions,
+        TimeProvider timeProvider,
         ILogger<AuthService> logger) : IAuthService
     {
         private const string BuyerRoleName = "buyer";
+        private const string GenericResetMessage = "Bu e-posta adresiyle kayıtlı bir hesap varsa şifre sıfırlama bağlantısını gönderdik. Gelen kutunuzu ve istenmeyen klasörünü kontrol edin.";
+        private const string InvalidResetLinkMessage = "Bu bağlantı geçersiz ya da süresi dolmuş. Yeni bir bağlantı isteyin.";
+
+        public static readonly TimeSpan ResetTokenLifetime = TimeSpan.FromHours(1);
+        public static readonly TimeSpan ResendCooldown = TimeSpan.FromMinutes(1);
 
         public async Task<ServiceResult> RegisterAsync(RegisterRequest request)
         {
@@ -81,83 +87,125 @@ namespace App.Application.Services
             return ServiceResult<AuthUserDto>.Ok(dto);
         }
 
-        public async Task<ServiceResult> RequestPasswordResetAsync(string email)
+        public async Task<ServiceResult<PasswordResetRequestDto>> RequestPasswordResetAsync(string email, string requestBaseUrl)
         {
-            var user = await userRepo.GetAll().FirstOrDefaultAsync(u => u.Email == email);
+            var now = timeProvider.GetUtcNow().UtcDateTime;
+            var normalized = (email ?? string.Empty).Trim();
+            var user = await userRepo.GetAll().FirstOrDefaultAsync(u => u.Email == normalized);
 
-            if (user is null)
+            // Same answer whether or not the address is registered, so the form cannot be used
+            // to find out who has an account.
+            var response = new PasswordResetRequestDto();
+
+            if (user is null || !user.Enabled)
             {
-                return ServiceResult.NotFound("Kullanıcı bulunamadı.");
+                return ServiceResult<PasswordResetRequestDto>.Ok(response, GenericResetMessage);
             }
 
-            var resetPasswordToken = Guid.NewGuid().ToString("n");
-            user.ResetPasswordToken = resetPasswordToken;
+            // A link was sent less than a minute ago: do not send another one.
+            if (user.ResetPasswordTokenExpiresAt is DateTime expires && expires - ResetTokenLifetime > now - ResendCooldown)
+            {
+                return ServiceResult<PasswordResetRequestDto>.Ok(response, GenericResetMessage);
+            }
+
+            var token = ResetToken.Create();
+            user.ResetPasswordToken = ResetToken.Hash(token);
+            user.ResetPasswordTokenExpiresAt = now + ResetTokenLifetime;
             await userRepo.UpdateAsync(user);
 
-            await SendResetPasswordEmailAsync(user);
+            var options = emailOptions.Value;
+            var baseUrl = string.IsNullOrWhiteSpace(options.StorefrontUrl) ? requestBaseUrl : options.StorefrontUrl;
+            var resetLink = $"{baseUrl.TrimEnd('/')}/renew-password/{token}";
 
-            return ServiceResult.Ok("Şifre sıfırlama maili gönderildi. Lütfen e-posta adresinizi kontrol edin.");
+            var sent = await TrySendResetPasswordEmailAsync(user, resetLink);
+            if (!sent)
+            {
+                // No SMTP in development: hand the link back so it can be shown on the page.
+                response.UndeliveredLink = resetLink;
+            }
+
+            return ServiceResult<PasswordResetRequestDto>.Ok(response, GenericResetMessage);
         }
 
         public async Task<ServiceResult<bool>> VerifyResetTokenAsync(string verificationCode)
         {
-            if (string.IsNullOrEmpty(verificationCode))
-            {
-                return ServiceResult<bool>.ValidationError("Geçersiz doğrulama kodu.");
-            }
+            var user = await FindUserByResetTokenAsync(verificationCode);
 
-            var exists = await userRepo.GetAll().AnyAsync(u => u.ResetPasswordToken == verificationCode);
-
-            return exists
+            return user is not null
                 ? ServiceResult<bool>.Ok(true)
-                : ServiceResult<bool>.NotFound("Geçersiz veya süresi dolmuş doğrulama kodu.");
+                : ServiceResult<bool>.NotFound(InvalidResetLinkMessage);
         }
 
         public async Task<ServiceResult> ResetPasswordAsync(RenewPasswordRequest request)
         {
-            var user = await userRepo.GetAll().FirstOrDefaultAsync(u => u.ResetPasswordToken == request.VerificationCode);
+            var user = await FindUserByResetTokenAsync(request.VerificationCode);
 
             if (user is null)
             {
-                return ServiceResult.NotFound("Geçersiz veya süresi dolmuş doğrulama kodu.");
+                return ServiceResult.NotFound(InvalidResetLinkMessage);
             }
 
             user.Password = PasswordHasher.Hash(request.Password);
             user.ResetPasswordToken = null;
+            user.ResetPasswordTokenExpiresAt = null;
 
             await userRepo.UpdateAsync(user);
 
-            return ServiceResult.Ok("Şifreniz başarıyla güncellendi. Giriş yapabilirsiniz.");
+            return ServiceResult.Ok("Şifreniz güncellendi. Yeni şifrenizle giriş yapabilirsiniz.");
         }
 
-        private async Task SendResetPasswordEmailAsync(UserEntity user)
+        private async Task<UserEntity?> FindUserByResetTokenAsync(string? token)
+        {
+            if (!ResetToken.LooksValid(token))
+            {
+                return null;
+            }
+
+            var hash = ResetToken.Hash(token!);
+            var now = timeProvider.GetUtcNow().UtcDateTime;
+
+            return await userRepo.GetAll()
+                .FirstOrDefaultAsync(u => u.ResetPasswordToken == hash && u.ResetPasswordTokenExpiresAt > now && u.Enabled);
+        }
+
+        private async Task<bool> TrySendResetPasswordEmailAsync(UserEntity user, string resetLink)
         {
             var options = emailOptions.Value;
-            var resetLink = $"{options.StorefrontUrl.TrimEnd('/')}/renew-password/{user.ResetPasswordToken}";
 
             if (!options.IsConfigured)
             {
-                logger.LogWarning("SMTP is not configured; password reset link for {Email}: {ResetLink}", user.Email, resetLink);
-                return;
+                logger.LogWarning("SMTP is not configured; password reset e-mail for user {UserId} was not sent.", user.Id);
+                return false;
             }
 
-            using SmtpClient client = new(options.Host, options.Port)
+            try
             {
-                EnableSsl = options.EnableSsl,
-                Credentials = new NetworkCredential(options.Username, options.Password),
-            };
+                using SmtpClient client = new(options.Host, options.Port)
+                {
+                    EnableSsl = options.EnableSsl,
+                    Credentials = new NetworkCredential(options.Username, options.Password),
+                };
 
-            using MailMessage mail = new()
+                using MailMessage mail = new()
+                {
+                    From = new MailAddress(options.FromAddress, options.FromName),
+                    Subject = "Marketly şifre sıfırlama",
+                    Body = $"Merhaba {WebUtility.HtmlEncode(user.FirstName)},<br><br>"
+                        + $"Şifrenizi yenilemek için <a href=\"{WebUtility.HtmlEncode(resetLink)}\">bu bağlantıya</a> tıklayın. "
+                        + "Bağlantı 1 saat geçerlidir ve yalnızca bir kez kullanılabilir.<br><br>"
+                        + "Bu isteği siz yapmadıysanız e-postayı yok sayabilirsiniz.",
+                    IsBodyHtml = true,
+                };
+
+                mail.To.Add(user.Email);
+                await client.SendMailAsync(mail);
+                return true;
+            }
+            catch (Exception ex) when (ex is SmtpException or InvalidOperationException or FormatException)
             {
-                From = new MailAddress(options.FromAddress, options.FromName),
-                Subject = "Şifre sıfırlama",
-                Body = $"Merhaba {WebUtility.HtmlEncode(user.FirstName)},<br>Şifrenizi sıfırlamak için <a href='{resetLink}'>bu bağlantıya</a> tıklayın.",
-                IsBodyHtml = true,
-            };
-
-            mail.To.Add(user.Email);
-
-            await client.SendMailAsync(mail);
+                logger.LogError(ex, "Password reset e-mail for user {UserId} could not be sent.", user.Id);
+                return false;
+            }
         }
     }
 }

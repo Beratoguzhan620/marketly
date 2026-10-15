@@ -17,8 +17,11 @@ namespace App.Application.Options
         public string FromAddress { get; set; } = string.Empty;
         public string FromName { get; set; } = "Marketly";
 
-        /// <summary>Public URL of the storefront, used to build links inside e-mails.</summary>
-        public string StorefrontUrl { get; set; } = "https://localhost:7114";
+        /// <summary>
+        /// Public URL of the storefront, used to build links inside e-mails. Leave empty to use the
+        /// scheme and host of the incoming request.
+        /// </summary>
+        public string StorefrontUrl { get; set; } = string.Empty;
 
         public bool IsConfigured => !string.IsNullOrWhiteSpace(Host) && !string.IsNullOrWhiteSpace(FromAddress);
     }

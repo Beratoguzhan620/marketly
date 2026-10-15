@@ -1,4 +1,4 @@
-﻿using App.Application.Models.Dtos;
+using App.Application.Models.Dtos;
 using App.Application.Models.Requests;
 using App.Application.Services.Interfaces;
 using App.Eticaret.Models.ViewModels;
@@ -11,7 +11,7 @@ using System.Security.Claims;
 namespace App.Eticaret.Controllers
 {
     [AllowAnonymous]
-    public class AuthController(IAuthService authService) : BaseController
+    public class AuthController(IAuthService authService, IWebHostEnvironment environment) : BaseController
     {
         [Route("/register")]
         [HttpGet]
@@ -134,18 +134,24 @@ namespace App.Eticaret.Controllers
                 return View(model);
             }
 
-            var result = await authService.RequestPasswordResetAsync(model.Email);
+            var result = await authService.RequestPasswordResetAsync(model.Email, $"{Request.Scheme}://{Request.Host}{Request.PathBase}");
 
             if (!result.Success)
             {
-                ModelState.AddModelError(string.Empty, result.Message ?? "Kullanıcı bulunamadı.");
+                ModelState.AddModelError(string.Empty, result.Message ?? "İstek işlenemedi. Lütfen tekrar deneyin.");
                 return View(model);
             }
 
             ViewBag.SuccessMessage = result.Message;
-            ModelState.Clear();
 
-            return View();
+            // Without SMTP the link cannot be e-mailed; in Development it is shown so the flow can be tried.
+            if (environment.IsDevelopment() && result.Data?.UndeliveredLink is string link)
+            {
+                ViewBag.DevResetLink = link;
+            }
+
+            ModelState.Clear();
+            return View(new ForgotPasswordViewModel());
         }
 
         [Route("/renew-password/{verificationCode}")]
@@ -156,6 +162,7 @@ namespace App.Eticaret.Controllers
 
             if (!result.Success)
             {
+                TempData["ErrorMessage"] = result.Message;
                 return RedirectToAction(nameof(ForgotPassword));
             }
 
@@ -183,10 +190,8 @@ namespace App.Eticaret.Controllers
                 return View(model);
             }
 
-            ViewBag.SuccessMessage = result.Message;
-            ModelState.Clear();
-
-            return View(new RenewPasswordViewModel { VerificationCode = model.VerificationCode });
+            TempData["SuccessMessage"] = result.Message;
+            return RedirectToAction(nameof(Login));
         }
 
         [Route("/logout")]
