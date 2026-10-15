@@ -1,4 +1,4 @@
-﻿using App.Application.Models.Dtos;
+using App.Application.Models.Dtos;
 using App.Application.Models.Requests;
 using App.Application.Services.Interfaces;
 using App.Eticaret.Models.ViewModels;
@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace App.Eticaret.Controllers
 {
     [Authorize(Roles = "buyer, seller")]
-    public class OrderController(IOrderService orderService, ICartService cartService) : BaseController
+    public class OrderController(IOrderService orderService, ICartService cartService, ICouponService couponService) : BaseController
     {
         [HttpPost("/order")]
         public async Task<IActionResult> Create([FromForm] CheckoutViewModel model)
@@ -22,20 +22,19 @@ namespace App.Eticaret.Controllers
 
             if (!ModelState.IsValid)
             {
-                var cart = await cartService.GetCartAsync(userId.Value);
-                return View("~/Views/Cart/Checkout.cshtml", MapToViewModels(cart));
+                return await CheckoutAgainAsync(userId.Value, model.CouponCode);
             }
 
             var result = await orderService.CreateOrderAsync(userId.Value, new OrderCreateRequest
             {
-                Address = model.Address
+                Address = model.Address,
+                CouponCode = model.CouponCode,
             });
 
             if (!result.Success || result.Data is null)
             {
                 ModelState.AddModelError(string.Empty, result.Message ?? "Sipariş oluşturulamadı.");
-                var cart = await cartService.GetCartAsync(userId.Value);
-                return View("~/Views/Cart/Checkout.cshtml", MapToViewModels(cart));
+                return await CheckoutAgainAsync(userId.Value, model.CouponCode);
             }
 
             return RedirectToAction(nameof(Details), new { orderCode = result.Data.OrderCode, placed = true });
@@ -65,6 +64,10 @@ namespace App.Eticaret.Controllers
                 OrderCode = order.OrderCode,
                 CreatedAt = order.CreatedAt,
                 Address = order.Address,
+                Status = order.Status,
+                StatusUpdatedAt = order.StatusUpdatedAt,
+                CouponCode = order.CouponCode,
+                DiscountAmount = order.DiscountAmount,
                 Items = order.Items.Select(i => new OrderItemViewModel
                 {
                     ProductName = i.ProductName,
@@ -74,6 +77,26 @@ namespace App.Eticaret.Controllers
             };
 
             return View(viewModel);
+        }
+
+        private async Task<IActionResult> CheckoutAgainAsync(int userId, string? couponCode)
+        {
+            var cart = await cartService.GetCartAsync(userId);
+            if (cart.Items.Count == 0)
+            {
+                return RedirectToAction(nameof(CartController.Edit), "Cart");
+            }
+
+            if (!string.IsNullOrWhiteSpace(couponCode))
+            {
+                var quote = await couponService.QuoteForCartAsync(userId, couponCode);
+                if (quote.Success)
+                {
+                    ViewData[CheckoutViewData.CouponQuote] = quote.Data;
+                }
+            }
+
+            return View("~/Views/Cart/Checkout.cshtml", MapToViewModels(cart));
         }
 
         private static List<CartItemViewModel> MapToViewModels(CartDto cart) =>

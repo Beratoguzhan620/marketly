@@ -1,3 +1,5 @@
+using App.Data.Entities;
+
 namespace App.Application.Models.Requests
 {
     public abstract class AdminPagedQuery
@@ -40,5 +42,21 @@ namespace App.Application.Models.Requests
     public class AdminCommentQuery : AdminPagedQuery
     {
         public CommentStatusFilter Status { get; set; }
+    }
+
+    public class AdminOrderQuery : AdminPagedQuery
+    {
+        /// <summary>Null shows every status.</summary>
+        public OrderStatus? Status { get; set; }
+    }
+
+    public class AdminBlogCommentQuery : AdminPagedQuery
+    {
+        public CommentStatusFilter Status { get; set; }
+    }
+
+    public class AdminCouponQuery : AdminPagedQuery
+    {
+        public ActiveFilter Status { get; set; }
     }
 }

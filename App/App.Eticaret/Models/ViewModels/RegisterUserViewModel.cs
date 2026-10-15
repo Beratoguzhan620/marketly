@@ -17,11 +17,11 @@ namespace App.Eticaret.Models.ViewModels
         public string Email { get; set; } = null!;
 
         [Display(Name = "Şifre")]
-        [Required, MinLength(4), DataType(DataType.Password)]
+        [Required, MinLength(8), MaxLength(128), DataType(DataType.Password)]
         public string Password { get; set; } = null!;
 
         [Display(Name = "Şifre tekrarı")]
-        [Required, MinLength(4), DataType(DataType.Password), Compare(nameof(Password))]
+        [Required, MinLength(8), MaxLength(128), DataType(DataType.Password), Compare(nameof(Password))]
         public string PasswordConfirm { get; set; } = null!;
     }
 }

@@ -1,7 +1,8 @@
 @model OrderDetailsViewModel
 @{
     ViewData["Title"] = $"Sipariş {Model.OrderCode}";
-    var total = Model.Items.Sum(i => i.TotalPrice);
+    var steps = new[] { App.Data.Entities.OrderStatus.Preparing, App.Data.Entities.OrderStatus.Shipped, App.Data.Entities.OrderStatus.Delivered };
+    var reached = Model.Status == App.Data.Entities.OrderStatus.Cancelled ? -1 : Array.IndexOf(steps, Model.Status);
     var justPlaced = string.Equals(Context.Request.Query["placed"], "true", StringComparison.OrdinalIgnoreCase);
 }
 
@@ -61,12 +62,34 @@ else
 
     <aside class="summary-card" aria-label="Sipariş bilgileri">
         <h2>Sipariş bilgileri</h2>
+        @if (reached >= 0)
+        {
+            <ol class="order-status-track" aria-label="Sipariş durumu">
+                @for (var i = 0; i < steps.Length; i++)
+                {
+                    <li class="@(i <= reached ? "done" : null)" aria-current="@(i == reached ? "step" : null)">@Display.OrderStatus(steps[i])</li>
+                }
+            </ol>
+        }
         <dl class="spec-list mb-3">
+            <dt>Durum</dt>
+            <dd>
+                <span class="@Display.OrderStatusBadge(Model.Status)">@Display.OrderStatus(Model.Status)</span>
+                @if (Model.StatusUpdatedAt is DateTime updated)
+                {
+                    <span class="d-block text-muted small mt-1">@Display.DateTime(updated)</span>
+                }
+            </dd>
             <dt>Sipariş no</dt><dd class="font-mono">@Model.OrderCode</dd>
             <dt>Tarih</dt><dd>@Display.DateTime(Model.CreatedAt)</dd>
             <dt>Adres</dt><dd style="white-space: pre-line">@Model.Address</dd>
         </dl>
-        <div class="summary-row total"><span>Toplam</span><span class="value">@Display.Money(total)</span></div>
+        @if (Model.DiscountAmount > 0)
+        {
+            <div class="summary-row"><span>Ürünler</span><span class="value">@Display.Money(Model.Subtotal)</span></div>
+            <div class="summary-row text-success"><span>Kupon (<span class="font-mono">@Model.CouponCode</span>)</span><span class="value">−@Display.Money(Model.DiscountAmount)</span></div>
+        }
+        <div class="summary-row total"><span>Toplam</span><span class="value">@Display.Money(Model.Total)</span></div>
         <a class="btn btn-outline-secondary w-100 mt-3" asp-controller="Home" asp-action="Listing">Alışverişe devam et</a>
     </aside>
 </div>

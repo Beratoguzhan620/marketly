@@ -1,4 +1,4 @@
-﻿namespace App.Data.Infrastructure;
+namespace App.Data.Infrastructure;
 
 using App.Data.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +17,7 @@ internal class ApplicationDbContext(DbContextOptions<ApplicationDbContext> optio
     public DbSet<OrderItemEntity> OrderItems { get; set; }
     public DbSet<ContactFormEntity> ContactForms { get; set; }
     public DbSet<DiscountEntity> ProductDiscounts { get; set; }
+    public DbSet<CouponEntity> Coupons { get; set; }
     public DbSet<BlogEntity> Blogs { get; set; }
     public DbSet<BlogCommentEntity> BlogComments { get; set; }
     public DbSet<BlogCategoryEntity> BlogCategories { get; set; }
@@ -37,6 +38,7 @@ internal class ApplicationDbContext(DbContextOptions<ApplicationDbContext> optio
         modelBuilder.ApplyConfiguration(new OrderItemEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ContactFormEntityConfiguration());
         modelBuilder.ApplyConfiguration(new DiscountEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new CouponEntityConfiguration());
         modelBuilder.ApplyConfiguration(new BlogEntityConfiguration());
         modelBuilder.ApplyConfiguration(new BlogCommentEntityConfiguration());
         modelBuilder.ApplyConfiguration(new BlogCategoryEntityConfiguration());

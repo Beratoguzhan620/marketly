@@ -12,6 +12,7 @@ public class UserEntity : EntityBase, IHasEnabled
     public string LastName { get; set; } = null!;
     public string Password { get; set; } = null!;
     public string? ResetPasswordToken { get; set; }
+    public DateTime? ResetPasswordTokenExpiresAt { get; set; }
     public int RoleId { get; set; }
     public bool Enabled { get; set; } = true;
     public bool HasSellerRequest { get; set; } = false;
@@ -30,6 +31,7 @@ internal class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
         builder.Property(e => e.FirstName).IsRequired().HasMaxLength(50);
         builder.Property(e => e.LastName).IsRequired().HasMaxLength(50);
         builder.Property(e => e.Password).IsRequired();
+        builder.Property(e => e.ResetPasswordToken).HasMaxLength(64);
         builder.Property(e => e.RoleId).IsRequired();
         builder.Property(e => e.Enabled).IsRequired().HasDefaultValue(true);
         builder.Property(e => e.CreatedAt).IsRequired();

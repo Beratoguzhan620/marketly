@@ -177,3 +177,19 @@ a.stat-card:hover { border-color: #C9C5BC; color: var(--mk-text); }
 .admin-login .card { width: 100%; max-width: 400px; }
 
 .form-card { max-width: 760px; }
+
+/* ---------- Detail pages ---------- */
+
+.detail-layout {
+    display: grid;
+    gap: 16px;
+}
+
+@media (min-width: 992px) {
+    .detail-layout { grid-template-columns: minmax(0, 1fr) 320px; }
+}
+
+.detail-layout tfoot td {
+    border-bottom: 0;
+    background: var(--mk-surface-2);
+}

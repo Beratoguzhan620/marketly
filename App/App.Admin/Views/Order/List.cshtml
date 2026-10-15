@@ -1,0 +1,84 @@
+@model OrderListPageViewModel
+@using App.Data.Entities
+@{
+    ViewData["Title"] = "Siparişler";
+    var q = Model.Query;
+    var statuses = new (OrderStatus? Value, string Text)[] { (null, "Tümü"), (OrderStatus.Preparing, "Hazırlanıyor"), (OrderStatus.Shipped, "Kargoda"), (OrderStatus.Delivered, "Teslim edildi"), (OrderStatus.Cancelled, "İptal") };
+}
+
+<partial name="Partials/_ViewMessages" />
+
+<div class="page-header">
+    <div>
+        <h1>Siparişler</h1>
+        <p>Sipariş durumunu detay sayfasından adım adım ilerletebilirsiniz.</p>
+    </div>
+</div>
+
+<div class="card">
+    <form class="filter-bar" method="get" asp-action="List" role="search">
+        <div class="search">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <input class="form-control form-control-sm" type="search" name="search" value="@q.Search" placeholder="Sipariş no, müşteri veya e-posta" aria-label="Sipariş ara" />
+        </div>
+        <div class="btn-group btn-group-sm flex-wrap" role="group" aria-label="Durum">
+            @foreach (var (value, text) in statuses)
+            {
+                <a class="btn @(q.Status == value ? "btn-primary" : "btn-outline-secondary")" href="@Url.Action("List", new { status = value, search = q.Search })">@text</a>
+            }
+        </div>
+        @if (q.Status is not null)
+        {
+            <input type="hidden" name="status" value="@q.Status" />
+        }
+        <button class="btn btn-outline-secondary btn-sm" type="submit">Ara</button>
+    </form>
+
+    @if (Model.Result.Items.Count == 0)
+    {
+        <partial name="Partials/_EmptyState" model="@(("Sipariş bulunamadı", "Filtreleri değiştirerek tekrar deneyin.", "bi-receipt"))" />
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Sipariş no</th>
+                        <th>Müşteri</th>
+                        <th>Tarih</th>
+                        <th class="num">Adet</th>
+                        <th class="num">Tutar</th>
+                        <th>Durum</th>
+                        <th><span class="visually-hidden">İşlem</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var o in Model.Result.Items)
+                    {
+                        <tr>
+                            <td class="font-mono text-nowrap">@o.OrderCode</td>
+                            <td>
+                                <div class="fw-medium">@o.CustomerName</div>
+                                <div class="text-muted small">@o.CustomerEmail</div>
+                            </td>
+                            <td class="text-muted text-nowrap">@Display.Date(o.CreatedAt)</td>
+                            <td class="num">@o.ItemCount</td>
+                            <td class="num text-nowrap">
+                                @Display.Money(o.Total)
+                                @if (o.CouponCode is not null)
+                                {
+                                    <div class="text-muted small font-mono">@o.CouponCode</div>
+                                }
+                            </td>
+                            <td><span class="@Display.OrderStatusBadge(o.Status)">@Display.OrderStatus(o.Status)</span></td>
+                            <td class="text-end"><a class="btn btn-outline-secondary btn-sm" asp-action="Detail" asp-route-id="@o.Id">Detay</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <partial name="Partials/_Pager" model="Model.Pager" />
+</div>

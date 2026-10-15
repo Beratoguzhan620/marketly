@@ -10,8 +10,8 @@ or environment variables in production.
 | `FileApi:BaseAddress` | Eticaret, Admin | `http://localhost:5031/` (`https://localhost:7018/` in Development) | URL of `App.FileApi`. |
 | `FileApi:ApiKey` | Eticaret, Admin | `local-dev-key` in Development | Must match `Authentication:ApiKey` of the File API. |
 | `Authentication:ApiKey` | FileApi | `local-dev-key` in Development | Required for upload/delete. |
-| `Email:Host`, `Email:Username`, `Email:Password`, `Email:FromAddress` | Eticaret, Admin | empty | When `Host` is empty, password-reset links are written to the log instead of being e-mailed. |
-| `Email:StorefrontUrl` | Eticaret, Admin | `https://localhost:7114` | Used to build links inside e-mails. |
+| `Email:Host`, `Email:Username`, `Email:Password`, `Email:FromAddress` | Eticaret, Admin | empty | When `Host` is empty no e-mail is sent; in Development the reset link is shown on the page instead. |
+| `Email:StorefrontUrl` | Eticaret, Admin | empty | Base URL for links inside e-mails. Empty means the scheme and host of the incoming request. Set it when the app runs behind a proxy. |
 
 ## Examples
 

@@ -47,49 +47,25 @@ namespace App.Data.Migrations
                         {
                             Id = 1,
                             CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "Beauty"
+                            Name = "Tarifler"
                         },
                         new
                         {
                             Id = 2,
                             CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "Food"
+                            Name = "Mevsim rehberi"
                         },
                         new
                         {
                             Id = 3,
                             CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "Life Style"
+                            Name = "Üretici hikâyeleri"
                         },
                         new
                         {
                             Id = 4,
                             CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "Travel"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "Fashion"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "Education"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "Entertainment"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "Sports"
+                            Name = "Beslenme"
                         });
                 });
 
@@ -131,6 +107,48 @@ namespace App.Data.Migrations
                     b.HasIndex("BlogId");
 
                     b.ToTable("BlogComments");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            BlogId = 1,
+                            Comment = "Fırında yumurtalı sebze fikri çok işime yaradı, misafirler bayıldı.",
+                            CreatedAt = new DateTime(2026, 1, 19, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "buyer@example.com",
+                            IsApproved = true,
+                            Name = "Zeynep Kaya"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            BlogId = 2,
+                            Comment = "Elmaları ayrı saklamayı bilmiyordum, teşekkürler.",
+                            CreatedAt = new DateTime(2026, 1, 24, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "burak.sahin@example.com",
+                            IsApproved = true,
+                            Name = "Burak Şahin"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            BlogId = 2,
+                            Comment = "Muz sapı yöntemi gerçekten işe yarıyor.",
+                            CreatedAt = new DateTime(2026, 1, 25, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "elif.arslan@example.com",
+                            IsApproved = true,
+                            Name = "Elif Arslan"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            BlogId = 5,
+                            Comment = "Islatma suyunu dökmek gerekiyor mu, emin değildim; artık netleşti.",
+                            CreatedAt = new DateTime(2026, 2, 9, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "deniz.celik@example.com",
+                            IsApproved = false,
+                            Name = "Deniz Çelik"
+                        });
                 });
 
             modelBuilder.Entity("App.Data.Entities.BlogEntity", b =>
@@ -175,72 +193,56 @@ namespace App.Data.Migrations
                         new
                         {
                             Id = 1,
-                            Content = "Visiting a clean farm in the US is an enlightening experience. The farm, with its well-maintained fields and healthy livestock, showcases the best of American agriculture. The cleanliness of the farm is a testament to the hard work and dedication of the farmers. They follow strict hygiene and cleanliness standards to ensure the health and safety of their animals and crops. The farm also uses sustainable farming practices to protect the environment. A visit to such a farm is not only educational but also inspiring, as it shows the importance of cleanliness and sustainability in farming.",
-                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Content = "Kalabalık bir sofrada her şeyi aynı anda sıcak tutmak zordur. Önceden hazırlanabilen tarifler seçmek işi çok kolaylaştırır.\n\nFırında yumurtalı sebze, bir gece önceden hazırlanan yulaf kavanozları ve büyük bir tepside kızartılmış domates biber bunların başında gelir.\n\nPeynir ve zeytin tabağını servisten yarım saat önce hazırlayın; oda sıcaklığına gelen peynirin tadı daha iyi çıkar. Meyveleri en son doğrayın ki kararmasın.",
+                            CreatedAt = new DateTime(2026, 1, 18, 9, 0, 0, 0, DateTimeKind.Utc),
                             Enabled = true,
-                            ImageUrl = "/theme/img/blog/blog-3.jpg",
-                            Title = "Visit the clean farm in the US",
-                            UserId = 1
+                            Title = "Kalabalık kahvaltı için 6 pratik fikir",
+                            UserId = 2
                         },
                         new
                         {
                             Id = 2,
-                            Content = "Preparing breakfast for a large group requires careful planning and organization. Start by choosing recipes that can be made in large quantities, such as scrambled eggs, pancakes, or a breakfast casserole. Consider making items that can be prepared ahead of time, like muffins or fruit salad. Set up a serving station with all the necessary utensils, plates, and cups. Cook as much as you can in advance to minimize stress on the day of the event. Remember to cater to different dietary needs and preferences. With these tips, you'll be able to host a successful breakfast for 30 people.",
-                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Content = "Portakal, mandalina ve elma kışın en çok tüketilen meyvelerdir. Doğru saklandıklarında haftalarca taze kalırlar.\n\nNarenciyeyi buzdolabının sebzeliğinde, poşetsiz saklayın. Elmalar etilen gazı saldığı için diğer meyvelerden ayrı durmalıdır.\n\nMuzu sapından streç filmle sarmak olgunlaşmayı birkaç gün yavaşlatır. Ezilen meyveleri ayırın; tek bir çürük meyve bütün kasayı etkiler.",
+                            CreatedAt = new DateTime(2026, 1, 23, 9, 0, 0, 0, DateTimeKind.Utc),
                             Enabled = true,
-                            ImageUrl = "/theme/img/blog/blog-2.jpg",
-                            Title = "6 ways to prepare breakfast for 30",
-                            UserId = 1
+                            Title = "Kış meyvelerini daha uzun saklamanın yolları",
+                            UserId = 4
                         },
                         new
                         {
                             Id = 3,
-                            Content = "Cooking can be a daunting task for many, especially when it comes to preparing meals for a family or a large group. However, with the right tips and techniques, it can be made simple and enjoyable. Start by planning your meals in advance and doing a weekly grocery shop. This not only saves time but also ensures you have all the ingredients you need. Use fresh ingredients wherever possible as they provide the best flavor. Don't be afraid to experiment with different herbs and spices to add a unique twist to your dishes. Remember, the key to simple cooking is preparation and using the right tools. Invest in a good set of knives, pots, and pans. Lastly, don't forget to clean as you go. This will keep your kitchen tidy and make the cooking process much more manageable.",
-                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Content = "Siyah üzümlerimizin geldiği bağda hasat sabah erken başlar. Güneş yükselmeden kesilen salkımlar daha uzun dayanır.\n\nBağın sahibi Hasan Bey, üç kuşaktır aynı topraklarda çalışıyor. Kimyasal ilaç yerine yaprak bakımına ve havalandırmaya güveniyor.\n\nHasat edilen üzümler aynı gün soğuk hava deposuna giriyor ve ertesi gün Marketly üzerinden sipariş veren müşterilere yola çıkıyor.",
+                            CreatedAt = new DateTime(2026, 1, 29, 9, 0, 0, 0, DateTimeKind.Utc),
                             Enabled = true,
-                            ImageUrl = "/theme/img/blog/blog-1.jpg",
-                            Title = "Cooking tips make cooking simple",
-                            UserId = 1
+                            Title = "Ege'de bir bağ bozumu günü",
+                            UserId = 2
                         },
                         new
                         {
                             Id = 4,
-                            Content = "Organic food has become increasingly popular in recent years, with many people choosing to buy organic produce over conventionally grown food. There are several benefits to eating organic food, including better taste, higher nutritional value, and fewer pesticides. Organic farming practices are also better for the environment, as they reduce pollution and conserve water and soil. Additionally, organic food is often fresher and free from harmful additives and preservatives. While organic food can be more expensive, many people believe the health benefits are worth the extra cost. Overall, eating organic food is a great way to support your health and the environment.",
-                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Content = "Ispanak, demir ve folat açısından zengin bir yapraklı sebzedir; ancak uzun süre haşlamak bu değerlerin bir kısmını suya geçirir.\n\nKısa süre buharda pişirmek ya da az zeytinyağında soteleyip hemen ocaktan almak en iyi yöntemdir. Üzerine sıkılan birkaç damla limon demirin emilimini artırır.\n\nTaze ıspanağı yıkamadan, kâğıt havluya sararak buzdolabında saklayın; nem yaprakların çabuk solmasına neden olur.",
+                            CreatedAt = new DateTime(2026, 2, 3, 9, 0, 0, 0, DateTimeKind.Utc),
                             Enabled = true,
-                            ImageUrl = "/theme/img/blog/blog-4.jpg",
-                            Title = "The benefits of eating organic food",
-                            UserId = 1
+                            Title = "Ispanağı besin değerini kaybetmeden pişirmek",
+                            UserId = 4
                         },
                         new
                         {
                             Id = 5,
-                            Content = "Fruits are an essential part of a healthy diet, providing essential vitamins, minerals, and fiber. However, it's essential to consume them in moderation and avoid overeating. While fruits are nutritious, they also contain natural sugars that can contribute to weight gain if consumed in excess. To include fruits in your diet, aim to eat a variety of colors and types to ensure you're getting a wide range of nutrients. Fresh, frozen, and dried fruits are all healthy options, but be mindful of added sugars in canned or packaged fruits. Avoid fruit juices and smoothies, as they can be high in sugar and calories. Instead, opt for whole fruits, which provide more fiber and nutrients. By following these tips, you can enjoy the health benefits of fruits without overdoing it.",
-                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Content = "Nohut ve kuru fasulyeyi bir gece önceden ıslatmak pişirme süresini neredeyse yarıya indirir ve sindirimi kolaylaştırır.\n\nMercimek ve bulgur için ıslatmaya gerek yoktur; yıkamak yeterlidir. Islatma suyunu dökmek, gaz yapan şekerlerin bir kısmını uzaklaştırır.\n\nZaman kısıtlıysa bakliyatı kaynar suda beş dakika haşlayıp bir saat dinlendirmek de iş görür.",
+                            CreatedAt = new DateTime(2026, 2, 8, 9, 0, 0, 0, DateTimeKind.Utc),
                             Enabled = true,
-                            ImageUrl = "/theme/img/blog/blog-5.jpg",
-                            Title = "How to (and not to) include fruits in your diet",
-                            UserId = 1
+                            Title = "Bakliyatı ıslatmak gerçekten gerekli mi?",
+                            UserId = 2
                         },
                         new
                         {
                             Id = 6,
-                            Content = "Garlic is a popular ingredient in many dishes, known for its strong flavor and health benefits. However, there are times when you may need to remove garlic from the menu. Some people are allergic to garlic and can experience symptoms like hives, itching, or difficulty breathing after consuming it. If you're cooking for someone with a garlic allergy, it's essential to avoid using garlic in your dishes. Additionally, some people may have a sensitivity to garlic that causes digestive issues like bloating or gas. In these cases, it's best to limit or avoid garlic in your cooking. While garlic is a versatile and flavorful ingredient, it's essential to be mindful of people's dietary needs and preferences when preparing meals.",
-                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Content = "Ürün sofraya ne kadar kısa yoldan gelirse o kadar taze kalır. Yerel üreticiden alışveriş, depoda geçen günleri ortadan kaldırır.\n\nÜretici de aracı payı ödemediği için emeğinin karşılığını daha adil alır. Marketly'de her ürünün satıcısını görebilmenizin nedeni budur.\n\nMevsiminde alışveriş yapmak hem lezzet hem bütçe için en iyi seçimdir.",
+                            CreatedAt = new DateTime(2026, 2, 13, 9, 0, 0, 0, DateTimeKind.Utc),
                             Enabled = true,
-                            ImageUrl = "/theme/img/blog/blog-6.jpg",
-                            Title = "The moment You Need To Remove Garlic From The Menu",
-                            UserId = 1
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Content = "Organic food has become increasingly popular in recent years, with many people choosing to buy organic produce over conventionally grown food. While organic food is often more expensive than non-organic options, there are several factors that contribute to the higher cost. Organic farming practices are more labor-intensive and require more time and effort than conventional farming methods. Additionally, organic farmers often pay higher prices for organic seeds, fertilizers, and pest control methods. The certification process for organic food is also costly, as farmers must meet strict standards to be certified organic. While the cost of organic food can be a barrier for some consumers, many people believe the health and environmental benefits are worth the extra expense.",
-                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
-                            Enabled = true,
-                            ImageUrl = "/theme/img/blog/blog-1.jpg",
-                            Title = "Cost anaylsis of organic food",
-                            UserId = 1
+                            Title = "Yerel üreticiden almak neyi değiştirir?",
+                            UserId = 4
                         });
                 });
 
@@ -262,7 +264,48 @@ namespace App.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("BlogTags");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "kahvaltı"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "meyve"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "sebze"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "saklama"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "yerel üretim"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "pratik"
+                        });
                 });
 
             modelBuilder.Entity("App.Data.Entities.CartItemEntity", b =>
@@ -434,6 +477,97 @@ namespace App.Data.Migrations
                     b.ToTable("ContactForms");
                 });
 
+            modelBuilder.Entity("App.Data.Entities.CouponEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte>("DiscountRate")
+                        .HasColumnType("tinyint");
+
+                    b.Property<bool>("Enabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("MinimumOrderTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("UsageLimit")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsedCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("Coupons", t =>
+                        {
+                            t.HasCheckConstraint("CK_Coupons_DiscountRate", "[DiscountRate] BETWEEN 1 AND 90");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "HOSGELDIN10",
+                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountRate = (byte)10,
+                            Enabled = true,
+                            EndDate = new DateTime(2029, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            MinimumOrderTotal = 200m,
+                            StartDate = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            UsedCount = 0
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "BUYUKSEPET20",
+                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountRate = (byte)20,
+                            Enabled = true,
+                            EndDate = new DateTime(2029, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            MinimumOrderTotal = 750m,
+                            StartDate = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            UsageLimit = 500,
+                            UsedCount = 0
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Code = "KIS2026",
+                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountRate = (byte)15,
+                            Enabled = true,
+                            EndDate = new DateTime(2026, 3, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            StartDate = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            UsedCount = 0
+                        });
+                });
+
             modelBuilder.Entity("App.Data.Entities.DiscountEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -506,13 +640,31 @@ namespace App.Data.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<string>("CouponCode")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<decimal>("DiscountAmount")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
 
                     b.Property<string>("OrderCode")
                         .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
+
+                    b.Property<byte>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint")
+                        .HasDefaultValue((byte)0);
+
+                    b.Property<DateTime?>("StatusUpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -521,6 +673,8 @@ namespace App.Data.Migrations
 
                     b.HasIndex("OrderCode")
                         .IsUnique();
+
+                    b.HasIndex("Status");
 
                     b.HasIndex("UserId");
 
@@ -532,7 +686,10 @@ namespace App.Data.Migrations
                             Id = 1,
                             Address = "Caferağa Mah. Moda Cad. No: 12 Kadıköy / İstanbul",
                             CreatedAt = new DateTime(2026, 1, 28, 9, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountAmount = 0m,
                             OrderCode = "MK-2026-0001",
+                            Status = (byte)2,
+                            StatusUpdatedAt = new DateTime(2026, 1, 31, 9, 0, 0, 0, DateTimeKind.Utc),
                             UserId = 3
                         },
                         new
@@ -540,7 +697,10 @@ namespace App.Data.Migrations
                             Id = 2,
                             Address = "Kızılay Mah. Atatürk Blv. No: 45 Çankaya / Ankara",
                             CreatedAt = new DateTime(2026, 1, 31, 9, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountAmount = 0m,
                             OrderCode = "MK-2026-0002",
+                            Status = (byte)2,
+                            StatusUpdatedAt = new DateTime(2026, 2, 3, 9, 0, 0, 0, DateTimeKind.Utc),
                             UserId = 6
                         },
                         new
@@ -548,7 +708,10 @@ namespace App.Data.Migrations
                             Id = 3,
                             Address = "Alsancak Mah. Kıbrıs Şehitleri Cad. No: 8 Konak / İzmir",
                             CreatedAt = new DateTime(2026, 2, 3, 9, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountAmount = 0m,
                             OrderCode = "MK-2026-0003",
+                            Status = (byte)2,
+                            StatusUpdatedAt = new DateTime(2026, 2, 6, 9, 0, 0, 0, DateTimeKind.Utc),
                             UserId = 7
                         },
                         new
@@ -556,7 +719,10 @@ namespace App.Data.Migrations
                             Id = 4,
                             Address = "Caferağa Mah. Moda Cad. No: 12 Kadıköy / İstanbul",
                             CreatedAt = new DateTime(2026, 2, 6, 9, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountAmount = 0m,
                             OrderCode = "MK-2026-0004",
+                            Status = (byte)1,
+                            StatusUpdatedAt = new DateTime(2026, 2, 8, 9, 0, 0, 0, DateTimeKind.Utc),
                             UserId = 3
                         },
                         new
@@ -564,7 +730,9 @@ namespace App.Data.Migrations
                             Id = 5,
                             Address = "Bahçelievler Mah. Dalyan Sok. No: 3 Nilüfer / Bursa",
                             CreatedAt = new DateTime(2026, 2, 9, 9, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountAmount = 0m,
                             OrderCode = "MK-2026-0005",
+                            Status = (byte)0,
                             UserId = 8
                         },
                         new
@@ -572,7 +740,10 @@ namespace App.Data.Migrations
                             Id = 6,
                             Address = "Kızılay Mah. Atatürk Blv. No: 45 Çankaya / Ankara",
                             CreatedAt = new DateTime(2026, 2, 12, 9, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountAmount = 0m,
                             OrderCode = "MK-2026-0006",
+                            Status = (byte)3,
+                            StatusUpdatedAt = new DateTime(2026, 2, 13, 9, 0, 0, 0, DateTimeKind.Utc),
                             UserId = 6
                         });
                 });
@@ -1540,65 +1711,51 @@ namespace App.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1,
+                            Id = 11,
                             BlogId = 1,
-                            CategoryId = 2,
+                            CategoryId = 1,
                             CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = 2,
-                            BlogId = 1,
-                            CategoryId = 4,
-                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 3,
+                            Id = 12,
                             BlogId = 2,
                             CategoryId = 2,
                             CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = 4,
-                            BlogId = 2,
+                            Id = 13,
+                            BlogId = 3,
                             CategoryId = 3,
                             CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = 5,
-                            BlogId = 3,
-                            CategoryId = 2,
-                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 6,
+                            Id = 14,
                             BlogId = 4,
-                            CategoryId = 2,
+                            CategoryId = 1,
                             CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = 7,
+                            Id = 15,
+                            BlogId = 4,
+                            CategoryId = 4,
+                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 16,
                             BlogId = 5,
-                            CategoryId = 2,
+                            CategoryId = 4,
                             CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            Id = 8,
+                            Id = 17,
                             BlogId = 6,
-                            CategoryId = 2,
-                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = 9,
-                            BlogId = 7,
-                            CategoryId = 2,
+                            CategoryId = 3,
                             CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
@@ -1622,11 +1779,84 @@ namespace App.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BlogId");
-
                     b.HasIndex("TagId");
 
+                    b.HasIndex("BlogId", "TagId")
+                        .IsUnique();
+
                     b.ToTable("RelBlogTags");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            BlogId = 1,
+                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            TagId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            BlogId = 1,
+                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            TagId = 6
+                        },
+                        new
+                        {
+                            Id = 3,
+                            BlogId = 2,
+                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            TagId = 2
+                        },
+                        new
+                        {
+                            Id = 4,
+                            BlogId = 2,
+                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            TagId = 4
+                        },
+                        new
+                        {
+                            Id = 5,
+                            BlogId = 3,
+                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            TagId = 5
+                        },
+                        new
+                        {
+                            Id = 6,
+                            BlogId = 3,
+                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            TagId = 2
+                        },
+                        new
+                        {
+                            Id = 7,
+                            BlogId = 4,
+                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            TagId = 3
+                        },
+                        new
+                        {
+                            Id = 8,
+                            BlogId = 4,
+                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            TagId = 6
+                        },
+                        new
+                        {
+                            Id = 9,
+                            BlogId = 5,
+                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            TagId = 6
+                        },
+                        new
+                        {
+                            Id = 10,
+                            BlogId = 6,
+                            CreatedAt = new DateTime(2026, 1, 15, 9, 0, 0, 0, DateTimeKind.Utc),
+                            TagId = 5
+                        });
                 });
 
             modelBuilder.Entity("App.Data.Entities.RoleEntity", b =>
@@ -1712,7 +1942,11 @@ namespace App.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ResetPasswordToken")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTime?>("ResetPasswordTokenExpiresAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
@@ -1955,9 +2189,9 @@ namespace App.Data.Migrations
             modelBuilder.Entity("App.Data.Entities.RelBlogCategoryEntity", b =>
                 {
                     b.HasOne("App.Data.Entities.BlogEntity", "Blog")
-                        .WithMany()
+                        .WithMany("CategoryLinks")
                         .HasForeignKey("BlogId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("App.Data.Entities.BlogCategoryEntity", "Category")
@@ -1974,13 +2208,13 @@ namespace App.Data.Migrations
             modelBuilder.Entity("App.Data.Entities.RelBlogTagEntity", b =>
                 {
                     b.HasOne("App.Data.Entities.BlogEntity", "Blog")
-                        .WithMany()
+                        .WithMany("TagLinks")
                         .HasForeignKey("BlogId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("App.Data.Entities.BlogTagEntity", "Tag")
-                        .WithMany()
+                        .WithMany("BlogRelations")
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
@@ -2008,7 +2242,16 @@ namespace App.Data.Migrations
 
             modelBuilder.Entity("App.Data.Entities.BlogEntity", b =>
                 {
+                    b.Navigation("CategoryLinks");
+
                     b.Navigation("Comments");
+
+                    b.Navigation("TagLinks");
+                });
+
+            modelBuilder.Entity("App.Data.Entities.BlogTagEntity", b =>
+                {
+                    b.Navigation("BlogRelations");
                 });
 
             modelBuilder.Entity("App.Data.Entities.OrderEntity", b =>

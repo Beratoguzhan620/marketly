@@ -3,6 +3,9 @@
     ViewData["Title"] = "Teslimat bilgileri";
     var address = Context.Request.HasFormContentType ? Context.Request.Form["Address"].ToString() : string.Empty;
     var addressError = ViewData.ModelState["Address"]?.Errors.FirstOrDefault()?.ErrorMessage;
+    var couponQuote = ViewData[CheckoutViewData.CouponQuote] as CouponQuoteDto;
+    var couponError = ViewData[CheckoutViewData.CouponError] as string;
+    var couponInput = ViewData[CheckoutViewData.CouponInput] as string;
 }
 
 <partial name="Partials/CheckoutSteps" model="2" />
@@ -29,6 +32,10 @@
                 }
                 <div class="form-text">En az 10 karakter. Kapı numarası ve ilçeyi eklemeyi unutmayın.</div>
             </div>
+            @if (couponQuote is not null)
+            {
+                <input type="hidden" name="CouponCode" value="@couponQuote.Code" />
+            }
             <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mt-4">
                 <a class="btn btn-link px-0" asp-controller="Cart" asp-action="Edit"><i class="bi bi-arrow-left"></i>Sepete dön</a>
                 <button class="btn btn-primary" type="submit">Siparişi onayla</button>
@@ -45,5 +52,30 @@
             }
         </ul>
         <partial name="Partials/OrderSummary" model="Model" />
+
+        <div class="mt-3 pt-3 border-top">
+            @if (couponQuote is not null)
+            {
+                <div class="coupon-applied">
+                    <span><i class="bi bi-tag" aria-hidden="true"></i> <strong class="font-mono">@couponQuote.Code</strong> uygulandı (%@couponQuote.DiscountRate)</span>
+                    <a asp-controller="Cart" asp-action="Checkout">Kaldır</a>
+                </div>
+            }
+            else
+            {
+                <form method="get" asp-controller="Cart" asp-action="Checkout" novalidate>
+                    <label class="form-label small" for="coupon">İndirim kodu</label>
+                    <div class="coupon-form">
+                        <input class="form-control form-control-sm @(couponError is null ? null : "input-validation-error")" id="coupon" name="coupon" value="@couponInput"
+                               maxlength="32" autocomplete="off" spellcheck="false" placeholder="ör. HOSGELDIN10" aria-describedby="@(couponError is null ? null : "couponError")" />
+                        <button class="btn btn-outline-secondary btn-sm" type="submit">Uygula</button>
+                    </div>
+                    @if (couponError is not null)
+                    {
+                        <span class="field-validation-error" id="couponError">@couponError</span>
+                    }
+                </form>
+            }
+        </div>
     </aside>
 </div>

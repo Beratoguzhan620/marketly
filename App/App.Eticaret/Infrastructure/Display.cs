@@ -16,6 +16,16 @@ namespace App.Eticaret.Infrastructure
 
         public static string DateTime(DateTime value) => value.ToLocalTime().ToString("d MMMM yyyy, HH:mm", Turkish);
 
+        public static string OrderStatus(App.Data.Entities.OrderStatus status) => App.Application.Orders.OrderStatusText.Label(status);
+
+        public static string OrderStatusBadge(App.Data.Entities.OrderStatus status) => status switch
+        {
+            App.Data.Entities.OrderStatus.Delivered => "badge badge-success",
+            App.Data.Entities.OrderStatus.Shipped => "badge badge-accent",
+            App.Data.Entities.OrderStatus.Cancelled => "badge badge-danger",
+            _ => "badge badge-warning",
+        };
+
         public static string Rating(double value) => value.ToString("0.0", Turkish);
 
         private static readonly (string Keyword, string Icon)[] CategoryIcons =

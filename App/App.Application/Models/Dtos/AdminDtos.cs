@@ -1,3 +1,5 @@
+using App.Data.Entities;
+
 namespace App.Application.Models.Dtos
 {
     public class AdminDashboardDto
@@ -9,6 +11,8 @@ namespace App.Application.Models.Dtos
         public int ActiveProductCount { get; set; }
         public int PendingCommentCount { get; set; }
         public int PendingSellerRequestCount { get; set; }
+        public int PendingBlogCommentCount { get; set; }
+        public int PreparingOrderCount { get; set; }
         public List<MonthlySalesDto> MonthlySales { get; set; } = [];
         public List<AdminOrderSummaryDto> RecentOrders { get; set; } = [];
     }
@@ -28,6 +32,29 @@ namespace App.Application.Models.Dtos
         public DateTime CreatedAt { get; set; }
         public int ItemCount { get; set; }
         public decimal Total { get; set; }
+        public OrderStatus Status { get; set; }
+    }
+
+    public class AdminOrderRowDto
+    {
+        public int Id { get; set; }
+        public string OrderCode { get; set; } = null!;
+        public string CustomerName { get; set; } = null!;
+        public string CustomerEmail { get; set; } = null!;
+        public DateTime CreatedAt { get; set; }
+        public int ItemCount { get; set; }
+        public decimal Subtotal { get; set; }
+        public decimal DiscountAmount { get; set; }
+        public decimal Total => Subtotal - DiscountAmount;
+        public string? CouponCode { get; set; }
+        public OrderStatus Status { get; set; }
+        public DateTime? StatusUpdatedAt { get; set; }
+    }
+
+    public class AdminOrderDetailDto : AdminOrderRowDto
+    {
+        public string Address { get; set; } = null!;
+        public List<OrderItemDto> Items { get; set; } = [];
     }
 
     public class AdminProductRowDto

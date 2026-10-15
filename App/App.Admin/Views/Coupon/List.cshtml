@@ -1,0 +1,94 @@
+@model CouponListPageViewModel
+@{
+    ViewData["Title"] = "İndirim kodları";
+    var q = Model.Query;
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+    var now = DateTime.UtcNow;
+}
+
+<partial name="Partials/_ViewMessages" />
+
+<div class="page-header">
+    <div>
+        <h1>İndirim kodları</h1>
+        <p>Müşterilerin ödeme adımında girdiği, sepetin tamamına uygulanan kodlar. Ürün bazlı indirimler ürün kaydında tutulur.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg"></i>Yeni kod</a>
+</div>
+
+<div class="card" data-bulk>
+    <form class="filter-bar" method="get" asp-action="List" role="search">
+        <div class="search">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <input class="form-control form-control-sm" type="search" name="search" value="@q.Search" placeholder="Kod ara" aria-label="Kod ara" />
+        </div>
+        <select class="form-select form-select-sm" name="status" aria-label="Durum" onchange="this.form.requestSubmit()">
+            <option value="All" selected="@(q.Status == ActiveFilter.All)">Tüm kodlar</option>
+            <option value="Active" selected="@(q.Status == ActiveFilter.Active)">Etkin</option>
+            <option value="Inactive" selected="@(q.Status == ActiveFilter.Inactive)">Durdurulmuş</option>
+        </select>
+        <button class="btn btn-outline-secondary btn-sm" type="submit">Ara</button>
+    </form>
+
+    <form method="post" asp-action="Bulk">
+        <input type="hidden" name="returnUrl" value="@returnUrl" />
+        <div class="bulk-bar" data-bulk-bar>
+            <span class="count" data-bulk-count></span>
+            <button class="btn btn-primary btn-sm" type="submit" name="operation" value="enable">Etkinleştir</button>
+            <button class="btn btn-outline-secondary btn-sm" type="submit" name="operation" value="disable">Durdur</button>
+        </div>
+
+        @if (Model.Result.Items.Count == 0)
+        {
+            <partial name="Partials/_EmptyState" model="@(("Kod bulunamadı", "Yeni bir indirim kodu oluşturabilirsiniz.", "bi-ticket-perforated"))" />
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th class="check-col"><input class="form-check-input" type="checkbox" data-bulk-all aria-label="Tümünü seç" /></th>
+                            <th>Kod</th>
+                            <th class="num">Oran</th>
+                            <th class="num">En az sepet</th>
+                            <th>Geçerlilik</th>
+                            <th class="num">Kullanım</th>
+                            <th>Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var c in Model.Result.Items)
+                        {
+                            var expired = c.EndDate < now;
+                            <tr>
+                                <td class="check-col"><input class="form-check-input" type="checkbox" name="ids" value="@c.Id" data-bulk-item aria-label="Kodu seç" /></td>
+                                <td class="font-mono fw-medium">@c.Code</td>
+                                <td class="num">%@c.DiscountRate</td>
+                                <td class="num">@(c.MinimumOrderTotal is decimal min ? Display.Money(min) : "—")</td>
+                                <td class="text-muted text-nowrap">@Display.Date(c.StartDate) – @Display.Date(c.EndDate)</td>
+                                <td class="num">@c.UsedCount@(c.UsageLimit is int limit ? $" / {limit}" : "")</td>
+                                <td>
+                                    @if (!c.Enabled)
+                                    {
+                                        <span class="badge badge-neutral">Durduruldu</span>
+                                    }
+                                    else if (expired)
+                                    {
+                                        <span class="badge badge-danger">Süresi doldu</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-success">Etkin</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </form>
+
+    <partial name="Partials/_Pager" model="Model.Pager" />
+</div>

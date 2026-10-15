@@ -121,12 +121,12 @@ internal static class DemoData
 
     public static readonly OrderEntity[] Orders =
     [
-        new() { Id = 1, UserId = 3, OrderCode = "MK-2026-0001", Address = "Caferağa Mah. Moda Cad. No: 12 Kadıköy / İstanbul", CreatedAt = BaseDate.AddDays(13) },
-        new() { Id = 2, UserId = 6, OrderCode = "MK-2026-0002", Address = "Kızılay Mah. Atatürk Blv. No: 45 Çankaya / Ankara", CreatedAt = BaseDate.AddDays(16) },
-        new() { Id = 3, UserId = 7, OrderCode = "MK-2026-0003", Address = "Alsancak Mah. Kıbrıs Şehitleri Cad. No: 8 Konak / İzmir", CreatedAt = BaseDate.AddDays(19) },
-        new() { Id = 4, UserId = 3, OrderCode = "MK-2026-0004", Address = "Caferağa Mah. Moda Cad. No: 12 Kadıköy / İstanbul", CreatedAt = BaseDate.AddDays(22) },
-        new() { Id = 5, UserId = 8, OrderCode = "MK-2026-0005", Address = "Bahçelievler Mah. Dalyan Sok. No: 3 Nilüfer / Bursa", CreatedAt = BaseDate.AddDays(25) },
-        new() { Id = 6, UserId = 6, OrderCode = "MK-2026-0006", Address = "Kızılay Mah. Atatürk Blv. No: 45 Çankaya / Ankara", CreatedAt = BaseDate.AddDays(28) },
+        new() { Id = 1, UserId = 3, OrderCode = "MK-2026-0001", Address = "Caferağa Mah. Moda Cad. No: 12 Kadıköy / İstanbul", CreatedAt = BaseDate.AddDays(13), Status = OrderStatus.Delivered, StatusUpdatedAt = BaseDate.AddDays(16) },
+        new() { Id = 2, UserId = 6, OrderCode = "MK-2026-0002", Address = "Kızılay Mah. Atatürk Blv. No: 45 Çankaya / Ankara", CreatedAt = BaseDate.AddDays(16), Status = OrderStatus.Delivered, StatusUpdatedAt = BaseDate.AddDays(19) },
+        new() { Id = 3, UserId = 7, OrderCode = "MK-2026-0003", Address = "Alsancak Mah. Kıbrıs Şehitleri Cad. No: 8 Konak / İzmir", CreatedAt = BaseDate.AddDays(19), Status = OrderStatus.Delivered, StatusUpdatedAt = BaseDate.AddDays(22) },
+        new() { Id = 4, UserId = 3, OrderCode = "MK-2026-0004", Address = "Caferağa Mah. Moda Cad. No: 12 Kadıköy / İstanbul", CreatedAt = BaseDate.AddDays(22), Status = OrderStatus.Shipped, StatusUpdatedAt = BaseDate.AddDays(24) },
+        new() { Id = 5, UserId = 8, OrderCode = "MK-2026-0005", Address = "Bahçelievler Mah. Dalyan Sok. No: 3 Nilüfer / Bursa", CreatedAt = BaseDate.AddDays(25), Status = OrderStatus.Preparing },
+        new() { Id = 6, UserId = 6, OrderCode = "MK-2026-0006", Address = "Kızılay Mah. Atatürk Blv. No: 45 Çankaya / Ankara", CreatedAt = BaseDate.AddDays(28), Status = OrderStatus.Cancelled, StatusUpdatedAt = BaseDate.AddDays(29) },
     ];
 
     public static readonly OrderItemEntity[] OrderItems =
@@ -146,5 +146,117 @@ internal static class DemoData
         new() { Id = 13, OrderId = 5, ProductId = 19, Quantity = 1, UnitPrice = 69.90m, CreatedAt = BaseDate.AddDays(25) },
         new() { Id = 14, OrderId = 6, ProductId = 24, Quantity = 1, UnitPrice = 289.90m, CreatedAt = BaseDate.AddDays(28) },
         new() { Id = 15, OrderId = 6, ProductId = 31, Quantity = 1, UnitPrice = 579.90m, CreatedAt = BaseDate.AddDays(28) },
+    ];
+
+    public static readonly CouponEntity[] Coupons =
+    [
+        new() { Id = 1, Code = "HOSGELDIN10", DiscountRate = 10, MinimumOrderTotal = 200m, StartDate = BaseDate, EndDate = BaseDate.AddYears(3), UsageLimit = null, Enabled = true, CreatedAt = BaseDate },
+        new() { Id = 2, Code = "BUYUKSEPET20", DiscountRate = 20, MinimumOrderTotal = 750m, StartDate = BaseDate, EndDate = BaseDate.AddYears(3), UsageLimit = 500, Enabled = true, CreatedAt = BaseDate },
+        new() { Id = 3, Code = "KIS2026", DiscountRate = 15, MinimumOrderTotal = null, StartDate = BaseDate, EndDate = BaseDate.AddMonths(2), UsageLimit = null, Enabled = true, CreatedAt = BaseDate },
+    ];
+
+    public static readonly BlogCategoryEntity[] BlogCategories =
+    [
+        new() { Id = 1, Name = "Tarifler", CreatedAt = BaseDate },
+        new() { Id = 2, Name = "Mevsim rehberi", CreatedAt = BaseDate },
+        new() { Id = 3, Name = "Üretici hikâyeleri", CreatedAt = BaseDate },
+        new() { Id = 4, Name = "Beslenme", CreatedAt = BaseDate },
+    ];
+
+    public static readonly BlogTagEntity[] BlogTags =
+    [
+        new() { Id = 1, Name = "kahvaltı", CreatedAt = BaseDate },
+        new() { Id = 2, Name = "meyve", CreatedAt = BaseDate },
+        new() { Id = 3, Name = "sebze", CreatedAt = BaseDate },
+        new() { Id = 4, Name = "saklama", CreatedAt = BaseDate },
+        new() { Id = 5, Name = "yerel üretim", CreatedAt = BaseDate },
+        new() { Id = 6, Name = "pratik", CreatedAt = BaseDate },
+    ];
+
+    public static readonly BlogEntity[] BlogPosts =
+    [
+        new()
+        {
+            Id = 1, UserId = 2, ImageUrl = null, Enabled = true, CreatedAt = BaseDate.AddDays(3),
+            Title = "Kalabalık kahvaltı için 6 pratik fikir",
+            Content = "Kalabalık bir sofrada her şeyi aynı anda sıcak tutmak zordur. Önceden hazırlanabilen tarifler seçmek işi çok kolaylaştırır.\n\n"
+                + "Fırında yumurtalı sebze, bir gece önceden hazırlanan yulaf kavanozları ve büyük bir tepside kızartılmış domates biber bunların başında gelir.\n\n"
+                + "Peynir ve zeytin tabağını servisten yarım saat önce hazırlayın; oda sıcaklığına gelen peynirin tadı daha iyi çıkar. Meyveleri en son doğrayın ki kararmasın.",
+        },
+        new()
+        {
+            Id = 2, UserId = 4, ImageUrl = null, Enabled = true, CreatedAt = BaseDate.AddDays(8),
+            Title = "Kış meyvelerini daha uzun saklamanın yolları",
+            Content = "Portakal, mandalina ve elma kışın en çok tüketilen meyvelerdir. Doğru saklandıklarında haftalarca taze kalırlar.\n\n"
+                + "Narenciyeyi buzdolabının sebzeliğinde, poşetsiz saklayın. Elmalar etilen gazı saldığı için diğer meyvelerden ayrı durmalıdır.\n\n"
+                + "Muzu sapından streç filmle sarmak olgunlaşmayı birkaç gün yavaşlatır. Ezilen meyveleri ayırın; tek bir çürük meyve bütün kasayı etkiler.",
+        },
+        new()
+        {
+            Id = 3, UserId = 2, ImageUrl = null, Enabled = true, CreatedAt = BaseDate.AddDays(14),
+            Title = "Ege'de bir bağ bozumu günü",
+            Content = "Siyah üzümlerimizin geldiği bağda hasat sabah erken başlar. Güneş yükselmeden kesilen salkımlar daha uzun dayanır.\n\n"
+                + "Bağın sahibi Hasan Bey, üç kuşaktır aynı topraklarda çalışıyor. Kimyasal ilaç yerine yaprak bakımına ve havalandırmaya güveniyor.\n\n"
+                + "Hasat edilen üzümler aynı gün soğuk hava deposuna giriyor ve ertesi gün Marketly üzerinden sipariş veren müşterilere yola çıkıyor.",
+        },
+        new()
+        {
+            Id = 4, UserId = 4, ImageUrl = null, Enabled = true, CreatedAt = BaseDate.AddDays(19),
+            Title = "Ispanağı besin değerini kaybetmeden pişirmek",
+            Content = "Ispanak, demir ve folat açısından zengin bir yapraklı sebzedir; ancak uzun süre haşlamak bu değerlerin bir kısmını suya geçirir.\n\n"
+                + "Kısa süre buharda pişirmek ya da az zeytinyağında soteleyip hemen ocaktan almak en iyi yöntemdir. Üzerine sıkılan birkaç damla limon demirin emilimini artırır.\n\n"
+                + "Taze ıspanağı yıkamadan, kâğıt havluya sararak buzdolabında saklayın; nem yaprakların çabuk solmasına neden olur.",
+        },
+        new()
+        {
+            Id = 5, UserId = 2, ImageUrl = null, Enabled = true, CreatedAt = BaseDate.AddDays(24),
+            Title = "Bakliyatı ıslatmak gerçekten gerekli mi?",
+            Content = "Nohut ve kuru fasulyeyi bir gece önceden ıslatmak pişirme süresini neredeyse yarıya indirir ve sindirimi kolaylaştırır.\n\n"
+                + "Mercimek ve bulgur için ıslatmaya gerek yoktur; yıkamak yeterlidir. Islatma suyunu dökmek, gaz yapan şekerlerin bir kısmını uzaklaştırır.\n\n"
+                + "Zaman kısıtlıysa bakliyatı kaynar suda beş dakika haşlayıp bir saat dinlendirmek de iş görür.",
+        },
+        new()
+        {
+            Id = 6, UserId = 4, ImageUrl = null, Enabled = true, CreatedAt = BaseDate.AddDays(29),
+            Title = "Yerel üreticiden almak neyi değiştirir?",
+            Content = "Ürün sofraya ne kadar kısa yoldan gelirse o kadar taze kalır. Yerel üreticiden alışveriş, depoda geçen günleri ortadan kaldırır.\n\n"
+                + "Üretici de aracı payı ödemediği için emeğinin karşılığını daha adil alır. Marketly'de her ürünün satıcısını görebilmenizin nedeni budur.\n\n"
+                + "Mevsiminde alışveriş yapmak hem lezzet hem bütçe için en iyi seçimdir.",
+        },
+    ];
+
+    // Ids start at 11 so the old template rows are deleted instead of rewritten in place,
+    // which would briefly break the unique (BlogId, CategoryId) index during the migration.
+    public static readonly RelBlogCategoryEntity[] BlogCategoryLinks =
+    [
+        new() { Id = 11, BlogId = 1, CategoryId = 1, CreatedAt = BaseDate },
+        new() { Id = 12, BlogId = 2, CategoryId = 2, CreatedAt = BaseDate },
+        new() { Id = 13, BlogId = 3, CategoryId = 3, CreatedAt = BaseDate },
+        new() { Id = 14, BlogId = 4, CategoryId = 1, CreatedAt = BaseDate },
+        new() { Id = 15, BlogId = 4, CategoryId = 4, CreatedAt = BaseDate },
+        new() { Id = 16, BlogId = 5, CategoryId = 4, CreatedAt = BaseDate },
+        new() { Id = 17, BlogId = 6, CategoryId = 3, CreatedAt = BaseDate },
+    ];
+
+    public static readonly RelBlogTagEntity[] BlogTagLinks =
+    [
+        new() { Id = 1, BlogId = 1, TagId = 1, CreatedAt = BaseDate },
+        new() { Id = 2, BlogId = 1, TagId = 6, CreatedAt = BaseDate },
+        new() { Id = 3, BlogId = 2, TagId = 2, CreatedAt = BaseDate },
+        new() { Id = 4, BlogId = 2, TagId = 4, CreatedAt = BaseDate },
+        new() { Id = 5, BlogId = 3, TagId = 5, CreatedAt = BaseDate },
+        new() { Id = 6, BlogId = 3, TagId = 2, CreatedAt = BaseDate },
+        new() { Id = 7, BlogId = 4, TagId = 3, CreatedAt = BaseDate },
+        new() { Id = 8, BlogId = 4, TagId = 6, CreatedAt = BaseDate },
+        new() { Id = 9, BlogId = 5, TagId = 6, CreatedAt = BaseDate },
+        new() { Id = 10, BlogId = 6, TagId = 5, CreatedAt = BaseDate },
+    ];
+
+    public static readonly BlogCommentEntity[] BlogComments =
+    [
+        new() { Id = 1, BlogId = 1, Name = "Zeynep Kaya", Email = "buyer@example.com", Comment = "Fırında yumurtalı sebze fikri çok işime yaradı, misafirler bayıldı.", IsApproved = true, CreatedAt = BaseDate.AddDays(4) },
+        new() { Id = 2, BlogId = 2, Name = "Burak Şahin", Email = "burak.sahin@example.com", Comment = "Elmaları ayrı saklamayı bilmiyordum, teşekkürler.", IsApproved = true, CreatedAt = BaseDate.AddDays(9) },
+        new() { Id = 3, BlogId = 2, Name = "Elif Arslan", Email = "elif.arslan@example.com", Comment = "Muz sapı yöntemi gerçekten işe yarıyor.", IsApproved = true, CreatedAt = BaseDate.AddDays(10) },
+        new() { Id = 4, BlogId = 5, Name = "Deniz Çelik", Email = "deniz.celik@example.com", Comment = "Islatma suyunu dökmek gerekiyor mu, emin değildim; artık netleşti.", IsApproved = false, CreatedAt = BaseDate.AddDays(25) },
     ];
 }

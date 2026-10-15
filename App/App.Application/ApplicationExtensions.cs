@@ -24,6 +24,8 @@ namespace App.Application
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<ICartService, CartService>();
             services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<ICouponService, CouponService>();
+            services.AddScoped<IBlogService, BlogService>();
             services.AddScoped<IProductCommentService, ProductCommentService>();
             services.AddScoped<IContactService, ContactService>();
 

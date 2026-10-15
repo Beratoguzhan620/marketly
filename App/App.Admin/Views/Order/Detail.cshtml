@@ -1,0 +1,117 @@
+@model AdminOrderDetailDto
+@using App.Application.Orders
+@using App.Data.Entities
+@{
+    ViewData["Title"] = $"Sipariş {Model.OrderCode}";
+    var nextSteps = OrderStatusText.NextSteps(Model.Status);
+    var returnUrl = Context.Request.Path.ToString();
+}
+
+<partial name="Partials/_ViewMessages" />
+
+<div class="page-header">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-action="List">Siparişler</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@Model.OrderCode</li>
+            </ol>
+        </nav>
+        <h1>Sipariş <span class="font-mono">@Model.OrderCode</span></h1>
+        <p>@Display.DateTime(Model.CreatedAt) · @Model.CustomerName</p>
+    </div>
+</div>
+
+<div class="detail-layout">
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Ürün</th>
+                        <th class="num">Adet</th>
+                        <th class="num">Birim fiyat</th>
+                        <th class="num">Tutar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td class="fw-medium">@item.ProductName</td>
+                            <td class="num">@item.Quantity</td>
+                            <td class="num">@Display.Money(item.UnitPrice)</td>
+                            <td class="num">@Display.Money(item.TotalPrice)</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    @if (Model.DiscountAmount > 0)
+                    {
+                        <tr>
+                            <td colspan="3" class="text-end text-muted">Ara toplam</td>
+                            <td class="num">@Display.Money(Model.Subtotal)</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-end text-muted">Kupon <span class="font-mono">@Model.CouponCode</span></td>
+                            <td class="num">−@Display.Money(Model.DiscountAmount)</td>
+                        </tr>
+                    }
+                    <tr>
+                        <td colspan="3" class="text-end fw-semibold">Toplam</td>
+                        <td class="num fw-semibold">@Display.Money(Model.Total)</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="d-grid gap-3 align-content-start">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="h6">Durum</h2>
+                <p class="mb-1"><span class="@Display.OrderStatusBadge(Model.Status)">@Display.OrderStatus(Model.Status)</span></p>
+                @if (Model.StatusUpdatedAt is DateTime updated)
+                {
+                    <p class="text-muted small mb-0">Son değişiklik: @Display.DateTime(updated)</p>
+                }
+
+                @if (nextSteps.Count > 0)
+                {
+                    <div class="d-flex flex-wrap gap-2 mt-3">
+                        @foreach (var next in nextSteps)
+                        {
+                            var cancel = next == OrderStatus.Cancelled;
+                            <form method="post" asp-action="UpdateStatus" asp-route-id="@Model.Id">
+                                <input type="hidden" name="status" value="@next" />
+                                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                @if (cancel)
+                                {
+                                    <button class="btn btn-outline-secondary btn-sm" type="submit"
+                                            data-confirm="Sipariş iptal edilecek ve ürünler stoğa geri eklenecek." data-confirm-title="Siparişi iptal et" data-confirm-ok="İptal et">Siparişi iptal et</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-primary btn-sm" type="submit">@(next == OrderStatus.Shipped ? "Kargoya verildi" : "Teslim edildi") olarak işaretle</button>
+                                }
+                            </form>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted small mt-3 mb-0">Bu sipariş kapandı; durumu artık değiştirilemez.</p>
+                }
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h2 class="h6">Müşteri ve teslimat</h2>
+                <p class="mb-1 fw-medium">@Model.CustomerName</p>
+                <p class="mb-2 text-muted small">@Model.CustomerEmail</p>
+                <p class="mb-0 small" style="white-space: pre-line">@Model.Address</p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,12 +1,119 @@
+@model BlogDetailPageViewModel
 @{
-    ViewData["Title"] = "Blog";
+    var post = Model.Post;
+    ViewData["Title"] = post.Title;
 }
 
-<div class="page-header">
-    <div>
-        <h1>Blog</h1>
-        <p>Üreticilerden tarifler, mevsim rehberleri ve pazar haberleri.</p>
-    </div>
-</div>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Index">Blog</a></li>
+        @if (post.Categories.Count > 0)
+        {
+            <li class="breadcrumb-item"><a asp-action="Index" asp-route-category="@post.Categories[0].Id">@post.Categories[0].Name</a></li>
+        }
+        <li class="breadcrumb-item active" aria-current="page">@post.Title</li>
+    </ol>
+</nav>
 
-<partial name="Partials/EmptyState" model="@(new EmptyStateViewModel("Yazılar hazırlanıyor", "Blog bölümü yakında açılacak. Bu sırada mevsimin ürünlerine göz atabilirsiniz.", "bi-journal-text", "Ürünlere göz at", Url.Action("Listing", "Home")))" />
+<article class="post-article">
+    <header>
+        <h1>@post.Title</h1>
+        <div class="post-meta">
+            <span>@post.AuthorName</span>
+            <span>@Display.Date(post.CreatedAt)</span>
+            <span>@post.ReadingMinutes dk okuma</span>
+        </div>
+    </header>
+
+    @if (!string.IsNullOrEmpty(post.ImageUrl))
+    {
+        <img class="post-cover" src="@post.ImageUrl" alt="" />
+    }
+
+    <div class="post-body">
+        @foreach (var paragraph in post.Paragraphs)
+        {
+            <p>@paragraph</p>
+        }
+    </div>
+
+    @if (post.Tags.Count > 0)
+    {
+        <div class="tag-cloud mt-4" aria-label="Etiketler">
+            @foreach (var tag in post.Tags)
+            {
+                <a class="tag-link" asp-action="Index" asp-route-tag="@tag.Id">#@tag.Name</a>
+            }
+        </div>
+    }
+
+    <section class="post-comments" id="comments" aria-labelledby="comments-title">
+        <h2 id="comments-title">Yorumlar <span class="text-muted fw-normal">(@post.Comments.Count)</span></h2>
+
+        <partial name="Partials/ViewMessages" />
+
+        @if (post.Comments.Count == 0)
+        {
+            <p class="text-muted">Henüz yorum yok. İlk yorumu siz yazın.</p>
+        }
+        else
+        {
+            <ul class="comment-list">
+                @foreach (var comment in post.Comments)
+                {
+                    <li>
+                        <div class="comment-head"><strong>@comment.Name</strong><span>@Display.Date(comment.CreatedAt)</span></div>
+                        <p>@comment.Comment</p>
+                    </li>
+                }
+            </ul>
+        }
+
+        <form class="card mt-4" method="post" asp-controller="Blog" asp-action="AddComment" asp-route-id="@post.Id" asp-fragment="comments" novalidate>
+            <div class="card-body p-4">
+                <h3 class="h6 mb-3">Yorum yazın</h3>
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <label class="form-label" asp-for="Form.Name"></label>
+                        <input class="form-control" asp-for="Form.Name" autocomplete="name" />
+                        <span asp-validation-for="Form.Name"></span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label" asp-for="Form.Email"></label>
+                        <input class="form-control" asp-for="Form.Email" type="email" autocomplete="email" />
+                        <span asp-validation-for="Form.Email"></span>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" asp-for="Form.Comment"></label>
+                        <textarea class="form-control" asp-for="Form.Comment" rows="4" maxlength="1000"></textarea>
+                        <span asp-validation-for="Form.Comment"></span>
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mt-3">
+                    <span class="form-text m-0">E-posta adresiniz yayınlanmaz. Yorumlar onaydan sonra görünür.</span>
+                    <button class="btn btn-primary" type="submit">Gönder</button>
+                </div>
+            </div>
+        </form>
+    </section>
+</article>
+
+@if (post.Related.Count > 0)
+{
+    <section class="related-posts" aria-labelledby="related-title">
+        <h2 id="related-title">Diğer yazılar</h2>
+        <div class="post-grid">
+            @foreach (var related in post.Related)
+            {
+                <article class="post-card">
+                    <div class="post-meta"><span>@Display.Date(related.CreatedAt)</span><span>@related.ReadingMinutes dk</span></div>
+                    <h3><a asp-action="Detail" asp-route-id="@related.Id">@related.Title</a></h3>
+                </article>
+            }
+        </div>
+    </section>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

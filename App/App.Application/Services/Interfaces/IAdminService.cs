@@ -1,6 +1,7 @@
 using App.Application.Models.Dtos;
 using App.Application.Models.Requests;
 using App.Application.Results;
+using App.Data.Entities;
 
 namespace App.Application.Services.Interfaces
 {
@@ -22,5 +23,23 @@ namespace App.Application.Services.Interfaces
         Task<ServiceResult> ApproveCommentsAsync(IReadOnlyCollection<int> commentIds);
 
         Task<ServiceResult> DeleteCommentsAsync(IReadOnlyCollection<int> commentIds);
+
+        Task<PagedResult<AdminOrderRowDto>> GetOrdersAsync(AdminOrderQuery query);
+
+        Task<AdminOrderDetailDto?> GetOrderAsync(int orderId);
+
+        Task<ServiceResult> UpdateOrderStatusAsync(int orderId, OrderStatus status);
+
+        Task<PagedResult<AdminBlogCommentRowDto>> GetBlogCommentsAsync(AdminBlogCommentQuery query);
+
+        Task<ServiceResult> ApproveBlogCommentsAsync(IReadOnlyCollection<int> commentIds);
+
+        Task<ServiceResult> DeleteBlogCommentsAsync(IReadOnlyCollection<int> commentIds);
+
+        Task<PagedResult<AdminCouponRowDto>> GetCouponsAsync(AdminCouponQuery query);
+
+        Task<ServiceResult> CreateCouponAsync(CouponCreateRequest request);
+
+        Task<ServiceResult> SetCouponsEnabledAsync(IReadOnlyCollection<int> couponIds, bool enabled);
     }
 }

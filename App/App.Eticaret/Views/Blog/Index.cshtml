@@ -1,12 +1,111 @@
+@model BlogListDto
 @{
-    ViewData["Title"] = "Blog";
+    ViewData["Title"] = Model.ActiveCategory?.Name ?? (Model.ActiveTag is null ? "Blog" : $"#{Model.ActiveTag.Name}");
+    var posts = Model.Posts;
+
+    string ListUrl(int? category, int? tag, int? page = null) =>
+        Url.Action("Index", "Blog", new { category, tag, page = page is > 1 ? page : null })!;
 }
 
 <div class="page-header">
     <div>
         <h1>Blog</h1>
-        <p>Üreticilerden tarifler, mevsim rehberleri ve pazar haberleri.</p>
+        <p>Üreticilerden tarifler, mevsim rehberleri ve saklama önerileri.</p>
     </div>
 </div>
 
-<partial name="Partials/EmptyState" model="@(new EmptyStateViewModel("Yazılar hazırlanıyor", "Blog bölümü yakında açılacak. Bu sırada mevsimin ürünlerine göz atabilirsiniz.", "bi-journal-text", "Ürünlere göz at", Url.Action("Listing", "Home")))" />
+<div class="listing-layout">
+    <aside class="filter-panel" aria-label="Blog filtreleri">
+        <div class="filter-group">
+            <h2>Kategoriler</h2>
+            <ul class="category-filter">
+                <li>
+                    <a class="@(Model.ActiveCategory is null ? "active" : null)" href="@ListUrl(null, Model.ActiveTag?.Id)">
+                        <span>Tüm yazılar</span>
+                    </a>
+                </li>
+                @foreach (var category in Model.Categories)
+                {
+                    <li>
+                        <a class="@(Model.ActiveCategory?.Id == category.Id ? "active" : null)" href="@ListUrl(category.Id, Model.ActiveTag?.Id)">
+                            <span>@category.Name</span><span class="count">@category.PostCount</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+        @if (Model.Tags.Count > 0)
+        {
+            <div class="filter-group">
+                <h2>Etiketler</h2>
+                <div class="tag-cloud">
+                    @foreach (var tag in Model.Tags)
+                    {
+                        var active = Model.ActiveTag?.Id == tag.Id;
+                        <a class="tag-link @(active ? "active" : null)" aria-current="@(active ? "true" : null)"
+                           href="@ListUrl(Model.ActiveCategory?.Id, active ? null : tag.Id)">#@tag.Name</a>
+                    }
+                </div>
+            </div>
+        }
+    </aside>
+
+    <section aria-label="Yazılar">
+        @if (Model.ActiveCategory is not null || Model.ActiveTag is not null)
+        {
+            <div class="active-filters" aria-label="Uygulanan filtreler">
+                @if (Model.ActiveCategory is not null)
+                {
+                    <a class="filter-chip" href="@ListUrl(null, Model.ActiveTag?.Id)">@Model.ActiveCategory.Name <i class="bi bi-x"></i><span class="visually-hidden">kaldır</span></a>
+                }
+                @if (Model.ActiveTag is not null)
+                {
+                    <a class="filter-chip" href="@ListUrl(Model.ActiveCategory?.Id, null)">#@Model.ActiveTag.Name <i class="bi bi-x"></i><span class="visually-hidden">kaldır</span></a>
+                }
+                <a class="filter-chip" href="@ListUrl(null, null)">Tümünü temizle</a>
+            </div>
+        }
+
+        @if (posts.TotalCount == 0)
+        {
+            <partial name="Partials/EmptyState" model="@(new EmptyStateViewModel("Bu filtrede yazı yok", "Başka bir kategori ya da etiket seçin.", "bi-journal-text", "Tüm yazılar", ListUrl(null, null)))" />
+        }
+        else
+        {
+            <p class="result-count text-muted small mb-3">@posts.TotalCount yazı</p>
+            <div class="post-list">
+                @foreach (var post in posts.Items)
+                {
+                    <article class="post-card">
+                        <div class="post-meta">
+                            @if (post.Categories.Count > 0)
+                            {
+                                <span class="post-category">@string.Join(" · ", post.Categories.Select(c => c.Name))</span>
+                            }
+                            <span>@Display.Date(post.CreatedAt)</span>
+                        </div>
+                        <h2><a asp-action="Detail" asp-route-id="@post.Id">@post.Title</a></h2>
+                        <p>@post.Excerpt</p>
+                        <div class="post-meta">
+                            <span>@post.AuthorName</span>
+                            <span>@post.ReadingMinutes dk okuma</span>
+                            @if (post.CommentCount > 0)
+                            {
+                                <span><i class="bi bi-chat" aria-hidden="true"></i> @post.CommentCount</span>
+                            }
+                        </div>
+                    </article>
+                }
+            </div>
+
+            <div class="d-flex justify-content-center mt-4">
+                <partial name="Partials/Pagination" model="@(new PaginationViewModel
+                {
+                    Page = posts.Page,
+                    TotalPages = posts.TotalPages,
+                    PageUrl = p => ListUrl(Model.ActiveCategory?.Id, Model.ActiveTag?.Id, p),
+                })" />
+            </div>
+        }
+    </section>
+</div>
