@@ -31,10 +31,10 @@ Her aşama ayrı bir branch ve PR olarak yapılır (`stage/<no>-<kisa-ad>`). Bir
 - [x] Satıcı başvurusu onay akışı, yorum onay akışı
 
 ## Aşama 4 — Özellik tamamlama
-- [ ] Blog: seed verisi ve TODO'ların kaldırılması, kategori/etiket filtreleri
-- [ ] İndirim kodu (DiscountEntity) checkout'ta çalışır
-- [ ] Şifremi unuttum / yenile akışı uçtan uca çalışır (e-posta ayarı env'den)
-- [ ] Sipariş durumları (Hazırlanıyor → Kargoda → Teslim edildi) admin'den güncellenir
+- [x] Blog: seed verisi ve TODO'ların kaldırılması, kategori/etiket filtreleri
+- [x] İndirim kodu checkout'ta çalışır (sepet geneli için yeni `CouponEntity`; `DiscountEntity` ürün bazlı indirim olarak kaldı)
+- [x] Şifremi unuttum / yenile akışı uçtan uca çalışır (e-posta ayarı env'den)
+- [x] Sipariş durumları (Hazırlanıyor → Kargoda → Teslim edildi) admin'den güncellenir
 
 ## Aşama 5 — Test, yayın, README
 - [ ] Test projesi: servis katmanı için xUnit testleri (sepet, sipariş, indirim)
