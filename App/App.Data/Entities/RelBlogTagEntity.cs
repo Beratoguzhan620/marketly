@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using App.Data.Seeding;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace App.Data.Entities;
@@ -22,15 +23,18 @@ internal class RelBlogTagEntityConfiguration : IEntityTypeConfiguration<RelBlogT
         builder.Property(e => e.BlogId).IsRequired();
         builder.Property(e => e.TagId).IsRequired();
         builder.Property(e => e.CreatedAt).IsRequired();
+        builder.HasIndex(e => new { e.BlogId, e.TagId }).IsUnique();
 
         builder.HasOne(d => d.Blog)
-            .WithMany()
+            .WithMany(b => b.TagLinks)
             .HasForeignKey(d => d.BlogId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(d => d.Tag)
-            .WithMany()
+            .WithMany(t => t.BlogRelations)
             .HasForeignKey(d => d.TagId)
             .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasData(DemoData.BlogTagLinks);
     }
 }

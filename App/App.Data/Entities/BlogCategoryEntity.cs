@@ -29,15 +29,6 @@ internal class BlogCategoryEntitySeed : IEntityTypeSeed<BlogCategoryEntity>
 {
     public void SeedData(EntityTypeBuilder<BlogCategoryEntity> builder)
     {
-        builder.HasData(new List<BlogCategoryEntity> {
-            new() { Id = 1, Name = "Beauty", CreatedAt = DemoData.BaseDate },
-            new() { Id = 2, Name = "Food", CreatedAt = DemoData.BaseDate },
-            new() { Id = 3, Name = "Life Style", CreatedAt = DemoData.BaseDate },
-            new() { Id = 4, Name = "Travel", CreatedAt = DemoData.BaseDate },
-            new() { Id = 5, Name = "Fashion", CreatedAt = DemoData.BaseDate },
-            new() { Id = 7, Name = "Education", CreatedAt = DemoData.BaseDate },
-            new() { Id = 8, Name = "Entertainment", CreatedAt = DemoData.BaseDate },
-            new() { Id = 9, Name = "Sports", CreatedAt = DemoData.BaseDate }
-        });
+        builder.HasData(DemoData.BlogCategories);
     }
 }

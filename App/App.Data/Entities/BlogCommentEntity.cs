@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using App.Data.Seeding;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace App.Data.Entities;
@@ -31,5 +32,7 @@ internal class BlogCommentEntityConfiguration : IEntityTypeConfiguration<BlogCom
             .WithMany(e => e.Comments)
             .HasForeignKey(e => e.BlogId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasData(DemoData.BlogComments);
     }
 }
