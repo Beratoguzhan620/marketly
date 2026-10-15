@@ -60,6 +60,33 @@ for (const [device, options] of Object.entries(viewports)) {
   await page.goto(`${baseUrl}/register`);
   await shot(page, `${device}-register`);
 
+  // Blog: list, tag filter, post page and a reader comment waiting for approval.
+  await page.goto(`${baseUrl}/blog`);
+  await shot(page, `${device}-blog`);
+  await page.goto(`${baseUrl}/blog?tag=6`);
+  await shot(page, `${device}-blog-tag`);
+  await page.goto(`${baseUrl}/blog/2`);
+  await shot(page, `${device}-blog-post`);
+  if (device === "desktop") {
+    await page.fill("#Form_Name", "Ayşe Yılmaz");
+    await page.fill("#Form_Email", "ayse@example.com");
+    await page.fill("#Form_Comment", "Narenciyeyi poşetsiz saklamayı denedim, gerçekten daha uzun dayanıyor.");
+    await Promise.all([page.waitForNavigation(), page.click("#comments form button[type=submit]")]);
+    await shot(page, `${device}-blog-comment-sent`);
+
+    // Password reset: without SMTP the Development build shows the link on the page.
+    await page.goto(`${baseUrl}/forgot-password`);
+    await page.fill("#Email", "elif.arslan@example.com");
+    await Promise.all([page.waitForNavigation(), page.click("form button[type=submit]")]);
+    await shot(page, `${device}-forgot-password-sent`);
+    await Promise.all([page.waitForNavigation(), page.click(".alert-warning a")]);
+    await shot(page, `${device}-renew-password`);
+    await page.fill("#Password", password);
+    await page.fill("#PasswordConfirm", password);
+    await Promise.all([page.waitForNavigation(), page.click("form button[type=submit]")]);
+    await shot(page, `${device}-renew-password-done`);
+  }
+
   // Buyer: add to cart, check out, see the order.
   await login(page, "buyer@example.com");
   for (const id of [12, 2, 30]) {
@@ -78,6 +105,10 @@ for (const [device, options] of Object.entries(viewports)) {
   await page.waitForLoadState("networkidle").catch(() => {});
   await shot(page, `${device}-checkout-validation`);
 
+  await page.goto(`${baseUrl}/checkout?coupon=YANLIS`);
+  await shot(page, `${device}-checkout-coupon-invalid`);
+
+  await page.goto(`${baseUrl}/checkout?coupon=hosgeldin10`);
   await page.fill("#Address", "Bağdat Cad. No: 214 D: 7, Kadıköy / İstanbul");
   await shot(page, `${device}-checkout`);
   await Promise.all([page.waitForNavigation(), page.click("#checkoutForm button[type=submit]")]);
@@ -85,6 +116,9 @@ for (const [device, options] of Object.entries(viewports)) {
 
   await page.goto(`${baseUrl}/my-orders`);
   await shot(page, `${device}-my-orders`);
+
+  await page.goto(`${baseUrl}/order/MK-2026-0004/details`);
+  await shot(page, `${device}-order-shipped`);
 
   await page.goto(`${baseUrl}/profile`);
   await shot(page, `${device}-profile`);
@@ -134,6 +168,14 @@ for (const [device, options] of Object.entries(viewports)) {
   await shot(page, `${device}-admin-comments`);
   await page.goto(`${adminUrl}/categories`);
   await shot(page, `${device}-admin-categories`);
+  await page.goto(`${adminUrl}/orders`);
+  await shot(page, `${device}-admin-orders`);
+  await page.goto(`${adminUrl}/orders/5`);
+  await shot(page, `${device}-admin-order`);
+  await page.goto(`${adminUrl}/coupons`);
+  await shot(page, `${device}-admin-coupons`);
+  await page.goto(`${adminUrl}/blog-comments`);
+  await shot(page, `${device}-admin-blog-comments`);
 
   if (device === "desktop") {
     // Bulk action: select two products and take them off sale, through the confirm dialog.
@@ -153,6 +195,27 @@ for (const [device, options] of Object.entries(viewports)) {
     await page.check("input[data-bulk-all]");
     await Promise.all([page.waitForNavigation(), page.click("button[value=approve]")]);
     await shot(page, `${device}-admin-comments-approved`);
+
+    // Move an order forward, then try the coupon form.
+    await page.goto(`${adminUrl}/orders/5`);
+    await Promise.all([page.waitForNavigation(), page.click("input[name=status][value=Shipped] ~ button")]);
+    await shot(page, `${device}-admin-order-shipped`);
+
+    await page.goto(`${adminUrl}/coupons/new`);
+    await page.fill("#Code", "x");
+    await page.click("form button[type=submit]");
+    await page.waitForTimeout(300);
+    await shot(page, `${device}-admin-coupon-validation`);
+    await page.fill("#Code", "bahar25");
+    await page.fill("#DiscountRate", "25");
+    await page.fill("#UsageLimit", "100");
+    await Promise.all([page.waitForNavigation(), page.click("form button[type=submit]")]);
+    await shot(page, `${device}-admin-coupon-created`);
+
+    await page.goto(`${adminUrl}/blog-comments`);
+    await page.check("input[data-bulk-all]");
+    await Promise.all([page.waitForNavigation(), page.click("button[value=approve]")]);
+    await shot(page, `${device}-admin-blog-comments-approved`);
   }
 
   await context.close();
