@@ -225,15 +225,17 @@ internal static class DemoData
         },
     ];
 
+    // Ids start at 11 so the old template rows are deleted instead of rewritten in place,
+    // which would briefly break the unique (BlogId, CategoryId) index during the migration.
     public static readonly RelBlogCategoryEntity[] BlogCategoryLinks =
     [
-        new() { Id = 1, BlogId = 1, CategoryId = 1, CreatedAt = BaseDate },
-        new() { Id = 2, BlogId = 2, CategoryId = 2, CreatedAt = BaseDate },
-        new() { Id = 3, BlogId = 3, CategoryId = 3, CreatedAt = BaseDate },
-        new() { Id = 4, BlogId = 4, CategoryId = 1, CreatedAt = BaseDate },
-        new() { Id = 5, BlogId = 4, CategoryId = 4, CreatedAt = BaseDate },
-        new() { Id = 6, BlogId = 5, CategoryId = 4, CreatedAt = BaseDate },
-        new() { Id = 7, BlogId = 6, CategoryId = 3, CreatedAt = BaseDate },
+        new() { Id = 11, BlogId = 1, CategoryId = 1, CreatedAt = BaseDate },
+        new() { Id = 12, BlogId = 2, CategoryId = 2, CreatedAt = BaseDate },
+        new() { Id = 13, BlogId = 3, CategoryId = 3, CreatedAt = BaseDate },
+        new() { Id = 14, BlogId = 4, CategoryId = 1, CreatedAt = BaseDate },
+        new() { Id = 15, BlogId = 4, CategoryId = 4, CreatedAt = BaseDate },
+        new() { Id = 16, BlogId = 5, CategoryId = 4, CreatedAt = BaseDate },
+        new() { Id = 17, BlogId = 6, CategoryId = 3, CreatedAt = BaseDate },
     ];
 
     public static readonly RelBlogTagEntity[] BlogTagLinks =

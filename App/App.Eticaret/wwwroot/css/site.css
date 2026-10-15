@@ -1149,3 +1149,210 @@ main.shop-main {
 }
 
 .shop-footer a { overflow-wrap: anywhere; }
+
+/* ---------- Blog ---------- */
+
+.tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.tag-link {
+    padding: 3px 10px;
+    border: 1px solid var(--mk-border);
+    border-radius: 999px;
+    background: var(--mk-surface);
+    color: var(--mk-text-muted);
+    font-size: var(--mk-text-xs);
+    text-decoration: none;
+}
+
+.tag-link:hover { color: var(--mk-text); background: var(--mk-surface-2); }
+
+.tag-link.active {
+    border-color: var(--mk-accent);
+    background: var(--mk-accent-soft);
+    color: var(--mk-accent);
+}
+
+.post-list {
+    display: grid;
+    gap: 12px;
+}
+
+.post-grid {
+    display: grid;
+    gap: 12px;
+}
+
+@media (min-width: 768px) {
+    .post-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.post-card {
+    position: relative;
+    background: var(--mk-surface);
+    border: 1px solid var(--mk-border);
+    border-radius: var(--mk-radius-md);
+    padding: 20px;
+}
+
+.post-card:hover { border-color: #CFCBC2; }
+
+.post-card h2,
+.post-card h3 {
+    font-size: var(--mk-text-lg);
+    margin: 6px 0 8px;
+}
+
+.post-card h3 { font-size: var(--mk-text-md); margin-bottom: 0; }
+
+.post-card h2 a,
+.post-card h3 a {
+    color: var(--mk-text);
+    text-decoration: none;
+}
+
+.post-card h2 a::after,
+.post-card h3 a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+}
+
+.post-card p {
+    color: var(--mk-text-muted);
+    margin-bottom: 10px;
+}
+
+.post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    color: var(--mk-text-muted);
+    font-size: var(--mk-text-xs);
+}
+
+.post-category {
+    color: var(--mk-accent);
+    font-weight: 500;
+}
+
+.post-article {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.post-article header { margin-bottom: 24px; }
+
+.post-article h1 {
+    font-size: var(--mk-text-2xl);
+    margin-bottom: 10px;
+}
+
+@media (max-width: 575.98px) {
+    .post-article h1 { font-size: var(--mk-text-xl); }
+}
+
+.post-cover {
+    width: 100%;
+    border-radius: var(--mk-radius-md);
+    margin-bottom: 24px;
+}
+
+.post-body p {
+    font-size: 17px;
+    line-height: 1.7;
+    margin-bottom: 1.1em;
+}
+
+.post-comments {
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--mk-border);
+}
+
+.post-comments h2 { font-size: var(--mk-text-lg); margin-bottom: 16px; }
+
+.comment-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 16px;
+}
+
+.comment-list li + li {
+    padding-top: 16px;
+    border-top: 1px solid var(--mk-border);
+}
+
+.comment-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    align-items: baseline;
+    font-size: var(--mk-text-sm);
+}
+
+.comment-head span { color: var(--mk-text-muted); font-size: var(--mk-text-xs); }
+
+.comment-list p { margin: 4px 0 0; }
+
+.related-posts {
+    max-width: 720px;
+    margin: 48px auto 0;
+}
+
+@media (min-width: 992px) {
+    .related-posts { max-width: none; }
+}
+
+.related-posts h2 { font-size: var(--mk-text-lg); margin-bottom: 12px; }
+
+/* ---------- Order status ---------- */
+
+.order-status-track {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 16px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.order-status-track li {
+    padding-top: 8px;
+    border-top: 3px solid var(--mk-border);
+    color: var(--mk-text-muted);
+    font-size: var(--mk-text-xs);
+}
+
+.order-status-track li.done {
+    border-top-color: var(--mk-success);
+    color: var(--mk-text);
+    font-weight: 500;
+}
+
+.coupon-form {
+    display: flex;
+    gap: 8px;
+}
+
+.coupon-form .form-control {
+    text-transform: uppercase;
+    font-family: var(--mk-font-mono);
+}
+
+.coupon-applied {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px dashed var(--mk-success);
+    border-radius: var(--mk-radius-sm);
+    background: var(--mk-success-soft);
+    font-size: var(--mk-text-sm);
+}
