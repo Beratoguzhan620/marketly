@@ -1,0 +1,68 @@
+@model SaveCouponViewModel
+@{
+    ViewData["Title"] = "Yeni indirim kodu";
+}
+
+<div class="page-header">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-action="List">İndirim kodları</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Yeni kod</li>
+            </ol>
+        </nav>
+        <h1>Yeni indirim kodu</h1>
+    </div>
+</div>
+
+<div class="card form-card">
+    <div class="card-body p-4">
+        <partial name="Partials/_ViewMessages" />
+        <form method="post" asp-action="Create" novalidate>
+            <div class="row g-3 mb-3">
+                <div class="col-sm-6">
+                    <label class="form-label" asp-for="Code"></label>
+                    <input class="form-control font-mono text-uppercase" asp-for="Code" placeholder="BAHAR25" autocomplete="off" spellcheck="false" />
+                    <div class="form-text">Büyük harfe çevrilerek kaydedilir.</div>
+                    <span asp-validation-for="Code"></span>
+                </div>
+                <div class="col-sm-6">
+                    <label class="form-label" asp-for="DiscountRate"></label>
+                    <input class="form-control" asp-for="DiscountRate" type="number" min="1" max="90" />
+                    <span asp-validation-for="DiscountRate"></span>
+                </div>
+                <div class="col-sm-6">
+                    <label class="form-label" asp-for="StartDate"></label>
+                    <input class="form-control" asp-for="StartDate" type="date" />
+                    <span asp-validation-for="StartDate"></span>
+                </div>
+                <div class="col-sm-6">
+                    <label class="form-label" asp-for="EndDate"></label>
+                    <input class="form-control" asp-for="EndDate" type="date" />
+                    <div class="form-text">Kod bu günün sonuna kadar geçerlidir.</div>
+                    <span asp-validation-for="EndDate"></span>
+                </div>
+                <div class="col-sm-6">
+                    <label class="form-label" asp-for="MinimumOrderTotal"></label>
+                    <input class="form-control" asp-for="MinimumOrderTotal" type="number" min="0" step="0.01" />
+                    <div class="form-text">Boş bırakılırsa her tutarda geçerli.</div>
+                    <span asp-validation-for="MinimumOrderTotal"></span>
+                </div>
+                <div class="col-sm-6">
+                    <label class="form-label" asp-for="UsageLimit"></label>
+                    <input class="form-control" asp-for="UsageLimit" type="number" min="1" />
+                    <div class="form-text">Boş bırakılırsa sınırsız.</div>
+                    <span asp-validation-for="UsageLimit"></span>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Kodu oluştur</button>
+                <a class="btn btn-outline-secondary" asp-action="List">Vazgeç</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,4 +1,4 @@
-﻿using App.Application.Models.Requests;
+using App.Application.Models.Requests;
 using App.Application.Services.Interfaces;
 using App.Eticaret.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -107,6 +107,7 @@ namespace App.Eticaret.Controllers
                 OrderCode = o.OrderCode,
                 Address = o.Address,
                 CreatedAt = o.CreatedAt,
+                Status = o.Status,
                 TotalPrice = o.TotalPrice,
                 TotalProducts = o.TotalProducts,
                 TotalQuantity = o.TotalQuantity,

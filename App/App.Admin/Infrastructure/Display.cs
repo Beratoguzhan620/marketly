@@ -12,6 +12,16 @@ namespace App.Admin.Infrastructure
 
         public static string DateTime(DateTime utc) => utc.ToLocalTime().ToString("d MMM yyyy, HH:mm", Turkish);
 
+        public static string OrderStatus(App.Data.Entities.OrderStatus status) => App.Application.Orders.OrderStatusText.Label(status);
+
+        public static string OrderStatusBadge(App.Data.Entities.OrderStatus status) => status switch
+        {
+            App.Data.Entities.OrderStatus.Delivered => "badge badge-success",
+            App.Data.Entities.OrderStatus.Shipped => "badge badge-accent",
+            App.Data.Entities.OrderStatus.Cancelled => "badge badge-danger",
+            _ => "badge badge-warning",
+        };
+
         public static string MonthShort(int year, int month) => new DateTime(year, month, 1).ToString("MMM", Turkish);
 
         public static string RoleLabel(string role) => role.ToLowerInvariant() switch

@@ -27,6 +27,7 @@
                             <tr>
                                 <th>Sipariş no</th>
                                 <th>Tarih</th>
+                                <th>Durum</th>
                                 <th class="num">Ürün</th>
                                 <th class="num">Tutar</th>
                                 <th><span class="visually-hidden">İşlem</span></th>
@@ -38,6 +39,7 @@
                                 <tr>
                                     <td class="font-mono">@order.OrderCode</td>
                                     <td class="text-muted">@Display.Date(order.CreatedAt)</td>
+                                    <td><span class="@Display.OrderStatusBadge(order.Status)">@Display.OrderStatus(order.Status)</span></td>
                                     <td class="num">@order.TotalQuantity</td>
                                     <td class="num">@Display.Money(order.TotalPrice)</td>
                                     <td class="text-end">

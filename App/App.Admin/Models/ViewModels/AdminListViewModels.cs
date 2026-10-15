@@ -23,4 +23,16 @@ namespace App.Admin.Models.ViewModels
     public class CommentListPageViewModel : AdminListViewModel<AdminCommentRowDto, AdminCommentQuery>
     {
     }
+
+    public class OrderListPageViewModel : AdminListViewModel<AdminOrderRowDto, AdminOrderQuery>
+    {
+    }
+
+    public class BlogCommentListPageViewModel : AdminListViewModel<AdminBlogCommentRowDto, AdminBlogCommentQuery>
+    {
+    }
+
+    public class CouponListPageViewModel : AdminListViewModel<AdminCouponRowDto, AdminCouponQuery>
+    {
+    }
 }

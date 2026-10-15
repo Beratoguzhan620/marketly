@@ -16,6 +16,11 @@
             <a class="side-link@(Active("Home"))" aria-current="@Current("Home")" asp-controller="Home" asp-action="Index"><i class="bi bi-speedometer2"></i>Özet</a>
         </nav>
         <nav>
+            <div class="nav-section-title">Satış</div>
+            <a class="side-link@(Active("Order"))" aria-current="@Current("Order")" asp-controller="Order" asp-action="List"><i class="bi bi-receipt"></i>Siparişler</a>
+            <a class="side-link@(Active("Coupon"))" aria-current="@Current("Coupon")" asp-controller="Coupon" asp-action="List"><i class="bi bi-ticket-perforated"></i>İndirim kodları</a>
+        </nav>
+        <nav>
             <div class="nav-section-title">Katalog</div>
             <a class="side-link@(Active("Product"))" aria-current="@Current("Product")" asp-controller="Product" asp-action="List"><i class="bi bi-box-seam"></i>Ürünler</a>
             <a class="side-link@(Active("Category"))" aria-current="@Current("Category")" asp-controller="Category" asp-action="List"><i class="bi bi-tags"></i>Kategoriler</a>
@@ -23,7 +28,8 @@
         <nav>
             <div class="nav-section-title">Topluluk</div>
             <a class="side-link@(Active("User"))" aria-current="@Current("User")" asp-controller="User" asp-action="List"><i class="bi bi-people"></i>Kullanıcılar</a>
-            <a class="side-link@(Active("Comment"))" aria-current="@Current("Comment")" asp-controller="Comment" asp-action="List"><i class="bi bi-chat-square-text"></i>Yorumlar</a>
+            <a class="side-link@(Active("Comment"))" aria-current="@Current("Comment")" asp-controller="Comment" asp-action="List"><i class="bi bi-chat-square-text"></i>Ürün yorumları</a>
+            <a class="side-link@(Active("BlogComment"))" aria-current="@Current("BlogComment")" asp-controller="BlogComment" asp-action="List"><i class="bi bi-journal-text"></i>Blog yorumları</a>
         </nav>
 
         <div class="sidebar-footer">Marketly · @DateTime.UtcNow.Year</div>

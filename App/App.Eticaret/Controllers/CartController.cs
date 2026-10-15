@@ -1,4 +1,4 @@
-﻿using App.Application.Models.Dtos;
+using App.Application.Models.Dtos;
 using App.Application.Results;
 using App.Application.Services.Interfaces;
 using App.Eticaret.Models.ViewModels;
@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace App.Eticaret.Controllers
 {
     [Authorize(Roles = "buyer, seller")]
-    public class CartController(ICartService cartService) : BaseController
+    public class CartController(ICartService cartService, ICouponService couponService) : BaseController
     {
         [HttpGet("/add-to-cart/{productId:int}")]
         public async Task<IActionResult> AddProduct([FromRoute] int productId)
@@ -111,7 +111,7 @@ namespace App.Eticaret.Controllers
         }
 
         [HttpGet("/checkout")]
-        public async Task<IActionResult> Checkout()
+        public async Task<IActionResult> Checkout([FromQuery] string? coupon)
         {
             var userId = GetUserId();
 
@@ -125,6 +125,20 @@ namespace App.Eticaret.Controllers
             if (cart.Items.Count == 0)
             {
                 return RedirectToAction(nameof(Edit));
+            }
+
+            if (!string.IsNullOrWhiteSpace(coupon))
+            {
+                var quote = await couponService.QuoteForCartAsync(userId.Value, coupon);
+                if (quote.Success)
+                {
+                    ViewData[CheckoutViewData.CouponQuote] = quote.Data;
+                }
+                else
+                {
+                    ViewData[CheckoutViewData.CouponError] = quote.Message;
+                    ViewData[CheckoutViewData.CouponInput] = coupon.Trim();
+                }
             }
 
             return View(MapToViewModels(cart));
