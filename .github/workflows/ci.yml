@@ -49,7 +49,7 @@ jobs:
             sleep 3
           done
           curl -sf http://localhost:8080/ | grep -q "Marketly"
-          curl -sf http://localhost:8080/product/list | grep -q "Muz"
+          curl -sf http://localhost:8080/product/list | grep -q "product-card"
           for i in $(seq 1 30); do
             if curl -sf http://localhost:8081/login > /dev/null; then break; fi
             sleep 3
