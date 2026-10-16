@@ -1,0 +1,12 @@
+**/bin
+**/obj
+**/node_modules
+.git
+.github
+.vs
+.vscode
+.idea
+docs
+tests
+**/*.user
+**/appsettings.Development.json
