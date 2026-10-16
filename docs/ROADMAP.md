@@ -37,9 +37,10 @@ Her aşama ayrı bir branch ve PR olarak yapılır (`stage/<no>-<kisa-ad>`). Bir
 - [x] Sipariş durumları (Hazırlanıyor → Kargoda → Teslim edildi) admin'den güncellenir
 
 ## Aşama 5 — Test, yayın, README
-- [ ] Test projesi: servis katmanı için xUnit testleri (sepet, sipariş, indirim)
-- [ ] GitHub Actions: build + test
-- [ ] `docker-compose` (Eticaret + Admin + FileApi + SQL Server)
-- [ ] Canlı demo + demo hesapları (müşteri, satıcı, admin)
-- [ ] Ekran görüntüleri, GIF, README (TR + EN) ve mimari şeması
-- [ ] README'de "Proje geçmişi / Background" bölümü — TR: "Bu proje bir bootcamp projesi olarak başladı, sonra baştan geliştirildi." EN: "This project started as a bootcamp project and was later rebuilt from the ground up." Altına neyin yeniden yapıldığı kısaca maddelenir (tasarım, özellikler, testler, CI).
+- [x] Test projesi: servis katmanı için xUnit testleri (sepet, sipariş, indirim)
+- [x] GitHub Actions: build + test
+- [x] `docker-compose` (Eticaret + Admin + FileApi + SQL Server)
+- [x] Demo hesapları (müşteri, satıcı, admin)
+- [ ] Canlı demo — link README'ye
+- [x] Ekran görüntüleri, GIF, README (TR + EN) ve mimari şeması
+- [x] README'de "Proje geçmişi / Background" bölümü — TR: "Bu proje bir bootcamp projesi olarak başladı, sonra baştan geliştirildi." EN: "This project started as a bootcamp project and was later rebuilt from the ground up." Altına neyin yeniden yapıldığı kısaca maddelenir (tasarım, özellikler, testler, CI).

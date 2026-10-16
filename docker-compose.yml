@@ -1,0 +1,76 @@
+# Local run with one command: docker compose up --build
+# Storefront: http://localhost:8080 · Admin panel: http://localhost:8081 · File API: http://localhost:8082
+name: marketly
+
+x-app: &app
+  build:
+    context: .
+  restart: on-failure
+  environment:
+    ASPNETCORE_ENVIRONMENT: Production
+    ConnectionStrings__SqlServer: "Server=db;Database=Marketly;User Id=sa;Password=${DB_PASSWORD:-Marketly#Local2026};TrustServerCertificate=True;"
+    FileApi__BaseAddress: http://fileapi:8080/
+    FileApi__ApiKey: ${FILE_API_KEY:-local-dev-key}
+    TZ: Europe/Istanbul
+
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD:-Marketly#Local2026}
+    volumes:
+      - db-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  fileapi:
+    build:
+      context: .
+      args:
+        PROJECT: App.FileApi
+    restart: on-failure
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      Authentication__ApiKey: ${FILE_API_KEY:-local-dev-key}
+      FileStorage__PublicBaseUrl: http://localhost:8082/api/files
+    ports:
+      - "8082:8080"
+    volumes:
+      - uploads:/app/App_Data/uploads
+
+  web:
+    <<: *app
+    build:
+      context: .
+      args:
+        PROJECT: App.Eticaret
+    depends_on:
+      db:
+        condition: service_healthy
+      fileapi:
+        condition: service_started
+    ports:
+      - "8080:8080"
+
+  admin:
+    <<: *app
+    build:
+      context: .
+      args:
+        PROJECT: App.Admin
+    depends_on:
+      db:
+        condition: service_healthy
+      web:
+        condition: service_started
+    ports:
+      - "8081:8080"
+
+volumes:
+  db-data:
+  uploads:
