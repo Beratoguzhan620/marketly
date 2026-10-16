@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build
+    name: Build and test
     runs-on: ubuntu-latest
 
     steps:
@@ -24,7 +24,46 @@ jobs:
       - name: Build
         run: dotnet build Marketly.slnx --no-restore --configuration Release -warnaserror
 
+      - name: Test
+        run: dotnet test tests/App.Application.Tests/App.Application.Tests.csproj --no-build --configuration Release --logger "console;verbosity=normal"
+
       - name: Check for model changes without a migration
         run: |
           dotnet tool install --global dotnet-ef --version 10.0.9
           dotnet ef migrations has-pending-model-changes --project App/App.Data --startup-project App/App.Eticaret --no-build --configuration Release
+
+  docker:
+    name: Docker Compose
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start the stack
+        run: docker compose up --build --detach --wait --wait-timeout 300
+
+      - name: Check the storefront, the admin panel and the File API
+        run: |
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:8080/ > /dev/null; then break; fi
+            sleep 3
+          done
+          curl -sf http://localhost:8080/ | grep -q "Marketly"
+          curl -sf http://localhost:8080/product/list | grep -q "Muz"
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8081/login > /dev/null; then break; fi
+            sleep 3
+          done
+          curl -sf http://localhost:8081/login | grep -q "Marketly"
+          code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8082/api/files/missing.jpg)
+          case "$code" in 400|404) ;; *) echo "File API answered $code"; exit 1 ;; esac
+          echo "Storefront, admin panel and File API are up."
+
+      - name: Show logs
+        if: failure()
+        run: docker compose logs --no-color
+
+      - name: Stop the stack
+        if: always()
+        run: docker compose down --volumes
+
