@@ -1,0 +1,765 @@
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (31ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT 1
+info: Microsoft.EntityFrameworkCore.Migrations[20411]
+      Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (29ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      DECLARE @result int;
+      EXEC @result = sp_getapplock @Resource = '__EFMigrationsLock', @LockOwner = 'Session', @LockMode = 'Exclusive';
+      SELECT @result
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
+      BEGIN
+          CREATE TABLE [__EFMigrationsHistory] (
+              [MigrationId] nvarchar(150) NOT NULL,
+              [ProductVersion] nvarchar(32) NOT NULL,
+              CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
+          );
+      END;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [MigrationId], [ProductVersion]
+      FROM [__EFMigrationsHistory]
+      ORDER BY [MigrationId];
+info: Microsoft.EntityFrameworkCore.Migrations[20405]
+      No migrations were applied. The database is already up to date.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      DECLARE @result int;
+      EXEC @result = sp_releaseapplock @Resource = '__EFMigrationsLock', @LockOwner = 'Session';
+      SELECT @result
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://localhost:5081
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: /home/runner/work/marketly/marketly/App/App.Admin
+warn: Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware[3]
+      Failed to determine the https port for redirect.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (11ms) [Parameters=[@request_Email='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [u].[Id], [u].[CreatedAt], [u].[Email], [u].[Enabled], [u].[FirstName], [u].[HasSellerRequest], [u].[LastName], [u].[Password], [u].[ResetPasswordToken], [u].[ResetPasswordTokenExpiresAt], [u].[RoleId], [r].[Id], [r].[CreatedAt], [r].[Name]
+      FROM [Users] AS [u]
+      INNER JOIN [Roles] AS [r] ON [u].[RoleId] = [r].[Id]
+      WHERE [u].[Email] = @request_Email
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (8ms) [Parameters=[@firstMonth='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SELECT DATEPART(year, [o].[CreatedAt]) AS [Year], DATEPART(month, [o].[CreatedAt]) AS [Month], (
+          SELECT COALESCE(SUM([o0].[UnitPrice] * CAST([o0].[Quantity] AS decimal(18,2))), 0.0)
+          FROM [OrderItems] AS [o0]
+          WHERE [o].[Id] = [o0].[OrderId]) - [o].[DiscountAmount] AS [Total]
+      FROM [Orders] AS [o]
+      WHERE [o].[Status] <> CAST(3 AS tinyint) AND [o].[CreatedAt] >= @firstMonth
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (7ms) [Parameters=[@p='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [o0].[OrderCode], [u].[FirstName] + N' ' + [u].[LastName] AS [CustomerName], [o0].[CreatedAt], (
+          SELECT ISNULL(SUM(CAST([o1].[Quantity] AS int)), 0)
+          FROM [OrderItems] AS [o1]
+          WHERE [o0].[Id] = [o1].[OrderId]) AS [ItemCount], (
+          SELECT COALESCE(SUM([o2].[UnitPrice] * CAST([o2].[Quantity] AS decimal(18,2))), 0.0)
+          FROM [OrderItems] AS [o2]
+          WHERE [o0].[Id] = [o2].[OrderId]) - [o0].[DiscountAmount] AS [Total], [o0].[Status]
+      FROM (
+          SELECT TOP(@p) [o].[Id], [o].[CreatedAt], [o].[DiscountAmount], [o].[OrderCode], [o].[Status], [o].[UserId]
+          FROM [Orders] AS [o]
+          ORDER BY [o].[CreatedAt] DESC
+      ) AS [o0]
+      INNER JOIN [Users] AS [u] ON [o0].[UserId] = [u].[Id]
+      ORDER BY [o0].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Orders] AS [o]
+      WHERE [o].[Status] <> CAST(3 AS tinyint)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COALESCE(SUM([o].[UnitPrice] * CAST([o].[Quantity] AS decimal(18,2))), 0.0)
+      FROM [OrderItems] AS [o]
+      INNER JOIN [Orders] AS [o0] ON [o].[OrderId] = [o0].[Id]
+      WHERE [o0].[Status] <> CAST(3 AS tinyint)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COALESCE(SUM([o].[DiscountAmount]), 0.0)
+      FROM [Orders] AS [o]
+      WHERE [o].[Status] <> CAST(3 AS tinyint)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Users] AS [u]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@AddDays='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Users] AS [u]
+      WHERE [u].[CreatedAt] >= @AddDays
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Products] AS [p]
+      WHERE [p].[Enabled] = CAST(1 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [ProductComments] AS [p]
+      WHERE [p].[IsConfirmed] = CAST(0 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Users] AS [u]
+      WHERE [u].[HasSellerRequest] = CAST(1 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [BlogComments] AS [b]
+      WHERE [b].[IsApproved] = CAST(0 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Orders] AS [o]
+      WHERE [o].[Status] = CAST(0 AS tinyint)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Products] AS [p]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (7ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [p0].[Id], [p0].[Name], [c].[Name] AS [CategoryName], [u].[FirstName] + N' ' + [u].[LastName] AS [SellerName], [p0].[Price], [p0].[StockAmount] AS [Stock], [p0].[Enabled], (
+          SELECT COUNT(*)
+          FROM [ProductImages] AS [p1]
+          WHERE [p0].[Id] = [p1].[ProductId]) AS [ImageCount], [p0].[CreatedAt]
+      FROM (
+          SELECT [p].[Id], [p].[CategoryId], [p].[CreatedAt], [p].[Enabled], [p].[Name], [p].[Price], [p].[SellerId], [p].[StockAmount]
+          FROM [Products] AS [p]
+          ORDER BY [p].[CreatedAt] DESC, [p].[Id] DESC
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [p0]
+      INNER JOIN [Categories] AS [c] ON [p0].[CategoryId] = [c].[Id]
+      INNER JOIN [Users] AS [u] ON [p0].[SellerId] = [u].[Id]
+      ORDER BY [p0].[CreatedAt] DESC, [p0].[Id] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[Id], [c].[Name], [c].[Color], [c].[IconCssClass], (
+          SELECT COUNT(*)
+          FROM [Products] AS [p]
+          WHERE [p].[Enabled] = CAST(1 AS bit) AND [p].[CategoryId] = [c].[Id]) AS [ProductCount]
+      FROM [Categories] AS [c]
+      ORDER BY [c].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Users] AS [u]
+      WHERE [u].[HasSellerRequest] = CAST(1 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [u0].[Id], [u0].[FirstName] + N' ' + [u0].[LastName] AS [FullName], [u0].[Email], [r].[Name] AS [Role], [u0].[Enabled], [u0].[HasSellerRequest], [u0].[CreatedAt]
+      FROM (
+          SELECT [u].[Id], [u].[CreatedAt], [u].[Email], [u].[Enabled], [u].[FirstName], [u].[HasSellerRequest], [u].[LastName], [u].[RoleId]
+          FROM [Users] AS [u]
+          WHERE [u].[HasSellerRequest] = CAST(1 AS bit)
+          ORDER BY [u].[HasSellerRequest] DESC, [u].[FirstName], [u].[LastName]
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [u0]
+      INNER JOIN [Roles] AS [r] ON [u0].[RoleId] = [r].[Id]
+      ORDER BY [u0].[HasSellerRequest] DESC, [u0].[FirstName], [u0].[LastName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [ProductComments] AS [p]
+      WHERE [p].[IsConfirmed] = CAST(0 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [p1].[Id], [p1].[ProductId], [p0].[Name] AS [ProductName], [u].[FirstName] + N' ' + [u].[LastName] AS [UserName], [p1].[Text], [p1].[StarCount], [p1].[IsConfirmed], [p1].[CreatedAt]
+      FROM (
+          SELECT [p].[Id], [p].[CreatedAt], [p].[IsConfirmed], [p].[ProductId], [p].[StarCount], [p].[Text], [p].[UserId]
+          FROM [ProductComments] AS [p]
+          WHERE [p].[IsConfirmed] = CAST(0 AS bit)
+          ORDER BY [p].[CreatedAt] DESC
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [p1]
+      INNER JOIN [Products] AS [p0] ON [p1].[ProductId] = [p0].[Id]
+      INNER JOIN [Users] AS [u] ON [p1].[UserId] = [u].[Id]
+      ORDER BY [p1].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[Id], [c].[Name], [c].[Color], [c].[IconCssClass], (
+          SELECT COUNT(*)
+          FROM [Products] AS [p]
+          WHERE [p].[Enabled] = CAST(1 AS bit) AND [p].[CategoryId] = [c].[Id]) AS [ProductCount]
+      FROM [Categories] AS [c]
+      ORDER BY [c].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Orders] AS [o]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (8ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [o0].[Id], [o0].[OrderCode], [u].[FirstName] + N' ' + [u].[LastName] AS [CustomerName], [u].[Email] AS [CustomerEmail], [o0].[CreatedAt], (
+          SELECT ISNULL(SUM(CAST([o1].[Quantity] AS int)), 0)
+          FROM [OrderItems] AS [o1]
+          WHERE [o0].[Id] = [o1].[OrderId]) AS [ItemCount], (
+          SELECT COALESCE(SUM([o2].[UnitPrice] * CAST([o2].[Quantity] AS decimal(18,2))), 0.0)
+          FROM [OrderItems] AS [o2]
+          WHERE [o0].[Id] = [o2].[OrderId]) AS [Subtotal], [o0].[DiscountAmount], [o0].[CouponCode], [o0].[Status], [o0].[StatusUpdatedAt]
+      FROM (
+          SELECT [o].[Id], [o].[CouponCode], [o].[CreatedAt], [o].[DiscountAmount], [o].[OrderCode], [o].[Status], [o].[StatusUpdatedAt], [o].[UserId]
+          FROM [Orders] AS [o]
+          ORDER BY [o].[CreatedAt] DESC, [o].[Id] DESC
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [o0]
+      INNER JOIN [Users] AS [u] ON [o0].[UserId] = [u].[Id]
+      ORDER BY [o0].[CreatedAt] DESC, [o0].[Id] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (8ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [s].[Id], [s].[OrderCode], [s].[c], [s].[Email], [s].[CreatedAt], [s].[c0], [s].[c1], [s].[DiscountAmount], [s].[CouponCode], [s].[Status], [s].[StatusUpdatedAt], [s].[Address], [s].[Id0], [s0].[ProductName], [s0].[Quantity], [s0].[UnitPrice], [s0].[Id], [s0].[Id0]
+      FROM (
+          SELECT TOP(1) [o].[Id], [o].[OrderCode], [u].[FirstName] + N' ' + [u].[LastName] AS [c], [u].[Email], [o].[CreatedAt], (
+              SELECT ISNULL(SUM(CAST([o0].[Quantity] AS int)), 0)
+              FROM [OrderItems] AS [o0]
+              WHERE [o].[Id] = [o0].[OrderId]) AS [c0], (
+              SELECT COALESCE(SUM([o1].[UnitPrice] * CAST([o1].[Quantity] AS decimal(18,2))), 0.0)
+              FROM [OrderItems] AS [o1]
+              WHERE [o].[Id] = [o1].[OrderId]) AS [c1], [o].[DiscountAmount], [o].[CouponCode], [o].[Status], [o].[StatusUpdatedAt], [o].[Address], [u].[Id] AS [Id0]
+          FROM [Orders] AS [o]
+          INNER JOIN [Users] AS [u] ON [o].[UserId] = [u].[Id]
+          WHERE [o].[Id] = @orderId
+      ) AS [s]
+      LEFT JOIN (
+          SELECT [p].[Name] AS [ProductName], CAST([o2].[Quantity] AS int) AS [Quantity], [o2].[UnitPrice], [o2].[Id], [p].[Id] AS [Id0], [o2].[OrderId]
+          FROM [OrderItems] AS [o2]
+          INNER JOIN [Products] AS [p] ON [o2].[ProductId] = [p].[Id]
+      ) AS [s0] ON [s].[Id] = [s0].[OrderId]
+      ORDER BY [s].[Id], [s].[Id0], [s0].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Coupons] AS [c]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[Id], [c].[Code], [c].[DiscountRate], [c].[MinimumOrderTotal], [c].[StartDate], [c].[EndDate], [c].[UsageLimit], [c].[UsedCount], [c].[Enabled]
+      FROM [Coupons] AS [c]
+      ORDER BY [c].[Enabled] DESC, [c].[EndDate] DESC
+      OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [BlogComments] AS [b]
+      WHERE [b].[IsApproved] = CAST(0 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [b1].[Id], [b1].[BlogId], [b0].[Title] AS [BlogTitle], [b1].[Name], [b1].[Email], [b1].[Comment], [b1].[IsApproved], [b1].[CreatedAt]
+      FROM (
+          SELECT [b].[Id], [b].[BlogId], [b].[Comment], [b].[CreatedAt], [b].[Email], [b].[IsApproved], [b].[Name]
+          FROM [BlogComments] AS [b]
+          WHERE [b].[IsApproved] = CAST(0 AS bit)
+          ORDER BY [b].[CreatedAt] DESC
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [b1]
+      INNER JOIN [Blogs] AS [b0] ON [b1].[BlogId] = [b0].[Id]
+      ORDER BY [b1].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@term_contains='?' (Size = 100), @term_contains0='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Products] AS [p]
+      INNER JOIN [Users] AS [u] ON [p].[SellerId] = [u].[Id]
+      WHERE [p].[Name] LIKE @term_contains ESCAPE N'\' OR [u].[FirstName] + N' ' + [u].[LastName] LIKE @term_contains0 ESCAPE N'\'
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (6ms) [Parameters=[@term_contains='?' (Size = 100), @term_contains0='?' (Size = 4000), @p='?' (DbType = Int32), @p3='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [s].[Id], [s].[Name], [c].[Name] AS [CategoryName], [s].[FirstName] + N' ' + [s].[LastName] AS [SellerName], [s].[Price], [s].[StockAmount] AS [Stock], [s].[Enabled], (
+          SELECT COUNT(*)
+          FROM [ProductImages] AS [p0]
+          WHERE [s].[Id] = [p0].[ProductId]) AS [ImageCount], [s].[CreatedAt]
+      FROM (
+          SELECT [p].[Id], [p].[CategoryId], [p].[CreatedAt], [p].[Enabled], [p].[Name], [p].[Price], [p].[StockAmount], [u].[FirstName], [u].[LastName]
+          FROM [Products] AS [p]
+          INNER JOIN [Users] AS [u] ON [p].[SellerId] = [u].[Id]
+          WHERE [p].[Name] LIKE @term_contains ESCAPE N'\' OR [u].[FirstName] + N' ' + [u].[LastName] LIKE @term_contains0 ESCAPE N'\'
+          ORDER BY [p].[CreatedAt] DESC, [p].[Id] DESC
+          OFFSET @p ROWS FETCH NEXT @p3 ROWS ONLY
+      ) AS [s]
+      INNER JOIN [Categories] AS [c] ON [s].[CategoryId] = [c].[Id]
+      ORDER BY [s].[CreatedAt] DESC, [s].[Id] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[Id], [c].[Name], [c].[Color], [c].[IconCssClass], (
+          SELECT COUNT(*)
+          FROM [Products] AS [p]
+          WHERE [p].[Enabled] = CAST(1 AS bit) AND [p].[CategoryId] = [c].[Id]) AS [ProductCount]
+      FROM [Categories] AS [c]
+      ORDER BY [c].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@p='?' (DbType = Boolean), @productIds1='?' (DbType = Int32), @productIds2='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      UPDATE [p]
+      SET [p].[Enabled] = @p
+      FROM [Products] AS [p]
+      WHERE [p].[Id] IN (@productIds1, @productIds2)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@term_contains='?' (Size = 100), @term_contains0='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Products] AS [p]
+      INNER JOIN [Users] AS [u] ON [p].[SellerId] = [u].[Id]
+      WHERE [p].[Name] LIKE @term_contains ESCAPE N'\' OR [u].[FirstName] + N' ' + [u].[LastName] LIKE @term_contains0 ESCAPE N'\'
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@term_contains='?' (Size = 100), @term_contains0='?' (Size = 4000), @p='?' (DbType = Int32), @p3='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [s].[Id], [s].[Name], [c].[Name] AS [CategoryName], [s].[FirstName] + N' ' + [s].[LastName] AS [SellerName], [s].[Price], [s].[StockAmount] AS [Stock], [s].[Enabled], (
+          SELECT COUNT(*)
+          FROM [ProductImages] AS [p0]
+          WHERE [s].[Id] = [p0].[ProductId]) AS [ImageCount], [s].[CreatedAt]
+      FROM (
+          SELECT [p].[Id], [p].[CategoryId], [p].[CreatedAt], [p].[Enabled], [p].[Name], [p].[Price], [p].[StockAmount], [u].[FirstName], [u].[LastName]
+          FROM [Products] AS [p]
+          INNER JOIN [Users] AS [u] ON [p].[SellerId] = [u].[Id]
+          WHERE [p].[Name] LIKE @term_contains ESCAPE N'\' OR [u].[FirstName] + N' ' + [u].[LastName] LIKE @term_contains0 ESCAPE N'\'
+          ORDER BY [p].[CreatedAt] DESC, [p].[Id] DESC
+          OFFSET @p ROWS FETCH NEXT @p3 ROWS ONLY
+      ) AS [s]
+      INNER JOIN [Categories] AS [c] ON [s].[CategoryId] = [c].[Id]
+      ORDER BY [s].[CreatedAt] DESC, [s].[Id] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[Id], [c].[Name], [c].[Color], [c].[IconCssClass], (
+          SELECT COUNT(*)
+          FROM [Products] AS [p]
+          WHERE [p].[Enabled] = CAST(1 AS bit) AND [p].[CategoryId] = [c].[Id]) AS [ProductCount]
+      FROM [Categories] AS [c]
+      ORDER BY [c].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Users] AS [u]
+      WHERE [u].[HasSellerRequest] = CAST(1 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [u0].[Id], [u0].[FirstName] + N' ' + [u0].[LastName] AS [FullName], [u0].[Email], [r].[Name] AS [Role], [u0].[Enabled], [u0].[HasSellerRequest], [u0].[CreatedAt]
+      FROM (
+          SELECT [u].[Id], [u].[CreatedAt], [u].[Email], [u].[Enabled], [u].[FirstName], [u].[HasSellerRequest], [u].[LastName], [u].[RoleId]
+          FROM [Users] AS [u]
+          WHERE [u].[HasSellerRequest] = CAST(1 AS bit)
+          ORDER BY [u].[HasSellerRequest] DESC, [u].[FirstName], [u].[LastName]
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [u0]
+      INNER JOIN [Roles] AS [r] ON [u0].[RoleId] = [r].[Id]
+      ORDER BY [u0].[HasSellerRequest] DESC, [u0].[FirstName], [u0].[LastName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@p='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[Id], [u].[CreatedAt], [u].[Email], [u].[Enabled], [u].[FirstName], [u].[HasSellerRequest], [u].[LastName], [u].[Password], [u].[ResetPasswordToken], [u].[ResetPasswordTokenExpiresAt], [u].[RoleId]
+      FROM [Users] AS [u]
+      WHERE [u].[Id] = @p
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Name]
+      FROM [Roles] AS [r]
+      WHERE [r].[Name] = N'seller'
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@p10='?' (DbType = Int32), @p0='?' (DbType = DateTime2), @p1='?' (Size = 256), @p2='?' (DbType = Boolean), @p3='?' (Size = 50), @p4='?' (DbType = Boolean), @p5='?' (Size = 50), @p6='?' (Size = 4000), @p7='?' (Size = 64), @p8='?' (DbType = DateTime2), @p9='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      UPDATE [Users] SET [CreatedAt] = @p0, [Email] = @p1, [Enabled] = @p2, [FirstName] = @p3, [HasSellerRequest] = @p4, [LastName] = @p5, [Password] = @p6, [ResetPasswordToken] = @p7, [ResetPasswordTokenExpiresAt] = @p8, [RoleId] = @p9
+      OUTPUT 1
+      WHERE [Id] = @p10;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Users] AS [u]
+      WHERE [u].[HasSellerRequest] = CAST(1 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [u0].[Id], [u0].[FirstName] + N' ' + [u0].[LastName] AS [FullName], [u0].[Email], [r].[Name] AS [Role], [u0].[Enabled], [u0].[HasSellerRequest], [u0].[CreatedAt]
+      FROM (
+          SELECT [u].[Id], [u].[CreatedAt], [u].[Email], [u].[Enabled], [u].[FirstName], [u].[HasSellerRequest], [u].[LastName], [u].[RoleId]
+          FROM [Users] AS [u]
+          WHERE [u].[HasSellerRequest] = CAST(1 AS bit)
+          ORDER BY [u].[HasSellerRequest] DESC, [u].[FirstName], [u].[LastName]
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [u0]
+      INNER JOIN [Roles] AS [r] ON [u0].[RoleId] = [r].[Id]
+      ORDER BY [u0].[HasSellerRequest] DESC, [u0].[FirstName], [u0].[LastName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [ProductComments] AS [p]
+      WHERE [p].[IsConfirmed] = CAST(0 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [p1].[Id], [p1].[ProductId], [p0].[Name] AS [ProductName], [u].[FirstName] + N' ' + [u].[LastName] AS [UserName], [p1].[Text], [p1].[StarCount], [p1].[IsConfirmed], [p1].[CreatedAt]
+      FROM (
+          SELECT [p].[Id], [p].[CreatedAt], [p].[IsConfirmed], [p].[ProductId], [p].[StarCount], [p].[Text], [p].[UserId]
+          FROM [ProductComments] AS [p]
+          WHERE [p].[IsConfirmed] = CAST(0 AS bit)
+          ORDER BY [p].[CreatedAt] DESC
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [p1]
+      INNER JOIN [Products] AS [p0] ON [p1].[ProductId] = [p0].[Id]
+      INNER JOIN [Users] AS [u] ON [p1].[UserId] = [u].[Id]
+      ORDER BY [p1].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@p='?' (DbType = Boolean), @commentIds1='?' (DbType = Int32), @commentIds2='?' (DbType = Int32), @commentIds3='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      UPDATE [p]
+      SET [p].[IsConfirmed] = @p
+      FROM [ProductComments] AS [p]
+      WHERE [p].[Id] IN (@commentIds1, @commentIds2, @commentIds3) AND [p].[IsConfirmed] = CAST(0 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [ProductComments] AS [p]
+      WHERE [p].[IsConfirmed] = CAST(0 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [p1].[Id], [p1].[ProductId], [p0].[Name] AS [ProductName], [u].[FirstName] + N' ' + [u].[LastName] AS [UserName], [p1].[Text], [p1].[StarCount], [p1].[IsConfirmed], [p1].[CreatedAt]
+      FROM (
+          SELECT [p].[Id], [p].[CreatedAt], [p].[IsConfirmed], [p].[ProductId], [p].[StarCount], [p].[Text], [p].[UserId]
+          FROM [ProductComments] AS [p]
+          WHERE [p].[IsConfirmed] = CAST(0 AS bit)
+          ORDER BY [p].[CreatedAt] DESC
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [p1]
+      INNER JOIN [Products] AS [p0] ON [p1].[ProductId] = [p0].[Id]
+      INNER JOIN [Users] AS [u] ON [p1].[UserId] = [u].[Id]
+      ORDER BY [p1].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [s].[Id], [s].[OrderCode], [s].[c], [s].[Email], [s].[CreatedAt], [s].[c0], [s].[c1], [s].[DiscountAmount], [s].[CouponCode], [s].[Status], [s].[StatusUpdatedAt], [s].[Address], [s].[Id0], [s0].[ProductName], [s0].[Quantity], [s0].[UnitPrice], [s0].[Id], [s0].[Id0]
+      FROM (
+          SELECT TOP(1) [o].[Id], [o].[OrderCode], [u].[FirstName] + N' ' + [u].[LastName] AS [c], [u].[Email], [o].[CreatedAt], (
+              SELECT ISNULL(SUM(CAST([o0].[Quantity] AS int)), 0)
+              FROM [OrderItems] AS [o0]
+              WHERE [o].[Id] = [o0].[OrderId]) AS [c0], (
+              SELECT COALESCE(SUM([o1].[UnitPrice] * CAST([o1].[Quantity] AS decimal(18,2))), 0.0)
+              FROM [OrderItems] AS [o1]
+              WHERE [o].[Id] = [o1].[OrderId]) AS [c1], [o].[DiscountAmount], [o].[CouponCode], [o].[Status], [o].[StatusUpdatedAt], [o].[Address], [u].[Id] AS [Id0]
+          FROM [Orders] AS [o]
+          INNER JOIN [Users] AS [u] ON [o].[UserId] = [u].[Id]
+          WHERE [o].[Id] = @orderId
+      ) AS [s]
+      LEFT JOIN (
+          SELECT [p].[Name] AS [ProductName], CAST([o2].[Quantity] AS int) AS [Quantity], [o2].[UnitPrice], [o2].[Id], [p].[Id] AS [Id0], [o2].[OrderId]
+          FROM [OrderItems] AS [o2]
+          INNER JOIN [Products] AS [p] ON [o2].[ProductId] = [p].[Id]
+      ) AS [s0] ON [s].[Id] = [s0].[OrderId]
+      ORDER BY [s].[Id], [s].[Id0], [s0].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@_8__locals1_orderId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [o].[Status]
+      FROM [Orders] AS [o]
+      WHERE [o].[Id] = @_8__locals1_orderId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@p='?' (Size = 1) (DbType = Byte), @p3='?' (DbType = DateTime2), @_8__locals1_orderId='?' (DbType = Int32), @current_Value='?' (Size = 1) (DbType = Byte)], CommandType='Text', CommandTimeout='30']
+      UPDATE [o]
+      SET [o].[Status] = @p,
+          [o].[StatusUpdatedAt] = @p3
+      FROM [Orders] AS [o]
+      WHERE [o].[Id] = @_8__locals1_orderId AND [o].[Status] = @current_Value
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [s].[Id], [s].[OrderCode], [s].[c], [s].[Email], [s].[CreatedAt], [s].[c0], [s].[c1], [s].[DiscountAmount], [s].[CouponCode], [s].[Status], [s].[StatusUpdatedAt], [s].[Address], [s].[Id0], [s0].[ProductName], [s0].[Quantity], [s0].[UnitPrice], [s0].[Id], [s0].[Id0]
+      FROM (
+          SELECT TOP(1) [o].[Id], [o].[OrderCode], [u].[FirstName] + N' ' + [u].[LastName] AS [c], [u].[Email], [o].[CreatedAt], (
+              SELECT ISNULL(SUM(CAST([o0].[Quantity] AS int)), 0)
+              FROM [OrderItems] AS [o0]
+              WHERE [o].[Id] = [o0].[OrderId]) AS [c0], (
+              SELECT COALESCE(SUM([o1].[UnitPrice] * CAST([o1].[Quantity] AS decimal(18,2))), 0.0)
+              FROM [OrderItems] AS [o1]
+              WHERE [o].[Id] = [o1].[OrderId]) AS [c1], [o].[DiscountAmount], [o].[CouponCode], [o].[Status], [o].[StatusUpdatedAt], [o].[Address], [u].[Id] AS [Id0]
+          FROM [Orders] AS [o]
+          INNER JOIN [Users] AS [u] ON [o].[UserId] = [u].[Id]
+          WHERE [o].[Id] = @orderId
+      ) AS [s]
+      LEFT JOIN (
+          SELECT [p].[Name] AS [ProductName], CAST([o2].[Quantity] AS int) AS [Quantity], [o2].[UnitPrice], [o2].[Id], [p].[Id] AS [Id0], [o2].[OrderId]
+          FROM [OrderItems] AS [o2]
+          INNER JOIN [Products] AS [p] ON [o2].[ProductId] = [p].[Id]
+      ) AS [s0] ON [s].[Id] = [s0].[OrderId]
+      ORDER BY [s].[Id], [s].[Id0], [s0].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@code='?' (Size = 32)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [Coupons] AS [c]
+              WHERE [c].[Code] = @code) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@p0='?' (Size = 32), @p1='?' (DbType = DateTime2), @p2='?' (Size = 1) (DbType = Byte), @p3='?' (DbType = DateTime2), @p4='?' (Precision = 18) (Scale = 2) (DbType = Decimal), @p5='?' (DbType = DateTime2), @p6='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [Coupons] ([Code], [CreatedAt], [DiscountRate], [EndDate], [MinimumOrderTotal], [StartDate], [UsageLimit])
+      OUTPUT INSERTED.[Id], INSERTED.[Enabled], INSERTED.[UsedCount]
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Coupons] AS [c]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[Id], [c].[Code], [c].[DiscountRate], [c].[MinimumOrderTotal], [c].[StartDate], [c].[EndDate], [c].[UsageLimit], [c].[UsedCount], [c].[Enabled]
+      FROM [Coupons] AS [c]
+      ORDER BY [c].[Enabled] DESC, [c].[EndDate] DESC
+      OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [BlogComments] AS [b]
+      WHERE [b].[IsApproved] = CAST(0 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [b1].[Id], [b1].[BlogId], [b0].[Title] AS [BlogTitle], [b1].[Name], [b1].[Email], [b1].[Comment], [b1].[IsApproved], [b1].[CreatedAt]
+      FROM (
+          SELECT [b].[Id], [b].[BlogId], [b].[Comment], [b].[CreatedAt], [b].[Email], [b].[IsApproved], [b].[Name]
+          FROM [BlogComments] AS [b]
+          WHERE [b].[IsApproved] = CAST(0 AS bit)
+          ORDER BY [b].[CreatedAt] DESC
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [b1]
+      INNER JOIN [Blogs] AS [b0] ON [b1].[BlogId] = [b0].[Id]
+      ORDER BY [b1].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@p='?' (DbType = Boolean), @commentIds1='?' (DbType = Int32), @commentIds2='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      UPDATE [b]
+      SET [b].[IsApproved] = @p
+      FROM [BlogComments] AS [b]
+      WHERE [b].[Id] IN (@commentIds1, @commentIds2) AND [b].[IsApproved] = CAST(0 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [BlogComments] AS [b]
+      WHERE [b].[IsApproved] = CAST(0 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [b1].[Id], [b1].[BlogId], [b0].[Title] AS [BlogTitle], [b1].[Name], [b1].[Email], [b1].[Comment], [b1].[IsApproved], [b1].[CreatedAt]
+      FROM (
+          SELECT [b].[Id], [b].[BlogId], [b].[Comment], [b].[CreatedAt], [b].[Email], [b].[IsApproved], [b].[Name]
+          FROM [BlogComments] AS [b]
+          WHERE [b].[IsApproved] = CAST(0 AS bit)
+          ORDER BY [b].[CreatedAt] DESC
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [b1]
+      INNER JOIN [Blogs] AS [b0] ON [b1].[BlogId] = [b0].[Id]
+      ORDER BY [b1].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@request_Email='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [u].[Id], [u].[CreatedAt], [u].[Email], [u].[Enabled], [u].[FirstName], [u].[HasSellerRequest], [u].[LastName], [u].[Password], [u].[ResetPasswordToken], [u].[ResetPasswordTokenExpiresAt], [u].[RoleId], [r].[Id], [r].[CreatedAt], [r].[Name]
+      FROM [Users] AS [u]
+      INNER JOIN [Roles] AS [r] ON [u].[RoleId] = [r].[Id]
+      WHERE [u].[Email] = @request_Email
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@firstMonth='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SELECT DATEPART(year, [o].[CreatedAt]) AS [Year], DATEPART(month, [o].[CreatedAt]) AS [Month], (
+          SELECT COALESCE(SUM([o0].[UnitPrice] * CAST([o0].[Quantity] AS decimal(18,2))), 0.0)
+          FROM [OrderItems] AS [o0]
+          WHERE [o].[Id] = [o0].[OrderId]) - [o].[DiscountAmount] AS [Total]
+      FROM [Orders] AS [o]
+      WHERE [o].[Status] <> CAST(3 AS tinyint) AND [o].[CreatedAt] >= @firstMonth
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [o0].[OrderCode], [u].[FirstName] + N' ' + [u].[LastName] AS [CustomerName], [o0].[CreatedAt], (
+          SELECT ISNULL(SUM(CAST([o1].[Quantity] AS int)), 0)
+          FROM [OrderItems] AS [o1]
+          WHERE [o0].[Id] = [o1].[OrderId]) AS [ItemCount], (
+          SELECT COALESCE(SUM([o2].[UnitPrice] * CAST([o2].[Quantity] AS decimal(18,2))), 0.0)
+          FROM [OrderItems] AS [o2]
+          WHERE [o0].[Id] = [o2].[OrderId]) - [o0].[DiscountAmount] AS [Total], [o0].[Status]
+      FROM (
+          SELECT TOP(@p) [o].[Id], [o].[CreatedAt], [o].[DiscountAmount], [o].[OrderCode], [o].[Status], [o].[UserId]
+          FROM [Orders] AS [o]
+          ORDER BY [o].[CreatedAt] DESC
+      ) AS [o0]
+      INNER JOIN [Users] AS [u] ON [o0].[UserId] = [u].[Id]
+      ORDER BY [o0].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Orders] AS [o]
+      WHERE [o].[Status] <> CAST(3 AS tinyint)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COALESCE(SUM([o].[UnitPrice] * CAST([o].[Quantity] AS decimal(18,2))), 0.0)
+      FROM [OrderItems] AS [o]
+      INNER JOIN [Orders] AS [o0] ON [o].[OrderId] = [o0].[Id]
+      WHERE [o0].[Status] <> CAST(3 AS tinyint)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COALESCE(SUM([o].[DiscountAmount]), 0.0)
+      FROM [Orders] AS [o]
+      WHERE [o].[Status] <> CAST(3 AS tinyint)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Users] AS [u]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@AddDays='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Users] AS [u]
+      WHERE [u].[CreatedAt] >= @AddDays
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Products] AS [p]
+      WHERE [p].[Enabled] = CAST(1 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [ProductComments] AS [p]
+      WHERE [p].[IsConfirmed] = CAST(0 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Users] AS [u]
+      WHERE [u].[HasSellerRequest] = CAST(1 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [BlogComments] AS [b]
+      WHERE [b].[IsApproved] = CAST(0 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Orders] AS [o]
+      WHERE [o].[Status] = CAST(0 AS tinyint)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Products] AS [p]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [p0].[Id], [p0].[Name], [c].[Name] AS [CategoryName], [u].[FirstName] + N' ' + [u].[LastName] AS [SellerName], [p0].[Price], [p0].[StockAmount] AS [Stock], [p0].[Enabled], (
+          SELECT COUNT(*)
+          FROM [ProductImages] AS [p1]
+          WHERE [p0].[Id] = [p1].[ProductId]) AS [ImageCount], [p0].[CreatedAt]
+      FROM (
+          SELECT [p].[Id], [p].[CategoryId], [p].[CreatedAt], [p].[Enabled], [p].[Name], [p].[Price], [p].[SellerId], [p].[StockAmount]
+          FROM [Products] AS [p]
+          ORDER BY [p].[CreatedAt] DESC, [p].[Id] DESC
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [p0]
+      INNER JOIN [Categories] AS [c] ON [p0].[CategoryId] = [c].[Id]
+      INNER JOIN [Users] AS [u] ON [p0].[SellerId] = [u].[Id]
+      ORDER BY [p0].[CreatedAt] DESC, [p0].[Id] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[Id], [c].[Name], [c].[Color], [c].[IconCssClass], (
+          SELECT COUNT(*)
+          FROM [Products] AS [p]
+          WHERE [p].[Enabled] = CAST(1 AS bit) AND [p].[CategoryId] = [c].[Id]) AS [ProductCount]
+      FROM [Categories] AS [c]
+      ORDER BY [c].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Users] AS [u]
+      WHERE [u].[HasSellerRequest] = CAST(1 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [u0].[Id], [u0].[FirstName] + N' ' + [u0].[LastName] AS [FullName], [u0].[Email], [r].[Name] AS [Role], [u0].[Enabled], [u0].[HasSellerRequest], [u0].[CreatedAt]
+      FROM (
+          SELECT [u].[Id], [u].[CreatedAt], [u].[Email], [u].[Enabled], [u].[FirstName], [u].[HasSellerRequest], [u].[LastName], [u].[RoleId]
+          FROM [Users] AS [u]
+          WHERE [u].[HasSellerRequest] = CAST(1 AS bit)
+          ORDER BY [u].[HasSellerRequest] DESC, [u].[FirstName], [u].[LastName]
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [u0]
+      INNER JOIN [Roles] AS [r] ON [u0].[RoleId] = [r].[Id]
+      ORDER BY [u0].[HasSellerRequest] DESC, [u0].[FirstName], [u0].[LastName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [ProductComments] AS [p]
+      WHERE [p].[IsConfirmed] = CAST(0 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [p1].[Id], [p1].[ProductId], [p0].[Name] AS [ProductName], [u].[FirstName] + N' ' + [u].[LastName] AS [UserName], [p1].[Text], [p1].[StarCount], [p1].[IsConfirmed], [p1].[CreatedAt]
+      FROM (
+          SELECT [p].[Id], [p].[CreatedAt], [p].[IsConfirmed], [p].[ProductId], [p].[StarCount], [p].[Text], [p].[UserId]
+          FROM [ProductComments] AS [p]
+          WHERE [p].[IsConfirmed] = CAST(0 AS bit)
+          ORDER BY [p].[CreatedAt] DESC
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [p1]
+      INNER JOIN [Products] AS [p0] ON [p1].[ProductId] = [p0].[Id]
+      INNER JOIN [Users] AS [u] ON [p1].[UserId] = [u].[Id]
+      ORDER BY [p1].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[Id], [c].[Name], [c].[Color], [c].[IconCssClass], (
+          SELECT COUNT(*)
+          FROM [Products] AS [p]
+          WHERE [p].[Enabled] = CAST(1 AS bit) AND [p].[CategoryId] = [c].[Id]) AS [ProductCount]
+      FROM [Categories] AS [c]
+      ORDER BY [c].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Orders] AS [o]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [o0].[Id], [o0].[OrderCode], [u].[FirstName] + N' ' + [u].[LastName] AS [CustomerName], [u].[Email] AS [CustomerEmail], [o0].[CreatedAt], (
+          SELECT ISNULL(SUM(CAST([o1].[Quantity] AS int)), 0)
+          FROM [OrderItems] AS [o1]
+          WHERE [o0].[Id] = [o1].[OrderId]) AS [ItemCount], (
+          SELECT COALESCE(SUM([o2].[UnitPrice] * CAST([o2].[Quantity] AS decimal(18,2))), 0.0)
+          FROM [OrderItems] AS [o2]
+          WHERE [o0].[Id] = [o2].[OrderId]) AS [Subtotal], [o0].[DiscountAmount], [o0].[CouponCode], [o0].[Status], [o0].[StatusUpdatedAt]
+      FROM (
+          SELECT [o].[Id], [o].[CouponCode], [o].[CreatedAt], [o].[DiscountAmount], [o].[OrderCode], [o].[Status], [o].[StatusUpdatedAt], [o].[UserId]
+          FROM [Orders] AS [o]
+          ORDER BY [o].[CreatedAt] DESC, [o].[Id] DESC
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [o0]
+      INNER JOIN [Users] AS [u] ON [o0].[UserId] = [u].[Id]
+      ORDER BY [o0].[CreatedAt] DESC, [o0].[Id] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [s].[Id], [s].[OrderCode], [s].[c], [s].[Email], [s].[CreatedAt], [s].[c0], [s].[c1], [s].[DiscountAmount], [s].[CouponCode], [s].[Status], [s].[StatusUpdatedAt], [s].[Address], [s].[Id0], [s0].[ProductName], [s0].[Quantity], [s0].[UnitPrice], [s0].[Id], [s0].[Id0]
+      FROM (
+          SELECT TOP(1) [o].[Id], [o].[OrderCode], [u].[FirstName] + N' ' + [u].[LastName] AS [c], [u].[Email], [o].[CreatedAt], (
+              SELECT ISNULL(SUM(CAST([o0].[Quantity] AS int)), 0)
+              FROM [OrderItems] AS [o0]
+              WHERE [o].[Id] = [o0].[OrderId]) AS [c0], (
+              SELECT COALESCE(SUM([o1].[UnitPrice] * CAST([o1].[Quantity] AS decimal(18,2))), 0.0)
+              FROM [OrderItems] AS [o1]
+              WHERE [o].[Id] = [o1].[OrderId]) AS [c1], [o].[DiscountAmount], [o].[CouponCode], [o].[Status], [o].[StatusUpdatedAt], [o].[Address], [u].[Id] AS [Id0]
+          FROM [Orders] AS [o]
+          INNER JOIN [Users] AS [u] ON [o].[UserId] = [u].[Id]
+          WHERE [o].[Id] = @orderId
+      ) AS [s]
+      LEFT JOIN (
+          SELECT [p].[Name] AS [ProductName], CAST([o2].[Quantity] AS int) AS [Quantity], [o2].[UnitPrice], [o2].[Id], [p].[Id] AS [Id0], [o2].[OrderId]
+          FROM [OrderItems] AS [o2]
+          INNER JOIN [Products] AS [p] ON [o2].[ProductId] = [p].[Id]
+      ) AS [s0] ON [s].[Id] = [s0].[OrderId]
+      ORDER BY [s].[Id], [s].[Id0], [s0].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Coupons] AS [c]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[Id], [c].[Code], [c].[DiscountRate], [c].[MinimumOrderTotal], [c].[StartDate], [c].[EndDate], [c].[UsageLimit], [c].[UsedCount], [c].[Enabled]
+      FROM [Coupons] AS [c]
+      ORDER BY [c].[Enabled] DESC, [c].[EndDate] DESC
+      OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [BlogComments] AS [b]
+      WHERE [b].[IsApproved] = CAST(0 AS bit)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [b1].[Id], [b1].[BlogId], [b0].[Title] AS [BlogTitle], [b1].[Name], [b1].[Email], [b1].[Comment], [b1].[IsApproved], [b1].[CreatedAt]
+      FROM (
+          SELECT [b].[Id], [b].[BlogId], [b].[Comment], [b].[CreatedAt], [b].[Email], [b].[IsApproved], [b].[Name]
+          FROM [BlogComments] AS [b]
+          WHERE [b].[IsApproved] = CAST(0 AS bit)
+          ORDER BY [b].[CreatedAt] DESC
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [b1]
+      INNER JOIN [Blogs] AS [b0] ON [b1].[BlogId] = [b0].[Id]
+      ORDER BY [b1].[CreatedAt] DESC
