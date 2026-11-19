@@ -33,6 +33,9 @@ public sealed class SqliteDemoTests : IDisposable
         var context = scope.ServiceProvider.GetRequiredService<DbContext>();
         Assert.Equal(DemoData.Products.Length, await context.Set<ProductEntity>().CountAsync());
         Assert.True(await context.Set<UserEntity>().AnyAsync());
+        // Prices can be ordered and summed in SQL on SQLite too (stored as REAL there).
+        Assert.True(await context.Set<ProductEntity>().OrderByDescending(p => p.Price).Select(p => p.Price).FirstAsync() > 0);
+        Assert.True(await context.Set<ProductEntity>().SumAsync(p => p.Price) > 0);
     }
 
     [Fact]

@@ -25,6 +25,14 @@ internal class ApplicationDbContext(DbContextOptions<ApplicationDbContext> optio
     public DbSet<RelBlogTagEntity> RelBlogTags { get; set; }
     public DbSet<RelBlogCategoryEntity> RelBlogCategories { get; set; }
 
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        // SQLite (the public demo) has no decimal type: EF stores decimals as text there, which cannot be ordered,
+        // summed or range-checked. As REAL they can; prices, totals and rates stay well within its precision. SQL Server keeps decimal.
+        if (Database.IsSqlite())
+            configurationBuilder.Properties<decimal>().HaveConversion<double>();
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new UserEntityConfiguration());
