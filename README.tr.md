@@ -12,6 +12,8 @@ Yerel üreticiler için çok satıcılı pazar yeri: sepet, indirim kodu ve sipa
 
 ## Demo hesapları
 
+**Canlı demo:** [marketly-demo.onrender.com](https://marketly-demo.onrender.com). Yönetim paneli [/admin](https://marketly-demo.onrender.com/admin/) adresinde; aşağıdaki hesaplar orada da çalışır. Ücretsiz bir sunucuda, veritabanı konteynerin içinde SQLite olarak çalışıyor; her yeniden başlatmada aynı verilerle baştan açılır. Bir süre kimse açmadıysa ilk açılış bir dakika kadar sürebilir.
+
 Tüm hesapların şifresi `Demo123!`.
 
 | Rol | E-posta | Nerede |
