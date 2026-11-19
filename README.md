@@ -12,6 +12,8 @@ A multi-seller marketplace for local producers: a storefront with cart, coupons 
 
 ## Demo accounts
 
+**Live demo:** [marketly-demo.onrender.com](https://marketly-demo.onrender.com). The admin panel is at [/admin](https://marketly-demo.onrender.com/admin/), and the accounts below work there. It runs on a free server with SQLite inside the container, so every restart starts again from the same data; after a quiet spell the first visit can take about a minute.
+
 Every account uses the password `Demo123!`.
 
 | Role | E-mail | Where |
