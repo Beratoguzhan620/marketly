@@ -20,7 +20,7 @@ builder.Services.AddControllersWithViews(options =>
     messages.SetUnknownValueIsInvalidAccessor(field => $"{field} için girilen değer geçerli değil.");
 });
 
-builder.Services.AddDataLayer(builder.Configuration.GetConnectionString("SqlServer")!);
+builder.Services.AddDataLayer(builder.Configuration.GetConnectionString("SqlServer")!, builder.Configuration["Database:Provider"]);
 builder.Services.AddApplicationLayer(builder.Configuration);
 
 builder.Services

@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
 
-builder.Services.AddDataLayer(builder.Configuration.GetConnectionString("SqlServer")!);
+builder.Services.AddDataLayer(builder.Configuration.GetConnectionString("SqlServer")!, builder.Configuration["Database:Provider"]);
 builder.Services.AddApplicationLayer(builder.Configuration);
 
 builder.Services
@@ -19,6 +19,12 @@ builder.Services
     });
 
 var app = builder.Build();
+
+// The public demo serves the admin panel under /admin of the storefront's address.
+if (app.Configuration["PathBase"] is { Length: > 0 } pathBase)
+{
+    app.UsePathBase(pathBase);
+}
 
 if (!app.Environment.IsDevelopment())
 {
